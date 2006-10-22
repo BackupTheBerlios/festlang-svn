@@ -1,0 +1,16 @@
+<chapter id="bsv-corpus-ch">
+<title>Corpus developement</title>
+
+<para>
+This chapter discusses the techniques used to design a good corpus for
+recording for use in general speech synthesis.  The basic requirements
+for a speech synthesis corpus are:
+
+phonetically prosodically balanced
+targeted toward the intended domain(s)
+easy to say by voice talent without mistakes
+short enough for the voice talent to be willing to say it.
+
+</para>
+
+</chapter>
