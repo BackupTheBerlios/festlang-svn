@@ -419,6 +419,9 @@ float WImpurity::vector_impurity()
     double count = 1;
 
     a.reset();
+
+#if 1
+    /* simple distance */
     for (j=wgn_VertexTrack_start; j<=wgn_VertexTrack_end; j++)
     {
         b.reset();
@@ -430,6 +433,59 @@ float WImpurity::vector_impurity()
         a += b.stddev();
         count = b.samples();
     }
+#endif
+
+#if 0
+    /* full covariance */
+    /* worse in listening experiments */
+    EST_SuffStats **cs;
+    int mmm;
+    cs = new EST_SuffStats *[wgn_VertexTrack_end+1];
+    for (j=0; j<=wgn_VertexTrack_end; j++)
+        cs[j] = new EST_SuffStats[wgn_VertexTrack_end+1];
+    /* Find means for diagonal */
+    for (j=wgn_VertexTrack_start; j<=wgn_VertexTrack_end; j++)
+    {
+        for (pp=members.head(); pp != 0; pp=next(pp))
+            cs[j][j] += wgn_VertexTrack.a(members.item(pp),j);
+    }
+    for (j=wgn_VertexTrack_start; j<=wgn_VertexTrack_end; j++)
+        for (i=j+1; i<wgn_VertexTrack_end; i++)
+            for (pp=members.head(); pp != 0; pp=next(pp))
+            {
+                mmm = members.item(pp);
+                cs[i][j] += (wgn_VertexTrack.a(mmm,i)-cs[j][j].mean())*
+                    (wgn_VertexTrack.a(mmm,j)-cs[j][j].mean());
+            }
+    for (j=wgn_VertexTrack_start; j<=wgn_VertexTrack_end; j++)
+        for (i=j+1; i<wgn_VertexTrack_end; i++)
+            a += cs[i][j].stddev();
+    count = cs[0][0].samples();
+#endif
+
+#if 0
+    // look at mean euclidean distance between vectors 
+    EST_Litem *qq;
+    int x,y;
+    double d,q;
+    count = 0;
+    for (pp=members.head(); pp != 0; pp=next(pp))
+    {
+        x = members.item(pp);
+        count++;
+        for (qq=next(pp); qq != 0; qq=next(qq))
+        {
+            y = members.item(qq);
+            for (q=0.0,j=wgn_VertexTrack_start; j<=wgn_VertexTrack_end; j++)
+            {
+                d = wgn_VertexTrack(x,j)-wgn_VertexTrack(y,j);
+                q += d*d;
+            }
+            a += sqrt(q);
+        }
+
+    }
+#endif
 
     // This is sum of stddev*samples
     return a.mean() * count; 
@@ -746,19 +802,66 @@ ostream & operator <<(ostream &s, WImpurity &imp)
 	EST_Litem *p;
 	s << "((";
         imp.vector_impurity();
-        for (j=0; j<wgn_VertexTrack.num_channels(); j++)
+        if (wgn_vertex_output == "mean")  //output means
         {
-            b.reset();
+            for (j=0; j<wgn_VertexTrack.num_channels(); j++)
+            {
+                b.reset();
+                for (p=imp.members.head(); p != 0; p=next(p))
+                {
+                    b += wgn_VertexTrack.a(imp.members.item(p),j);
+                }
+                s << "(" << b.mean() << " " << b.stddev() << ")";
+                if (j+1<wgn_VertexTrack.num_channels())
+                    s << " ";
+            }
+        }
+        else /* output best in the cluster */
+        {
+            /* print out vector closest to center, rather than average */
+            double best = WGN_HUGE_VAL;
+            double x,d;
+            int bestp = 0;
+            EST_SuffStats *cs;
+
+            cs = new EST_SuffStats [wgn_VertexTrack_end+1];
+            
+            for (j=wgn_VertexTrack_start; j<=wgn_VertexTrack_end; j++)
+            {
+                cs[j].reset();
+                for (p=imp.members.head(); p != 0; p=next(p))
+                {
+                    cs[j] += wgn_VertexTrack.a(imp.members.item(p),j);
+                }
+            }
+
             for (p=imp.members.head(); p != 0; p=next(p))
             {
-                b += wgn_VertexTrack.a(imp.members.item(p),j);
+                for (x=0,j=wgn_VertexTrack_start; j<=wgn_VertexTrack_end; j++)
+                {
+                    d = (wgn_VertexTrack.a(imp.members.item(p),j)-cs[j].mean())
+                        /* / b.stddev() */ ;
+                    x += d*d;
+                }
+                if (x < best)
+                {
+                    bestp = imp.members.item(p);
+                    best = x;
+                }
             }
-            s << "(" << b.mean() << " " << b.stddev() << ")";
-            if (j+1<wgn_VertexTrack.num_channels())
-                s << " ";
+            for (j=0; j<wgn_VertexTrack.num_channels(); j++)
+            {
+                s << "( ";
+                s << wgn_VertexTrack.a(bestp,j);
+                s << " 0 "; // fake stddev
+                s << " ) ";
+                if (j+1<wgn_VertexTrack.num_channels())
+                    s << " ";
+            }
+
+            delete [] cs;
         }
 	s << ") ";
-	// Mean of cross product of distances (cluster score)
 	s << imp.a.mean() << ")";
     }
     else if (imp.t == wnim_trajectory)

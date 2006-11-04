@@ -162,6 +162,7 @@ static int wagon_main(int argc, char **argv)
 	 "-balance <float>  For derived stop size, if dataset at node, divided\n"+
 	 "                  by balance is greater than stop it is used as stop\n"+
 	 "                  if balance is 0 (default) always use stop as is.\n"+
+         "-vertex_output <string> Output <mean> or <best> of cluster\n"+
 	 "-held_out <int>   Percent to hold out for pruning\n"+
 	 "-heap <int> {210000}\n"+
 	 "              Set size of Lisp heap, should not normally need\n"+
@@ -199,6 +200,8 @@ static int wagon_main(int argc, char **argv)
 	wgn_float_range_split = atof(al.val("-frs"));
     if (al.present("-swopt"))
 	wgn_opt_param = al.val("-swopt");
+    if (al.present("-vertex_output"))
+	wgn_vertex_output = al.val("-vertex_output");
     if (al.present("-output") || al.present("-o"))
     {
 	if (al.present("-o"))
@@ -263,7 +266,9 @@ static int wagon_main(int argc, char **argv)
         if ((wgn_VertexTrack_start < 0) ||
             (wgn_VertexTrack_start > wgn_VertexTrack.num_channels()))
         {
-            cerr << "wagon: track_start invalid\n";
+            printf("wagon: track_start invalid: %d out of %d channels\n",
+                   wgn_VertexTrack_start,
+                   wgn_VertexTrack.num_channels());
             exit(-1);
         }
     }
@@ -274,7 +279,10 @@ static int wagon_main(int argc, char **argv)
         if ((wgn_VertexTrack_end < wgn_VertexTrack_start) ||
             (wgn_VertexTrack_end > wgn_VertexTrack.num_channels()))
         {
-            cerr << "wagon: track_endinvalid\n";
+            printf("wagon: track_end invalid: %d between start %d out of %d channels\n",
+                   wgn_VertexTrack_end,
+                   wgn_VertexTrack_start,
+                   wgn_VertexTrack.num_channels());
             exit(-1);
         }
     }

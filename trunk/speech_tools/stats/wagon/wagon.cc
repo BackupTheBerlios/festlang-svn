@@ -74,6 +74,8 @@ EST_String wgn_predictee_name = "";
 float wgn_float_range_split = 10;
 float wgn_balance = 0;
 EST_String wgn_opt_param = "";
+EST_String wgn_vertex_output = "mean";
+EST_String wgn_vertex_otype = "mean";
 
 static float do_summary(WNode &tree,WDataSet &ds,ostream *output);
 static float test_tree_float(WNode &tree,WDataSet &ds,ostream *output);

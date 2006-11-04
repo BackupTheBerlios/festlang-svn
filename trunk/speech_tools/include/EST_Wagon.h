@@ -264,6 +264,7 @@ extern EST_String wgn_predictee_name;
 extern float wgn_float_range_split;
 extern float wgn_balance;
 extern EST_String wgn_opt_param;
+extern EST_String wgn_vertex_output;
 
 #define wgn_ques_feature(X) (get_c_string(car(X)))
 #define wgn_ques_oper_str(X) (get_c_string(car(cdr(X))))
