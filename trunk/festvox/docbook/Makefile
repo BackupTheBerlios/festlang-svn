@@ -45,7 +45,7 @@ TEXT = bsv.sgml \
    lexicons.sgml machlearn.sgml markup.sgml phonetable.sgml \
    prosody.sgml require.sgml resources.sgml scheme.sgml speech.sgml \
    text.sgml unitsel.sgml usukdiphone.sgml waveform.sgml  \
-   nonenldom.sgml label.sgml
+   nonenldom.sgml label.sgml sps.sgml
 IMAGESPS = $(IMAGESPNG:.png=.eps)
 IMAGES = $(IMAGESPNG) $(IMAGESPS) 
 OTHERS = texi2docbook

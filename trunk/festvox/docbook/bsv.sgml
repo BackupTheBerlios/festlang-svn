@@ -27,6 +27,7 @@
 <!ENTITY speech SYSTEM "speech.sgml">
 <!ENTITY text SYSTEM "text.sgml">
 <!ENTITY unitsel SYSTEM "unitsel.sgml">
+<!ENTITY sps SYSTEM "sps.sgml">
 <!ENTITY usukdiphone SYSTEM "usukdiphone.sgml">
 <!ENTITY waveform SYSTEM "waveform.sgml">
 <!ENTITY label SYSTEM "label.sgml">
@@ -40,11 +41,11 @@
   <author><firstname>Kevin A.</firstname><surname>Lenzo</surname></author>
   </authorgroup>
   <copyright>
-    <year>1999-2003</year>
+    <year>1999-2006</year>
     <holder>Alan W Black &amp; Kevin A. Lenzo</holder>
   </copyright>
-  <date>2nd January 2003</date>
-  <edition>For FestVox 2.0</edition>
+  <date>12th September 2006</date>
+  <edition>For FestVox 2.1</edition>
   <affiliation>
   <address>
   Language Technologies Institute, Carnegie Mellon University and Cepstral, LLC
@@ -223,6 +224,7 @@ a set of appendices.
 &waveform;
   &diphone;
   &unitsel;
+  &sps;
 
 &label;
 &eval;
