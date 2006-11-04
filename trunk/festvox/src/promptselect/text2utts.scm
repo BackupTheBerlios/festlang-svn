@@ -52,6 +52,7 @@
   Convert textfile(s) to .data files
   Options
   -onlynice        Output only \"nice\" utterances
+  -onlynicelatin   Output only \"nice\" utterances (assume latin charset)
   -all             Output all (not just nice) utterances
   -o ofile         File to save output to (default is stdout).
   -odir <string>   Output directory
@@ -75,6 +76,7 @@
 (defvar odir ".")
 (defvar text_files '("-"))
 (defvar nice_utts_only nil)
+(defvar nice_utts_only_latin nil)
 (defvar nopunc nil)
 (defvar dbname "txt_")
 (defvar txtnum 1)
@@ -103,6 +105,9 @@
 	  (set! o (cdr o)))
 	 ((string-equal "-onlynice" (car o))
           (set! nice_utts_only t))
+	 ((string-equal "-onlynicelatin" (car o))
+          (set! nice_utts_only t)
+          (set! nice_utts_only_latin t))
 	 ((string-equal "-all" (car o))
           (set! nice_utts_only nil))
 	 ((string-equal "-nopunc" (car o))
@@ -211,13 +216,36 @@
                    (set! this_name (downcase upcase_name)))))))))
     all_ok))
 
+(define (all_in_lex words)
+  (let ((all_ok t)
+        (lname "")
+        (this_name "")
+        )
+    (while (and words all_ok)
+       (set! this_name (item.name (car words)))
+       (cond
+        ((not (lex.lookup_all this_name))
+;         (format t "word not in lex %s\n" this_name)
+         (set! all_ok nil))
+        ((string-equal lname this_name)
+;         (format t "duplicate word %s\n" this_name)
+         (set! all_ok nil))
+        (t
+         (set! lname this_name)
+         (set! words (cdr words)))))
+    all_ok))
+
 (define (nice_utt utt)
   ;; We're lying, we're checking Tokens, not words
   (set! words (utt.relation.items utt 'Token))
   (set! num_words (length words))
+;  (format t "num_words in sentence %d\n" num_words)
   (if (and (> num_words 4)
            (< num_words 10)
-           (all_in_lex_plus words))
+           (if nice_utts_only_latin
+               (all_in_lex_plus words)
+               (all_in_lex words))
+           )
       t
       nil))
 
