@@ -101,10 +101,7 @@ extern "C" {
 /* Apple OSX */
 #if defined(__APPLE__)
 #define isnanf(X) isnan(X)
-#if __APPLE_CC__ == 1809  /* Tiger */
 #define isnan(X) __isnan(X)
-extern "C" int __isnan(double);
-#endif
 #endif
 
 /* FreeBSD *and other 4.4 based systems require anything, isnanf is defined */

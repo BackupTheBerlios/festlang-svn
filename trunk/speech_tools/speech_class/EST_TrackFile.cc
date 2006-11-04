@@ -522,6 +522,7 @@ EST_read_status EST_TrackFile::load_est_ts(EST_TokenStream &ts,
 // 	}
 
 	if( ascii ){
+
 	  for (j = 0; j < num_channels; ++j){
 	    tr.a(i, j) = ts.get().Float(ok);
 	    if (!ok)

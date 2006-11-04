@@ -58,10 +58,7 @@ typedef int socklen_t;
 typedef int socklen_t;
 #endif
 
-#if defined(__APPLE__)
-#if __APPLE_CC__ != 1809  /* not Tiger */
-typedef int socklen_t;
-#endif
+#if defined(__APPLE__) 
 #endif
 
 #if defined(__CYGWIN__) &&  __GNUC__ < 3
