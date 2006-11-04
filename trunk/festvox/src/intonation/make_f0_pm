@@ -89,7 +89,7 @@ do
   $ESTDIR/bin/ch_wave -scaleN 0.9 wav/$fname.wav -F 16000 |
   $ESTDIR/bin/pitchmark -o pm_unfilled/$fname.pm -otype est $PM_ARGS $F0_ARGS
 
-  $FESTVOXDIR/src/general/smooth_f0 -o f0/$fname.f0 -pm_input -pm_min_f0 70 -otype ssff pm_unfilled/$fname.pm -lab lab/$fname.lab -silences $SILENCE -interpolate -postsmooth -postwindow 0.025
+  $FESTVOXDIR/src/general/smooth_f0 -o f0/$fname.f0 -pm_input -pm_min_f0 $F0MIN -otype ssff pm_unfilled/$fname.pm -lab lab/$fname.lab -silences $SILENCE -interpolate -postsmooth -postwindow 0.025
 done
 
 

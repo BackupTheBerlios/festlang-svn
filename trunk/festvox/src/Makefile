@@ -36,7 +36,7 @@
 TOP=..
 DIRNAME=src
 BUILD_DIRS = general diphones eval promptselect vc ehmm
-ALL_DIRS= db_example intonation duration unitsel \
+ALL_DIRS= db_example intonation duration unitsel clustergen \
           ldom vox_diphone vox_files prosody st lts hts_build $(BUILD_DIRS)
 FILES = Makefile 
 

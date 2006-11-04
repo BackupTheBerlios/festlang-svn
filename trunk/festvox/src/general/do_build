@@ -59,7 +59,7 @@ fi
 
 if [ $# = 0 ]
 then
-   $0 setup $*
+#   $0 setup $*
    # import prompt list
    $0 build_prompts
    # import/record waveform files

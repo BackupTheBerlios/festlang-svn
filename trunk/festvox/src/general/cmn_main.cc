@@ -42,23 +42,24 @@
 static void find_meanstd(EST_Track &ss, EST_StrList &files);
 static void cep_normalize(EST_Track &tt, const EST_Track &ss, EST_Relation &rr);
 
-#define num_phones 43
+#define num_phones 44
 const char *phonetab [num_phones] = {
-     "aa", "ae", "ah", "ao", "aw", "ax", "ay", "b", "ch", "d", "dh",
-    "eh", "er", "ey", "f", "g", "h#", "ih", "iy",
-    "jh", "k", "l", "m", "n", "ng", "ow", "oy", "p", "pau", "r", "s", 
-    "sh", "t",
-     "th", "uh", "uw", "v", "w", "y", "z", "zh", "other", NULL };
+    "other", "aa", "ae", "ah", "ao", "aw", "ax", "ay", "b", "ch", 
+    "d", "dh", "eh", "er", "ey", "f", "g", "hh", "ih", "iy",
+    "jh", "k", "l", "m", "n", "ng", "ow", "oy", "p", "pau", 
+    "r", "s", "sh", "t", "th", "uh", "uw", "v", "w", "y", 
+    "z", "zh", "ssil", NULL };
 
 static int get_phone_id(const char* phone)
 {
     int i;
 
-    for (i=0; phonetab[i]; i++)
+    for (i=1; phonetab[i]; i++)
 	if (streq(phone,phonetab[i]))
 	    return i;
 
-    return i;
+    printf("treating %s as other\n",phone);
+    return 0;
 }
 
 int main(int argc,char **argv)
@@ -71,7 +72,7 @@ int main(int argc,char **argv)
 
     parse_command_line
 	(argc,argv,
-	 EST_String("[options] mcep/*.mcep")+
+	 EST_String("[options] mcep/*.mcep\n")+
 	 "Summary: find (and apply) phone based means/stddev for \n"+
          "         cepstral normalization.  Outputs to nmcep/\n"+
 	 "-h        Options help\n",
@@ -99,6 +100,7 @@ static void find_meanstd(EST_Track &ss, EST_StrList &files)
     // Find means and stddev for each coefficient
     int i,j;
     float v;
+    FILE *fd;
     EST_Litem *p;
     EST_Track tt;
     EST_Item *s;
@@ -123,14 +125,16 @@ static void find_meanstd(EST_Track &ss, EST_StrList &files)
     {
 	tt.load(files(p));
 	lll = EST_String("lab/")+basename(files(p)).before(".")+".lab";
-	printf("%s\n",(const char *)lll);
+        /*	printf("%s\n",(const char *)lll); */
 	rr.clear();
 	rr.load(lll);
 	phoneid = get_phone_id("pau");
 	for (s=rr.head(),i=0; i<tt.num_frames(); i++)
 	{
 /*	    printf("%s %f %f\n", phonetab[phoneid], s->F("end"),tt.t(i)); */
-	    for (j=0; j<tt.num_channels(); j++)
+            if (tt.a_no_check(i,0) > 0) /* F0 */
+                sstable[phoneid][0] += tt.a_no_check(i,0);
+	    for (j=1; j<tt.num_channels(); j++)
 	    {
 		v = tt.a_no_check(i,j);
 		if (!finite(v))   // sigh, better safe that sorry
@@ -148,25 +152,28 @@ static void find_meanstd(EST_Track &ss, EST_StrList &files)
 	}
     }
 
+    fd = fopen("etc/phone.cmn","wb");
     ss.resize(2*num_phones,tt.num_channels());
-    for (i=0; i<num_phones; i++)
+    for (i=0; phonetab[i]; i++)
     {
-	printf("%s\n",phonetab[i]);
+	fprintf(fd,"%s ",phonetab[i]);
 	for (j=0; j<ss.num_channels(); j++)
 	{
-	    printf("%d %f %f\n",j,sstable[i][j].mean(), 
+	    fprintf(fd,"%f %f ",sstable[i][j].mean(), 
 		   sstable[i][j].stddev());
 	    ss.a_no_check((i*2)+0,j) = sstable[i][j].mean();
 	    ss.a_no_check((i*2)+1,j) = sstable[i][j].stddev();
 	}
+        fprintf(fd,"\n");
 	delete [] sstable[i];
     }
     delete [] sstable;
+    fclose(fd);
 }
 
 static void cep_normalize(EST_Track &tt, const EST_Track &ss, EST_Relation &rr)
 {
-    // Normalize coefficeints in tt from means and stddevs in ss
+    // Normalize coefficients in tt from means and stddevs in ss
     int i,j;
     EST_Item *s;
     int phoneid;
@@ -182,12 +189,13 @@ static void cep_normalize(EST_Track &tt, const EST_Track &ss, EST_Relation &rr)
     s = rr.head();
     for (i=0; i < tt.num_frames(); i++)
     {
-/*	printf("%s %f %f\n", phonetab[phoneid], s->F("end"),tt.t(i)); */
-	for (j=0; j < tt.num_channels(); j++)
+        if (tt.a_no_check(i,0) > 0) /* F0 */
+	    tt.a_no_check(i,0) = 10 + 
+		(tt.a_no_check(i,0) - 
+		 ss.a_no_check((phoneid*2)+0,0)) / 
+		ss.a_no_check((phoneid*2)+1,0);
+	for (j=1; j < tt.num_channels(); j++)
 	{
-//	    printf("i %d j %d\n",i,j);
-//	    printf("tt(i,j) %f ss.mean %f ss.stddev %f\n",
-//		   tt.a_no_check(i,j),ss.a_no_check(0,j),ss.a_no_check(1,j));
 	    tt.a_no_check(i,j) = 
 		(tt.a_no_check(i,j) - 
 		 ss.a_no_check((phoneid*2)+0,j)) / 

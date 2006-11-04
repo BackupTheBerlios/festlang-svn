@@ -172,6 +172,7 @@ int main(int argc,char **argv)
 	    if ((item == 0) ||
 		(item->name() == silences) ||
 		(item->name() == "h#")  ||
+		(item->name() == "ssil")  ||
 		(item->name() == "H#"))
 		spsil.a(i) = 0;
 	    else

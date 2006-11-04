@@ -76,7 +76,7 @@ fi
 if [ "$1" = "traintest" ]
 then
    echo "Split into training and test sets"
-   traintest lts_scratch/lex.align
+   $FESTVOXDIR/src/general/traintest lts_scratch/lex.align
    $FESTIVAL -b --heap 10000000 allowables.scm lts_scratch/lex-pl-tablesp.scm '(begin
       (build-feat-file "lts_scratch/lex.align.train" "lts_scratch/lex.feats.train"))'
 fi

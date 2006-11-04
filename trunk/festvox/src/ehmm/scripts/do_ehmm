@@ -47,6 +47,16 @@ fi
 
 export EHMMDIR=$FESTVOXDIR/src/ehmm
 
+if [ "$PROMPTFILE" = "" ]
+then
+   if [ $# = 2 ]
+   then
+      PROMPTFILE=$2
+   else
+      PROMPTFILE=etc/txt.done.data
+   fi
+fi
+
 . etc/voice.defs
 
 if [ $# = 0 ]
@@ -83,7 +93,7 @@ fi
 if [ "$1" = "phseq" ]
 then
     echo "EHMM extract phone sequences and base hmm state numbers"
-    $ESTDIR/../festival/bin/festival -b $EHMMDIR/bin/phseq.scm '(phseq "etc/txt.done.data" "ehmm/etc/txt.phseq.data")'
+    $ESTDIR/../festival/bin/festival -b $EHMMDIR/bin/phseq.scm '(phseq "'$PROMPTFILE'" "ehmm/etc/txt.phseq.data")'
     perl $EHMMDIR/bin/phfromutt.pl ehmm/etc/txt.phseq.data ehmm/etc/ph_list 5
     perl $EHMMDIR/bin/getwavlist.pl ehmm/etc/txt.phseq.data ehmm/etc/mywavelist
 fi
@@ -166,7 +176,7 @@ then
               printf("  else\n");
               printf("     printf(\"%%s 125 %%d %%s\\n\",$1,statenamemap[$3],statename[$3])\n");
               printf("}\n");}' >etc/mapstatenames.awk
-   cat etc/txt.done.data |
+   cat $PROMPTFILE |
    awk '{print $2}' |
    while read x
    do
