@@ -31,15 +31,22 @@
 ##                                                                       ##
 ###########################################################################
 ##                                                                       ##
-##  Basic voice skeleton files                                           ##
+##  Basic voice skeleton files for Spanish                               ##
 ##                                                                       ##
 ###########################################################################
-TOP=../..
-DIRNAME=src/vox_files
+TOP=../../..
+DIRNAME=src/vox_files/es
 BUILD_DIRS = 
-ALL_DIRS= us general uk prompts es
+ALL_DIRS= 
 
-FILES = Makefile speaker.licence
+SCHEMEFILES = INST_es_VOX_duration.scm INST_es_VOX_durdata.scm \
+              INST_es_VOX_f0model.scm INST_es_VOX_intonation.scm \
+              INST_es_VOX_lexicon.scm INST_es_VOX_lexicon_mex.scm \
+              INST_es_VOX_other.scm INST_es_VOX_phoneset.scm \
+              INST_es_VOX_phoneset_mex.scm INST_es_VOX_phrasing.scm \
+              INST_es_VOX_tagger.scm INST_es_VOX_tokenizer.scm
+
+FILES = Makefile $(SCHEMEFILES)
 
 ALL = 
 
