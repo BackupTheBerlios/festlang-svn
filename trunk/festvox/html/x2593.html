@@ -2,21 +2,24 @@
 <HTML
 ><HEAD
 ><TITLE
->Building Synthetic Voices</TITLE
+>Defining a diphone voice</TITLE
 ><META
 NAME="GENERATOR"
 CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
 REL="HOME"
 TITLE="Building Synthetic Voices"
 HREF="book1.html"><LINK
+REL="UP"
+TITLE="Diphone databases"
+HREF="c2261.html"><LINK
 REL="PREVIOUS"
-TITLE="Extracting features from utterances"
-HREF="x688.html"><LINK
+TITLE="Building LPC parameters"
+HREF="x2557.html"><LINK
 REL="NEXT"
-TITLE="Basic Requirements"
-HREF="c714.html"></HEAD
+TITLE="Checking and correcting diphones"
+HREF="x2599.html"></HEAD
 ><BODY
-CLASS="PART"
+CLASS="SECT1"
 BGCOLOR="#FFFFFF"
 TEXT="#000000"
 LINK="#0000FF"
@@ -42,7 +45,7 @@ WIDTH="10%"
 ALIGN="left"
 VALIGN="bottom"
 ><A
-HREF="x688.html"
+HREF="x2557.html"
 ACCESSKEY="P"
 >&#60;&#60;&#60; Previous</A
 ></TD
@@ -50,13 +53,13 @@ ACCESSKEY="P"
 WIDTH="80%"
 ALIGN="center"
 VALIGN="bottom"
-></TD
+>Diphone databases</TD
 ><TD
 WIDTH="10%"
 ALIGN="right"
 VALIGN="bottom"
 ><A
-HREF="c714.html"
+HREF="x2599.html"
 ACCESSKEY="N"
 >Next &#62;&#62;&#62;</A
 ></TD
@@ -66,93 +69,32 @@ ACCESSKEY="N"
 ALIGN="LEFT"
 WIDTH="100%"></DIV
 ><DIV
-CLASS="PART"
-><A
-NAME="BSV-BSV-PART"
-></A
-><DIV
-CLASS="TITLEPAGE"
+CLASS="SECT1"
 ><H1
-CLASS="TITLE"
->II. Building Synthetic Voices</H1
-><DIV
-CLASS="PARTINTRO"
+CLASS="SECT1"
 ><A
-NAME="AEN712"
-></A
+NAME="AEN2593"
+>Defining a diphone voice</A
+></H1
 ><P
-></P
-></DIV
-><DIV
-CLASS="TOC"
-><DL
-><DT
-><B
->Table of Contents</B
-></DT
-><DT
-><A
-HREF="c714.html"
->Basic Requirements</A
-></DT
-><DT
-><A
-HREF="c941.html"
->Limited domain synthesis</A
-></DT
-><DT
-><A
-HREF="c1189.html"
->Text analysis</A
-></DT
-><DT
-><A
-HREF="c1379.html"
->Lexicons</A
-></DT
-><DT
-><A
-HREF="c1637.html"
->Building prosodic models</A
-></DT
-><DT
-><A
-HREF="c2174.html"
->Corpus developement</A
-></DT
-><DT
-><A
-HREF="c2236.html"
->Waveform Synthesis</A
-></DT
-><DT
-><A
-HREF="c2261.html"
->Diphone databases</A
-></DT
-><DT
-><A
-HREF="c2641.html"
->Unit selection databases</A
-></DT
-><DT
-><A
-HREF="c3170.html"
->Statistical Parametric Synthesis</A
-></DT
-><DT
-><A
-HREF="c3245.html"
->Labeling Speech</A
-></DT
-><DT
-><A
-HREF="c3364.html"
->Evaluation and Improvements</A
-></DT
-></DL
-></DIV
-></DIV
+>The easiest way to define a voice is to start from the skeleton scheme
+files distributed. For English voices see <A
+HREF="c3610.html"
+>the Chapter called <I
+>US/UK English Diphone Synthesizer</I
+></A
+>, and for non-English voices see
+<A
+HREF="c3447.html"
+>the Chapter called <I
+>A Japanese Diphone Voice</I
+></A
+> for detailed walkthroughs.</P
+><P
+>Although in many cases you'll want to modify these files (sometimes quite 
+substantially), the basic skeleton files will give you a good grounding, 
+and they follow some basic conventions of voice files that will make it 
+easier to integrate your voice into the Festival system. </P
 ></DIV
 ><DIV
 CLASS="NAVFOOTER"
@@ -170,7 +112,7 @@ WIDTH="33%"
 ALIGN="left"
 VALIGN="top"
 ><A
-HREF="x688.html"
+HREF="x2557.html"
 ACCESSKEY="P"
 >&#60;&#60;&#60; Previous</A
 ></TD
@@ -188,7 +130,7 @@ WIDTH="33%"
 ALIGN="right"
 VALIGN="top"
 ><A
-HREF="c714.html"
+HREF="x2599.html"
 ACCESSKEY="N"
 >Next &#62;&#62;&#62;</A
 ></TD
@@ -198,17 +140,21 @@ ACCESSKEY="N"
 WIDTH="33%"
 ALIGN="left"
 VALIGN="top"
->Extracting features from utterances</TD
+>Building LPC parameters</TD
 ><TD
 WIDTH="34%"
 ALIGN="center"
 VALIGN="top"
->&nbsp;</TD
+><A
+HREF="c2261.html"
+ACCESSKEY="U"
+>Up</A
+></TD
 ><TD
 WIDTH="33%"
 ALIGN="right"
 VALIGN="top"
->Basic Requirements</TD
+>Checking and correcting diphones</TD
 ></TR
 ></TABLE
 ></DIV
