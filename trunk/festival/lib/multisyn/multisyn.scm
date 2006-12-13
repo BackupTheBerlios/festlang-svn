@@ -46,6 +46,7 @@
 ;; parameter.  (This should be set to the current voice object)
 (defvar currentMultiSynVoice nil)
 (defvar relp t)
+(defvar flattenVoice nil)
 
 ; extract utt list from a .data file
 (define (load_utt_list filename)
@@ -117,11 +118,14 @@ l))
 Create the fuction definitions to load and unload a voice."
   (let ((voice_name (string-append "voice_" name))
 	(free_name (string-append "free_voice_" name))
+	(pre_config_function (string-append config_function "_pre"))
 	(voice_variable (upcase (string-append "voice_" name))))
 
     (eval (list 'defvar (intern voice_variable) nil))
 
     (eval (list 'define (list (intern voice_name))
+		(list 'if (intern pre_config_function)
+		      (list (intern pre_config_function) (intern voice_variable)))
 		(list 'if (list 'null (intern voice_variable))
 		      (list 'set! (intern voice_variable)
 			    (list 'multisyn_load_voice_modules
@@ -160,7 +164,9 @@ Add voice modules to a voice."
 	   (voice.addModule voice utt_list dirs srate))))
    module_list)
   (voice.setName voice name)
-  (du_voice.setTargetCost voice t)
+  (if flattenVoice 
+      (du_voice.setTargetCost voice "flat")
+      (du_voice.setTargetCost voice t))
   (du_voice.setJoinCost voice t)
   (format t "Please wait: Initialising multisyn voice.\n")
   (voice.init voice)
@@ -169,6 +175,8 @@ Add voice modules to a voice."
   (du_voice.set_pruning_beam voice 0.25)
   (du_voice.setDiphoneBackoff voice backoff_rules)
   voice))
+
+
 
 
 (define (define_current_voice_reset)

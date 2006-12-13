@@ -134,10 +134,15 @@ static LISP FT_voice_set_name(LISP l_voice, LISP l_name)
   return NIL;
 }
 
-static LISP FT_voice_init( LISP l_voice )
+static LISP FT_voice_init( LISP l_voice, LISP l_ignore_bad_tag )
 {
   VoiceBase *v = voice( l_voice );
-  v->initialise();
+
+  bool ignore_bad_tag = false;
+  if( l_ignore_bad_tag != NIL )
+    ignore_bad_tag = true;
+  
+  v->initialise( ignore_bad_tag  );
   return NIL;
 }
 
@@ -598,9 +603,11 @@ void festival_MultiSyn_init(void)
     argument DATADIRS and adds it to the current voice. The voice waveform data\n\
     files are sampled at SAMPLERATE." );
     
-  init_subr_1("voice.init", FT_voice_init,
-  "(voice.init VOICE)\n\
-    Perform any necessary initialisation for the UnitSelection Voice object VOICE.");
+  init_subr_2("voice.init", FT_voice_init,
+  "(voice.init VOICE IGNORE_BAD)\n\
+    Perform any necessary initialisation for the UnitSelection Voice object VOICE.\n\
+    If optional IGNORE_BAD is not nil, then phones marked with a \"bad\" feature\n\
+    in the segment relation will not be added to the diphone inventory" );
 
   init_subr_2("voice.getUtteranceByFileID", FT_voice_getUtteranceByFileID,
   "(voice.getUtteranceByFileID VOICE FILEIDSTRING)\n\

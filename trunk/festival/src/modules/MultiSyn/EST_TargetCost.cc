@@ -50,7 +50,7 @@
 #include "EST_TargetCost.h"
 #include "siod.h"
 
-static const EST_String simple_pos(const EST_String s);
+static const EST_String simple_pos(const EST_String &s);
 static const EST_Utterance *tc_get_utt(const EST_Item *seg);
 static const EST_Item* tc_get_syl(const EST_Item *seg);
 static const EST_Item* tc_get_word(const EST_Item *seg);
@@ -87,8 +87,8 @@ float EST_TargetCost::apml_accent_cost() const
   EST_String targ_accent, cand_accent, targ_boundary, cand_boundary;
 
 
-  if( ph_is_vowel(targ->S("name")) && 
-      !ph_is_silence(targ->S("name")) )
+  if( ph_is_vowel(targ->features().val("name").String()) && 
+      !ph_is_silence(targ->features().val("name").String()) )
     {
       tsyl = tc_get_syl(targ);
       csyl = tc_get_syl(cand);
@@ -107,8 +107,8 @@ float EST_TargetCost::apml_accent_cost() const
 	return 1.0;
     }
 
-  if( ph_is_vowel(targ->next()->S("name")) && 
-      !ph_is_silence(targ->next()->S("name")) )
+  if( ph_is_vowel(targ->next()->features().val("name").String()) && 
+      !ph_is_silence(targ->next()->features().val("name").String()) )
     {
       tsyl = tc_get_syl(targ->next());
       csyl = tc_get_syl(cand->next());
@@ -138,8 +138,8 @@ float EST_TargetCost::stress_cost() const
   int targ_stress;
   const EST_Item *tsyl, *csyl;
 
-  if( ph_is_vowel(targ->S("name")) && 
-      !ph_is_silence(targ->S("name")) )
+  if( ph_is_vowel(targ->features().val("name").String()) && 
+      !ph_is_silence(targ->features().val("name").String()) )
     {
       tsyl = tc_get_syl(targ);
       csyl = tc_get_syl(cand);
@@ -162,8 +162,8 @@ float EST_TargetCost::stress_cost() const
 	}
     }
   
-  if( ph_is_vowel(targ->next()->S("name")) &&
-      !ph_is_silence(targ->next()->S("name")) )
+  if( ph_is_vowel(targ->next()->features().val("name").String()) &&
+      !ph_is_silence(targ->next()->features().val("name").String()) )
     {
       tsyl = tc_get_syl(targ->next());
       csyl = tc_get_syl(cand->next());
@@ -263,7 +263,7 @@ float EST_TargetCost::position_in_phrase_cost() const
   if (!targ_word || !cand_word)
     return 1;
 
-  return (targ_word->S("pbreak") == cand_word->S("pbreak")) ? 0 : 1;
+  return (targ_word->features().val("pbreak").String() == cand_word->features().val("pbreak").String()) ? 0 : 1;
 }
 
 float EST_TargetCost::punctuation_cost() const
@@ -280,8 +280,8 @@ float EST_TargetCost::punctuation_cost() const
     score += 0.5;
   else
     if (targ_word && cand_word)
-      if ( parent(targ_word,"Token")->S("punc","NONE")
-	   != parent(cand_word,"Token")->S("punc","NONE") )
+      if ( parent(targ_word,"Token")->features().val("punc","NONE").String()
+	   != parent(cand_word,"Token")->features().val("punc","NONE").String() )
 	score += 0.5;
   
 
@@ -289,8 +289,8 @@ float EST_TargetCost::punctuation_cost() const
     score += 0.5;
   else
     if(next_targ_word && next_cand_word)
-      if ( parent(next_targ_word,"Token")->S("punc","NONE")
-	   != parent(next_cand_word,"Token")->S("punc","NONE") )
+      if ( parent(next_targ_word,"Token")->features().val("punc","NONE").String()
+	   != parent(next_cand_word,"Token")->features().val("punc","NONE").String() )
 	score += 0.5;
   
 
@@ -310,8 +310,8 @@ float EST_TargetCost::partofspeech_cost() const
   if(!targ_left_word || !cand_left_word)
     return 1;
 
-  const EST_String targ_left_pos  = simple_pos(targ_left_word->S("pos"));
-  const EST_String cand_left_pos  = simple_pos(cand_left_word->S("pos"));
+  const EST_String targ_left_pos( simple_pos(targ_left_word->features().val("pos").String()) );
+  const EST_String cand_left_pos( simple_pos(cand_left_word->features().val("pos").String()) );
 
   if( targ_left_pos != cand_left_pos )
     return 1;
@@ -325,8 +325,8 @@ float EST_TargetCost::partofspeech_cost() const
   if(!targ_right_word || !cand_right_word)
     return 1;
 
-  const EST_String targ_right_pos = simple_pos(targ_right_word->S("pos"));
-  const EST_String cand_right_pos = simple_pos(cand_right_word->S("pos"));
+  const EST_String targ_right_pos( simple_pos(targ_right_word->features().val("pos").String()) );
+  const EST_String cand_right_pos( simple_pos(cand_right_word->features().val("pos").String()) );
 
   if( targ_right_pos != cand_right_pos )
     return 1;
@@ -345,7 +345,7 @@ float EST_TargetCost::left_context_cost() const
   if ( !targ_context  || !cand_context)
     return 1;
 
-  return (targ_context->S("name") == cand_context->S("name")) ? 0 : 1;
+  return (targ_context->features().val("name").String() == cand_context->features().val("name").String()) ? 0 : 1;
 }
 
 float EST_TargetCost::right_context_cost() const
@@ -359,7 +359,7 @@ float EST_TargetCost::right_context_cost() const
   if ( !targ_context  || !cand_context)
     return 1;
   
-  return (targ_context->S("name") == cand_context->S("name")) ? 0 : 1;
+  return (targ_context->features().val("name").String() == cand_context->features().val("name").String()) ? 0 : 1;
 }
 
 float EST_TargetCost::bad_duration_cost() const
@@ -387,15 +387,16 @@ float EST_TargetCost::bad_duration_cost() const
   return 0.0;
 }
 
-//////////////////////////////////////////////////////////////////////
-// (Should be fixed not to have hardcoded FVector indicies)
 float EST_TargetCost::bad_f0_cost() const
 {
+  // by default, the last element of join cost coef vector is
+  // the f0 (i.e. fv->a_no_check( fv->n()-1 ) )
+
   const EST_Item *cand_left = cand;
   const EST_Item *cand_right = cand_left->next();
 
-  EST_String left_phone(  cand_left->S("name")  );
-  EST_String right_phone( cand_right->S("name") );  
+  const EST_String &left_phone(  cand_left->features().val("name").String()  );
+  const EST_String &right_phone( cand_right->features().val("name").String() );  
 
   EST_FVector *fv = 0;
   float penalty = 0.0;
@@ -405,7 +406,7 @@ float EST_TargetCost::bad_f0_cost() const
       || ph_is_liquid( left_phone )
       || ph_is_nasal( left_phone ) ){
     fv = fvector( cand_left->f("midcoef") );
-    if( (*fv)[13] == -1.0 ) // means unvoiced
+    if( fv->a_no_check(fv->n()-1) == -1.0 ) // means unvoiced
       penalty += 0.5;
   }
   
@@ -414,7 +415,7 @@ float EST_TargetCost::bad_f0_cost() const
       || ph_is_liquid( right_phone )
       || ph_is_nasal( right_phone ) ){
     fv = fvector( cand_right->f("midcoef") );
-    if( (*fv)[13] == -1.0 ) // means unvoiced 
+    if( fv->a_no_check(fv->n()-1) == -1.0 ) // means unvoiced 
       penalty += 0.5;
   }
 
@@ -664,7 +665,7 @@ float EST_SchemeTargetCost::operator()( const EST_Item* targ, const EST_Item* ca
  */
 
 
-static const EST_String simple_pos(const EST_String s)
+static const EST_String simple_pos(const EST_String &s)
 {
   if( s == "nn" || s == "nnp" || s == "nns" || s == "nnps" || s == "fw" || s == "sym" || s == "ls")
     return "n";

@@ -77,16 +77,30 @@ typedef EST_TList<EST_Item*> ItemList;
 SIOD_REGISTER_CLASS_DCLS(du_voicemodule,DiphoneVoiceModule)
 VAL_REGISTER_CLASS_DCLS(du_voicemodule,DiphoneVoiceModule)
 
-// following is only necessary to put a candidate's voice module
-// parent in candidate->name (which is EST_Val)
-// i.e. yet another temporary hack
-class DiphoneVoiceModulePtr {
+// following is necessary to make some of a candidate's information
+// available in a faster way that EST_Item feature lookups (critically
+// the join cost coefficients EST_FVectors for example)
+// i.e. yet another temporary hack... (would be better if EST_viterbi
+// code allowed other things apart from just EST_Item* in order to 
+// perform the search)
+class DiphoneCandidate {
 public:
-  DiphoneVoiceModulePtr( const DiphoneVoiceModule *p ) : ptr( p ) {};
-  const DiphoneVoiceModule *ptr;
+  DiphoneCandidate( const EST_Item *phone1,
+		    const DiphoneVoiceModule *p,
+		    const EST_FVector *left,
+		    const EST_FVector *right ) 
+    : ph1(phone1), dvm( p ), l_coef(left), r_coef(right),
+    ph1_jccid(-1), ph1_jccindex(-1), ph2_jccid(-1), ph2_jccindex(-1){};
+
+  const EST_Item *ph1;
+  const DiphoneVoiceModule *dvm;
+  const EST_FVector *l_coef;
+  const EST_FVector *r_coef;
+  int ph1_jccid, ph1_jccindex;
+  int ph2_jccid, ph2_jccindex;
 };
 
-VAL_REGISTER_CLASS_DCLS(diphonevoicemoduleptr,DiphoneVoiceModulePtr)
+VAL_REGISTER_CLASS_DCLS(diphonecandidate,DiphoneCandidate)
 
 class DiphoneVoiceModule : public VoiceModuleBase {
 public:
@@ -103,7 +117,7 @@ public:
 
   virtual ~DiphoneVoiceModule();
 
-  virtual void initialise(const EST_TargetCost *tc);
+  virtual void initialise(const EST_TargetCost *tc, bool ignore_bad_tag=false );
   virtual unsigned int numModuleUnits() const;
   virtual unsigned int numUnitTypes() const;
   virtual unsigned int numAvailableCandidates( const EST_String &unit ) const;
@@ -130,6 +144,8 @@ public:
 // 					    EST_VTCandidate *head,
 // 					    EST_VTCandidate *tail ) const;
 
+
+
   int getCandidateList( const EST_Item& target, 
 			const EST_TargetCost *tc,
 			const TCDataHash *tcdh,
@@ -150,7 +166,7 @@ private:
   void flatPack( EST_Relation *segs, const EST_TargetCost *tc) const;
 
   void addCoefficients( EST_Relation *segs, const EST_Track& coefs );
-  void addToCatalogue( const EST_Utterance *utt, int *num_ignored ); 
+  void addToCatalogue( const EST_Utterance *utt, int *num_ignored, bool ignore_bad=false ); 
   void getDiphone( const EST_Item *phone1, 
 		   EST_Track* coef, EST_Wave* sig, int* midframe,
 		   bool extendLeft=0, bool extendRight=0 ) const;

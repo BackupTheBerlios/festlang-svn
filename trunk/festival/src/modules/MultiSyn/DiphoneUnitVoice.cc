@@ -149,7 +149,7 @@ DiphoneUnitVoice::DiphoneUnitVoice( const EST_StrList& basenames,
   diphone_backoff_rules = 0;
 }
 
-void DiphoneUnitVoice::initialise()
+void DiphoneUnitVoice::initialise( bool ignore_bad_tag )
 {
   if( jc == 0 )
     EST_error( "Need to set join cost calculator for voice" );
@@ -160,7 +160,7 @@ void DiphoneUnitVoice::initialise()
   EST_TList<DiphoneVoiceModule*>::Entries it;
   
   for( it.begin(voiceModules); it; it++ )
-    (*it)->initialise(tc);
+    (*it)->initialise( tc, ignore_bad_tag );
 }
 
 bool DiphoneUnitVoice::addVoiceModule( const EST_StrList& basenames,
@@ -258,7 +258,9 @@ void DiphoneUnitVoice::getDiphone( const EST_VTCandidate *cand,
   // synthesis parameters.  In future, it will work that way ;)
 
   // put there by DiphoneVoiceModule::getCandidateList
-  const DiphoneVoiceModule* parentModule = (diphonevoicemoduleptr( cand->name ))->ptr;  
+  const DiphoneCandidate *diphcand = diphonecandidate( cand->name );
+
+  const DiphoneVoiceModule* parentModule = diphcand->dvm;  
   EST_Item *firstPhoneInDiphone = cand->s;
 
   // need to call right getDiphone to do the actual work
@@ -293,9 +295,13 @@ void DiphoneUnitVoice::fillUnitRelation( EST_Relation *units, const EST_VTPath *
     //have to recalculate join cost as it's not currently saved anywhere
     if( path->from == 0 )
       it->set( "join_cost", 0.0);
-    else
+    else{
       // join cost between right edge of left diphone and vice versa
-      it->set( "join_cost", (*jc)( path->from->c->s->next(), path->c->s ) );
+      const DiphoneCandidate *l_diph = diphonecandidate(path->from->c->name);
+      const DiphoneCandidate *r_diph = diphonecandidate(path->c->name);
+
+      it->set( "join_cost", (*jc)( l_diph, r_diph ) );
+    }
   } 
 }
 
@@ -303,6 +309,29 @@ void DiphoneUnitVoice::fillUnitRelation( EST_Relation *units, const EST_VTPath *
 // necessary because the decoder as it stands at present can only take a function pointer 
 // (would be better to relax this restriction in the EST_Viterbi_Decoder class, or in a 
 // replacement class, rather than using this hack)
+// static EST_VTPath* extendPath( EST_VTPath *p, EST_VTCandidate *c,
+// 	 		       EST_Features&)
+// { 
+//   EST_VTPath *np = new EST_VTPath;
+//   CHECK_PTR(np);
+
+//   if( globalTempVoicePtr ==0 )
+//     EST_error( "globalTempVoicePtr is not set, can't continue" );
+  
+//   const EST_JoinCost &jcost = globalTempVoicePtr->getJoinCostCalculator();
+  
+//   np->c = c;
+//   np->from = p;
+//   np->state = c->pos;
+  
+//   if ((p == 0) || (p->c == 0))
+//     np->score = c->score;
+//   else{
+//     // join cost between right edge of left diphone and vice versa
+//     np->score = p->score + c->score + jcost( p->c->s->next(), c->s );
+//   }
+//   return np;
+// }
 static EST_VTPath* extendPath( EST_VTPath *p, EST_VTCandidate *c,
 	 		       EST_Features&)
 { 
@@ -321,8 +350,11 @@ static EST_VTPath* extendPath( EST_VTPath *p, EST_VTCandidate *c,
   if ((p == 0) || (p->c == 0))
     np->score = c->score;
   else{
+    const DiphoneCandidate *l_diph = diphonecandidate(p->c->name);
+    const DiphoneCandidate *r_diph = diphonecandidate(c->name);
+
     // join cost between right edge of left diphone and vice versa
-    np->score = p->score + c->score + jcost( p->c->s->next(), c->s );
+    np->score = p->score + c->score + jcost( l_diph, r_diph );
   }
   return np;
 }

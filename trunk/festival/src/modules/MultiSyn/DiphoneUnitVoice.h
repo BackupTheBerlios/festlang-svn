@@ -91,7 +91,7 @@ public:
   
   virtual ~DiphoneUnitVoice();
 
-  virtual void initialise();
+  virtual void initialise( bool ignore_bad_tag=false );
   virtual unsigned int numDatabaseUnits() const;
   virtual unsigned int numUnitTypes() const;
 
