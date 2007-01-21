@@ -37,6 +37,8 @@
 ###                                                                      ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ $# = 0 ]
 then
    echo "Make pm from pm labels (after editing)"

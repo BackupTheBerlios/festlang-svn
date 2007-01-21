@@ -40,6 +40,8 @@
 ##  This makes more directories than you may need
 ##
 
+LANG=C; export LANG
+
 mkdir bin
 mkdir wav
 mkdir recording

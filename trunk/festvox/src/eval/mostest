@@ -36,6 +36,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ $# = 0 ]
 then
     echo "Plays a set of waveform files and asks user for opinion"

@@ -46,6 +46,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 #  if [ $# != 3 ]
 #  then
 #      echo "Build a duration model, requires basic utterances to be pre-built"

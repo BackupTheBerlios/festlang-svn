@@ -37,7 +37,7 @@
 TOP=../..
 DIRNAME=src/lts
 SCMFILES = 
-SCRIPTS = build_lts build_lts_rules
+SCRIPTS = build_lts build_lts_rules make_allows make_allows-smt
 FILES = Makefile  $(SCMFILES) $(SCRIPTS)
 
 ALL = 

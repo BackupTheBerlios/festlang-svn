@@ -36,6 +36,8 @@
 ##   note this is zscoring, not just mean normalization                  ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! "$ESTDIR" ]
 then
    echo "environment variable ESTDIR is unset"

@@ -45,6 +45,9 @@ then
    echo '   csh% setenv ESTDIR /home/awb/projects/speech_tools/'
    exit 1
 fi
+
+LANG=C; export LANG
+
 SIG2FV=$ESTDIR/bin/sig2fv
 #SIG2FVPARAMS='-coefs melcep -delta melcep -melcep_order 12 -fbank_order 24 -shift 0.01 -factor 2.5 -preemph 0.97'
 SIG2FVPARAMS='-coefs melcep -melcep_order 12 -fbank_order 24 -shift 0.01 -factor 2.5 -preemph 0.97'

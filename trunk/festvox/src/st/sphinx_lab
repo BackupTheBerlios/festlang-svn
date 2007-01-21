@@ -47,6 +47,8 @@ then
    exit 1
 fi
 
+LANG=C; export LANG
+
 . ./etc/voice.defs
 
 S2BATCH=$SPHINX2DIR/bin/sphinx2-batch

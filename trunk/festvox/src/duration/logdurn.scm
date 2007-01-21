@@ -64,8 +64,6 @@
 	    (car (cdr di)))
 	 (car (cdr (cdr di))))))))
 
-
-
 (define (onset_has_ctype seg type)
   ;; "1" if onset contains ctype
   (let ((syl (item.relation.parent seg 'SylStructure)))

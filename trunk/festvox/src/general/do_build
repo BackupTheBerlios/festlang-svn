@@ -37,6 +37,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! "$FESTVOXDIR" ]
 then
    echo "environment variable FESTVOXDIR is unset"
@@ -68,7 +70,7 @@ then
    $0 do_pm
    $0 do_mcep
    $0 build_clunits
-   exit
+   exit 0
 fi
 
 if [ "$1" = "setup" ]
@@ -78,7 +80,7 @@ then
    cd $1"_"$2"_"$3
    $FESTVOXDIR/src/unitsel/setup_clunits $1 $2 $3
    $FESTVOXDIR/src/prosody/setup_prosody $1 $2 $3
-   exit
+   exit 0
 fi
 
 # we've already got a set up voice
@@ -88,52 +90,64 @@ if [ "$1" = "build_prompts" ]
 then
    $ESTDIR/../festival/bin/festival --heap 10000000 -b festvox/build_clunits.scm '(build_prompts "etc/txt.done.data")'
 
+   exit 0
 fi
 
 if [ "$1" = "record" ]
 then
    # I doubt anyone will run this from here
    ./bin/prompt_them etc/txt.done.data
+   exit 0
 fi
 
 if [ "$1" = "label" ]
 then
    $FESTVOXDIR/src/ehmm/bin/do_ehmm
+   exit 0
 fi
 
 if [ "$1" = "label_dtw" ]
 then
    ./bin/make_labs prompt-wav/*.wav
+   exit 0
 fi
 
 if [ "$1" = "label_sphinx" ]
 then
     ./bin/sphinxtrain
+   exit 0
 fi
 
 if [ "$1" = "build_utts" ]
 then
     $ESTDIR/../festival/bin/festival --heap 10000000 -b festvox/build_clunits.scm '(build_utts "etc/txt.done.data")'
+   exit 0
 fi
 
 if [ "$1" = "do_pm" ]
 then
     ./bin/make_pm_wave etc/txt.done.data
+   exit 0
 fi
 
 if [ "$1" = "do_mcep" ]
 then
     ./bin/make_mcep etc/txt.done.data
+   exit 0
 fi
 
 if [ "$1" = "build_clunits" ]
 then
     $ESTDIR/../festival/bin/festival --heap 10000000 -b festvox/build_clunits.scm '(build_clunits "etc/txt.done.data")'
+   exit 0
 fi
 
 if [ "$1" = "do_dur" ]
 then
     ./bin/make_dur_model &&
     cp -p festvox/$FV_VOICENAME"_dur.scm" festvox/$FV_VOICENAME"_durdara.scm"
+   exit 0
 fi
 
+echo $0 unknown option $1
+exit 1

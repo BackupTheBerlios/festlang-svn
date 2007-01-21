@@ -47,6 +47,8 @@ then
    exit 1
 fi
 
+LANG=C; export LANG
+
 TFILENAMEBASE=/tmp/ds_min_$$
 cat $1 >$TFILENAMEBASE.1
 for i in `awk '{print $2}' $2`

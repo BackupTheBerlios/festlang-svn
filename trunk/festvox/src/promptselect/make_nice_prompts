@@ -56,6 +56,8 @@ then
    exit 1
 fi
 
+LANG=C; export LANG
+
 DBNAME=data
 FVLANG=fv
 

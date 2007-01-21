@@ -56,6 +56,7 @@ then
    exit 1
 fi
 
+LANG=C; export LANG
 . etc/voice.defs
 
 # if [ -d etc ]

@@ -36,6 +36,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ $# = 0 ]
 then
    echo align nonsense word phone labels from prompts

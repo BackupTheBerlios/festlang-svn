@@ -32,6 +32,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ $# = 0 ]
 then
    echo "Extract and display an F0 from the given waveform"

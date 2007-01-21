@@ -50,9 +50,9 @@
    ;; vowel length: short long dipthong schwa
    (vlng s l d a 0)
    ;; vowel height: high mid low
-   (vheight 1 2 3 0)
+   (vheight 1 2 3 0 -)
    ;; vowel frontness: front mid back
-   (vfront 1 2 3 0)
+   (vfront 1 2 3 0 -)
    ;; lip rounding
    (vrnd + - 0)
    ;; consonant type: stop fricative affricative nasal liquid

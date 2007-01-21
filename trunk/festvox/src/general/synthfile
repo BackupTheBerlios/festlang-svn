@@ -1,9 +1,8 @@
 #!/bin/sh
 #####################################################-*-mode:shell-script-*-
 ##                                                                       ##
-##                   Carnegie Mellon University and                      ##
-##                   Alan W Black and Kevin A. Lenzo                     ##
-##                      Copyright (c) 1998-2000                          ##
+##                   Carnegie Mellon University                          ##
+##                      Copyright (c) 2006                               ##
 ##                        All Rights Reserved.                           ##
 ##                                                                       ##
 ##  Permission is hereby granted, free of charge, to use and distribute  ##
@@ -31,19 +30,17 @@
 ##  THIS SOFTWARE.                                                       ##
 ##                                                                       ##
 ###########################################################################
-###                                                                       ##
-###  Generate (filled) pitchmark file from EGG/LAR files                  ##
-###                                                                       ##
-############################################################################
+##                                                                       ##
+##  Synthesis given text file to given waveform file with current voice  ##
+##                                                                       ##
+###########################################################################
 
 LANG=C; export LANG
 
 if [ $# = 0 ]
 then
-   echo "Extract pitchmarks from EGG signals"
-   echo "Usage:  bin/make_pm lar/*.lar"
-   echo "Will create pm/*.pm"
-   echo "pitchmark parameters are set for male speaker, edit for female."
+   echo "Synthesis given textfile to given waveform file with current voice"
+   echo "Usage:  bin/synthfile file.txt file.wav"
    exit 1
 fi
 
@@ -57,16 +54,9 @@ then
    exit 1
 fi
 
-for i in $*
-do
-   fname=`basename $i .lar`
-   echo $i PM
-   # Due to a bug this only works for 16Khz
-   $ESTDIR/bin/ch_wave $i -F 16000 -o tmp$$.lar
-   # You'll need -inv if you are at CMU (or CSTR and maybe elsewhere)
-   # Male
-   $ESTDIR/bin/pitchmark tmp$$.lar -inv -o pm/$fname.pm -otype est -min 0.005 -max 0.012 -fill -def 0.01 -wave_end
-   # Female
-#   $ESTDIR/bin/pitchmark tmp$$.lar -inv -o pm/$fname.pm -otype est -min 0.00333 -max 0.0075 -fill -def 0.006 -wave_end
-   rm -f tmp$$.lar
-done
+. etc/voice.defs
+
+TEXT2WAVE=$ESTDIR/../festival/bin/text2wave
+
+$TEXT2WAVE -eval festvox/$FV_FULLVOICENAME.scm -eval "(voice_$FV_FULLVOICENAME)" $1 -o $2
+

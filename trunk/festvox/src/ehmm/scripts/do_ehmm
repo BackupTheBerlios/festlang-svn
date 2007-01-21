@@ -35,6 +35,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! "$FESTVOXDIR" ]
 then
    echo "environment variable FESTVOXDIR is unset"
@@ -47,17 +49,12 @@ fi
 
 export EHMMDIR=$FESTVOXDIR/src/ehmm
 
+. etc/voice.defs
+
 if [ "$PROMPTFILE" = "" ]
 then
-   if [ $# = 2 ]
-   then
-      PROMPTFILE=$2
-   else
-      PROMPTFILE=etc/txt.done.data
-   fi
+   PROMPTFILE=etc/txt.done.data
 fi
-
-. etc/voice.defs
 
 if [ $# = 0 ]
 then
@@ -176,7 +173,7 @@ then
               printf("  else\n");
               printf("     printf(\"%%s 125 %%d %%s\\n\",$1,statenamemap[$3],statename[$3])\n");
               printf("}\n");}' >etc/mapstatenames.awk
-   cat $PROMPTFILE |
+   cat etc/txt.done.data |
    awk '{print $2}' |
    while read x
    do

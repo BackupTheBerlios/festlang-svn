@@ -36,6 +36,8 @@
 ###                                                                      ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ $# = 0 ]
 then
    echo "prompt and record diphone nonsense words"

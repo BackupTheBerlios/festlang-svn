@@ -35,6 +35,8 @@
 ## extract lar from stereo recordings (check LAR really is channel 1)
 ##
 
+LANG=C; export LANG
+
 if [ $# = 0 ]
 then
    echo "Extract EGG (LAR) signal from recordings"

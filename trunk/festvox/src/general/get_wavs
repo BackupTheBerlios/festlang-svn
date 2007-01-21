@@ -35,6 +35,8 @@
 ## extract wav from stereo recordings (check LAR really is channel 1)
 ##
 
+LANG=C; export LANG
+
 if [ $# = 0 ]
 then
    echo "Extract wave signal from recordings"

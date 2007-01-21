@@ -40,6 +40,8 @@
 ###                                                                       ##
 ############################################################################
 
+LANG=C; export LANG
+
 if [ $# = 0 ]
 then
    echo "Extract pm files from waveforms using ESPS epoch program"

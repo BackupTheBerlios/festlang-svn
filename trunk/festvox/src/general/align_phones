@@ -37,6 +37,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ "$1" = "-help" ]
 then
    echo align phone list to waveforms

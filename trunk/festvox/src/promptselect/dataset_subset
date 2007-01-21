@@ -38,6 +38,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ $# = 0 ]
 then
    echo "Subsets a set $2 of prompts from a given prompt set $1"

@@ -42,6 +42,8 @@
 ##  This make more directories than you may need
 ##
 
+LANG=C; export LANG
+
 mkdir festival/dur/etc
 mkdir festival/dur/bin
 mkdir festival/dur/data

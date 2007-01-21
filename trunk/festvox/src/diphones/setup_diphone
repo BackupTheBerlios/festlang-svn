@@ -36,6 +36,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! "$FESTVOXDIR" ]
 then
    echo "environment variable FESTVOXDIR is unset"

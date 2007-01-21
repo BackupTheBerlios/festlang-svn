@@ -33,7 +33,13 @@
 ##                                                                       ##
 ###########################################################################
 
-FESTIVAL=festival
+LANG=C; export LANG
+
+if [ "$FESTIVALDIR" = "" ]
+then
+   FESTIVALDIR=$ESTDIR/../festival
+fi
+FESTIVAL=$FESTIVALDIR/bin/festival
 
 if [ $# = 0 ]
 then
@@ -43,9 +49,41 @@ then
    $0 build
    $0 merge
    $0 test
-   exit
+   exit 0
 fi
 
+if [ "$1" = "setup" ]
+then
+
+   cp -p $FESTVOXDIR/src/lts/build_lts_rules .
+   cp -p $FESTVOXDIR/src/lts/build_lts .
+   mkdir lts_scratch
+
+   LTYPE=nil
+   if [ $# = 3 ]
+   then
+      # asis or utf8
+      LTYPE=$3
+   fi
+
+   $FESTIVAL -b "(require 'lts_build)" '(dump-flat-entries "'$2'" "lts_scratch/lex_entries.out" "'$LTYPE'")'
+   exit 0
+fi
+
+if [ "$1" = "make_allowables" ]
+then
+   # Automatic build of allowables
+   if [ -f allowables.scm ]
+   then
+      cp -p allowables.scm allowables.scm-old
+   fi
+
+   $FESTIVAL -b "(require 'lts_build)" '(dump-lets-phones "lts_scratch/lex_entries.out")'
+
+   $FESTVOXDIR/src/lts/make_allows >allowables.scm
+
+   exit 0
+fi
 
 if [ "$1" = "cummulate" ]
 then
@@ -60,6 +98,7 @@ then
    $FESTIVAL -b --heap 10000000 allowables.scm '(begin
        (cummulate-pairs "lts_scratch/lex_entries.out")
        (save-table "lts_scratch/lex-") )'
+   exit 0
 fi
 
 
@@ -71,6 +110,7 @@ then
       (aligndata "lts_scratch/lex_entries.out" "lts_scratch/lex.align")
       (build-feat-file "lts_scratch/lex.align" "lts_scratch/lex.feats"))' |
       tee align.log
+   exit 0
 fi
 
 if [ "$1" = "traintest" ]
@@ -79,6 +119,7 @@ then
    $FESTVOXDIR/src/general/traintest lts_scratch/lex.align
    $FESTIVAL -b --heap 10000000 allowables.scm lts_scratch/lex-pl-tablesp.scm '(begin
       (build-feat-file "lts_scratch/lex.align.train" "lts_scratch/lex.feats.train"))'
+   exit 0
 fi
 
 
@@ -92,6 +133,7 @@ then
    fi
    (cd lts_scratch; ../build_lts_rules ) >lts_scratch/lts.build.out
 
+   exit 0
 fi
 
 if [ "$1" = "merge" ]
@@ -101,6 +143,7 @@ then
        $FESTIVAL -b --heap 10000000 ../allowables.scm '(begin
          (merge_models "lex_lts_rules" "lex_lts_rules.scm" allowables))')
    cp -p lts_scratch/lex_lts_rules.scm ./lex_lts_rules.scm
+   exit 0
 fi
 
 if [ "$1" = "test" ]
@@ -114,10 +157,15 @@ then
      $FESTIVAL -b --heap 10000000 allowables.scm lts_scratch/lex_lts_rules.scm '(lts_testset "lts_scratch/lex.align" lex_lts_rules)' | tee lts_test.log
      echo "with ALL data -- no held out test set"
   fi
+  exit 0
 fi
 
 if [ "$1" = "tidyup" ]
 then
    rm -rf lts_scratch
+   exit 0
 fi
+
+echo $0 unknown option $*
+exit 1
 

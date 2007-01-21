@@ -38,6 +38,8 @@
 ## (currently only tested for English)                                   ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! -d hts_build ]
 then
     mkdir hts_build

@@ -36,6 +36,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ $# == 0 ]
 then
     echo ./bin/make_samples TESTNAME [TESTSET]

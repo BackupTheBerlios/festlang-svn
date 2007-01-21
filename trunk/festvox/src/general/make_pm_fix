@@ -32,6 +32,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ $# = 0 ]
 then
    echo "Move pitch marks to nearest peak within window wrt wave files"
@@ -64,5 +66,5 @@ do
    fname=$i
    echo $fname
    $FIX_PM -wave wav/$fname.wav -pm pm/$fname.pm -window 32 -o $fname.pm  
-   mv $fname.pm $i
+   mv $fname.pm pm/$fname.pm
 done

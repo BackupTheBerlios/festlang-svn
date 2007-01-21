@@ -83,6 +83,15 @@ Return pronunciation of word not in lexicon."
     (set! syls (INST_LANG_lex_syllabify_phstress phones))
     (list word features syls)))
 
+;; utf8 letter based one
+;(define (INST_LANG_lts_function word features)
+;  "(INST_LANG_lts_function WORD FEATURES)
+;Return pronunciation of word not in lexicon."
+;  (let ((dword word) (phones) (syls))
+;    (set! phones (utf8explode dword))
+;    (set! syls (INST_LANG_lex_syllabify_phstress phones))
+;    (list word features syls)))
+
 (define (INST_LANG_is_vowel x)
   (string-equal "+" (phone_feature x "vc")))
 

@@ -33,6 +33,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 echo "((Relation.LTS.down.name" >ltsLTS.desc
 awk '{print $1}' lex.feats | sort -u >> ltsLTS.desc
 echo ') (p.p.p.p.name ignore ' >>ltsLTS.desc

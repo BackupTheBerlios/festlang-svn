@@ -32,6 +32,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! "$ESTDIR" ]
 then
    echo "environment variable ESTDIR is unset"

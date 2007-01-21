@@ -39,6 +39,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 echo "Guessing voice definitions ..."
 echo
 
