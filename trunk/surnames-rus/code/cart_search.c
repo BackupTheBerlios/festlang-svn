@@ -186,6 +186,13 @@ get_pos (char *phones, int index)
       {
 	  result = POS_SURNAME_IN;
       }
+    else if (phones[pau_index - 1] == PHONE_A &&
+	     phones[pau_index - 2] == PHONE_N &&
+	     (phones[pau_index - 3] == PHONE_I
+	      || phones[pau_index - 3] == PHONE_Y))
+      {
+	  result = POS_SURNAME_IN;
+      }
     else
       {
 	  result = POS_NAME;
