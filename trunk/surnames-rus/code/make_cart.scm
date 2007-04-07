@@ -1,5 +1,5 @@
 
-(defvar float_scale 20)
+(defvar float_scale 40)
 
 (define (carttoC tree)
   "(carttoC NAME TREE ODIR)

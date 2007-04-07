@@ -1,7 +1,7 @@
 #ifndef CART_H
 #define CART_H
 
-#define FLOAT_SCALE 20
+#define FLOAT_SCALE 40
 
 enum {
     POS_NAME = 1,
