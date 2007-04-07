@@ -190,7 +190,9 @@ get_pos (char *phones, int index)
       {
 	  result = POS_NAME;
       }
-
+#if DEBUG
+    printf ("Predicted pos is %d\n", result);
+#endif
     return result;
 }	/*get_pos */
 
@@ -297,10 +299,16 @@ find_stress_probability (char *phones, int index, int tree_index)
 
     if (ask_question (phones, index, tree_index))
       {
+#if DEBUG
+          printf ("CART question answer is yes\n");
+#endif
 	  return find_stress_probability (phones, index, tree_index + 1);
       }
     else
       {
+#if DEBUG
+          printf ("CART question answer is no\n");
+#endif
 	  return find_stress_probability (phones, index,
 					  ru_stress_cart_nodes[tree_index].
 					  no_index);
