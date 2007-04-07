@@ -210,7 +210,7 @@ ask_question (char *phones, int index, int tree_index)
 		if (is_vowel (phones[i]))
 		    result++;
 	    }
-	  return result * FLOAT_SCALE < ru_stress_cart_nodes[tree_index].value_float;
+	  return result * FLOAT_SCALE < ru_stress_cart_nodes[tree_index].value;
       case CART_QUESTION_NUM2END_SMALLER:
 	  result = 0;
 	  for (i = index; phones[i] > PHONE_SYLBREAK; i++)
@@ -218,67 +218,67 @@ ask_question (char *phones, int index, int tree_index)
 		if (is_vowel (phones[i]))
 		    result++;
 	    }
-	  return result * FLOAT_SCALE < ru_stress_cart_nodes[tree_index].value_float;
+	  return result * FLOAT_SCALE < ru_stress_cart_nodes[tree_index].value;
       case CART_QUESTION_PH_VFRONT:
 	  return (phoneset[phones[index] - 1].vfront ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_PH_VHEIGHT:
 	  return (phoneset[phones[index] - 1].vheight ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_PH_VRND:
 	  return (phoneset[phones[index] - 1].vrnd ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_P_VC:
 	  return (phoneset[phones[index - 1] - 1].vc ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_P_VHEIGTH:
 	  return (phoneset[phones[index - 1] - 1].vheight ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_P_VFRONT:
 	  return (phoneset[phones[index - 1] - 1].vfront ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QEUSTION_P_VRND:
 	  return (phoneset[phones[index - 1] - 1].vrnd ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_P_CVOX:
 	  return (phoneset[phones[index - 1] - 1].cvox ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_P_CTYPE:
 	  return (phoneset[phones[index - 1] - 1].ctype ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_P_CPLACE:
 	  return (phoneset[phones[index - 1] - 1].cplace ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_P_CSOFT:
 	  return (phoneset[phones[index - 1] - 1].csoft ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_N_VC:
 	  return (phoneset[phones[index + 1] - 1].vc ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_N_VHEIGTH:
 	  return (phoneset[phones[index + 1] - 1].vheight ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_N_VFRONT:
 	  return (phoneset[phones[index + 1] - 1].vfront ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QEUSTION_N_VRND:
 	  return (phoneset[phones[index + 1] - 1].vrnd ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_N_CVOX:
 	  return (phoneset[phones[index + 1] - 1].cvox ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_N_CTYPE:
 	  return (phoneset[phones[index + 1] - 1].ctype ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_N_CPLACE:
 	  return (phoneset[phones[index + 1] - 1].cplace ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_N_CSOFT:
 	  return (phoneset[phones[index + 1] - 1].csoft ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_POS:
 	  return (get_pos (phones, index) ==
-			  ru_stress_cart_nodes[tree_index].value_feature);
+			  ru_stress_cart_nodes[tree_index].value);
 	  break;
       default:
 	  return 0;
@@ -292,17 +292,15 @@ find_stress_probability (char *phones, int index, int tree_index)
 {
     if (ru_stress_cart_nodes[tree_index].type == CART_VALUE)
       {
-	  return ru_stress_cart_nodes[tree_index].value_float;
+	  return ru_stress_cart_nodes[tree_index].value;
       }
 
     if (ask_question (phones, index, tree_index))
       {
-    	  printf ("yes\n");
 	  return find_stress_probability (phones, index, tree_index + 1);
       }
     else
       {
-    	  printf ("no\n");
 	  return find_stress_probability (phones, index,
 					  ru_stress_cart_nodes[tree_index].
 					  no_index);

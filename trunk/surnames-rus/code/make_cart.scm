@@ -25,7 +25,7 @@ Do the tree dump"
     (format ofdc "#include \"cart.h\"\n\n")
     (format ofdc "const cart_node ru_stress_cart_nodes[] = {\n")
     (carttoC_tree_nodes tree ofdc ofdh)
-    (format ofdc "{CART_VALUE, 0, 0, 0}};\n\n")
+    (format ofdc "{CART_VALUE, 0, 0}};\n\n")
 
     (format ofdc "\n\n")
 
@@ -76,28 +76,24 @@ Dump the nodes in the tree."
   (let ((this_node (set! current_node (+ 1 current_node))))
     (cond
      ((cdr tree) ;; a question node
-      (format ofdc "{%s, %s, %d, %s},\n"
+      (format ofdc "{%s, %s, %s},\n"
 	      (cadr (assoc_string             ;; operator
 		    (caar tree)
 		     cart_operators))
 	      (format nil "CTNODE_NO_%04d" this_node); the no node
-	      (* (if (or (string-equal (caar tree) "sylpos") (string-equal (caar tree) "num2end"))
-	        (caddr (car tree))
-	        0) float_scale)
-	      (if (not (or (string-equal (caar tree) "sylpos") (string-equal (caar tree) "num2end")))
-	        (if (string-equal (caar tree) "pos")
-	    	(format nil "%s" (cadr (assoc_string
-	    			 (caddr (car tree))
-	    			 pos_to_chars)))
-	        (format nil  "\'%s\'" (caddr (car tree))))
-	        
-	        "0")
+	      (if (or (string-equal (caar tree) "sylpos") (string-equal (caar tree) "num2end"))
+	            (* (caddr (car tree)) float_scale)
+	          (if (string-equal (caar tree) "pos")
+		    	(format nil "%s" (cadr (assoc_string
+	    	    		 (caddr (car tree))
+	    		    	     pos_to_chars)))
+	          (format nil  "\'%s\'" (caddr (car tree)))))
 	       )
       (carttoC_tree_nodes (car (cdr tree)) ofdc ofdh)
       (format ofdh "#define CTNODE_NO_%04d %d\n"
 	      this_node (+ 1 current_node))
       (carttoC_tree_nodes (car (cdr (cdr tree))) ofdc ofdh))
      (t  ;; a leaf node
-      (format ofdc "{CART_VALUE, 0, %d, 0},\n" (* (cadr (caar tree)) float_scale))))))
+      (format ofdc "{CART_VALUE, 0, %d},\n" (* (cadr (caar tree)) float_scale))))))
 
 (provide 'make_cart)

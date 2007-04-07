@@ -46,9 +46,7 @@ typedef struct cart_node
 {
     int type : 6;
     int no_index : 18;
-
-    char value_float;
-    char value_feature;
+    char value;
 } cart_node;
 
 /**********************************************************************/
