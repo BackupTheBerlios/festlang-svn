@@ -1,0 +1,430 @@
+For initial introduction into Russian phonetics and Russian itself
+I'd recommend Edna Andrews book about Russian. Also it would be nice
+to understand Lisp, it's really a very simple programming language, but
+Lisp knowledge is not required.
+
+We need to convert string to the list of phonemes. There are 
+following phonemes in Russian phoneset we'll use (there are different
+phonesets actually depending on the level of details, we have
+to fix one)
+
+Each phone has some properties listed in table, headers are
+
+   (vc + -)  ;; vowel or consonant
+   (vheight 1 2 3 0) ;; vowel height: high mid low
+   (vfront 1 2 3 0)  ;; vowel frontness: front mid back 
+   (vrnd + - 0)  ;; lip rounding
+   (ctype s f a n l 0)  ;; consonant type: stop fricative affricative nasal liquid
+   (cplace l a p b d v 0)  ;; place of articulation: labial alveolar palatal labio-dental dental velar
+   (cvox + - 0) ;; consonant voicing
+
+   (csoft + - 0)    ;; consonant softness
+   )
+  (
+   (pau  - 0 0 0 0 0 0 0)  ;; silence ... 
+
+   ;;; vowels
+   
+   (i       +  3  1  -  0  0  0  0)
+   (y       +  3  3  -  0  0  0  0)
+   (e       +  2  1  -  0  0  0  0)
+   (a       +  1  2  -  0  0  0  0)
+   (o       +  1  3  +  0  0  0  0)
+   (u       +  3  3  +  0  0  0  0)
+   
+   ;;; reduced vowels
+   
+   (ao      +  1  2  -  0  0  0  0) ;; a and o in pretonic syllable
+   (ei      +  2  1  -  0  0  0  0) ;; i and e in pretonic syllable
+   (ae      +  2  2  -  0  0  0  0) ;; shwa
+
+   ;;; consonants
+
+   (p       -  0  0  0  s  l  -  -)
+   (pp      -  0  0  0  s  l  -  +)
+   (b       -  0  0  0  s  l  +  -)
+   (bb      -  0  0  0  s  l  +  +)
+   (t 	    -  0  0  0  s  d  -  -)
+   (tt 	    -  0  0  0  s  d  -  +)
+   (d 	    -  0  0  0  s  d  +  -)
+   (dd 	    -  0  0  0  s  d  +  +)
+   (k 	    -  0  0  0  s  p  -  -)
+   (kk      -  0  0  0  s  p  -  +)
+   (g 	    -  0  0  0  s  p  +  -)
+   (gg 	    -  0  0  0  s  p  +  +)
+   (c       -  0  0  0  a  d  -  -)
+   (ch      -  0  0  0  a  a  -  +)
+   (f       -  0  0  0  f  b  -  -)
+   (ff      -  0  0  0  f  b  -  +)
+   (v       -  0  0  0  f  b  +  -)
+   (vv      -  0  0  0  f  b  +  +)
+   (s 	    -  0  0  0  f  d  -  -)
+   (ss 	    -  0  0  0  f  d  -  +)
+   (z 	    -  0  0  0  f  d  +  -)
+   (zz 	    -  0  0  0  f  d  +  +)
+   (sh      -  0  0  0  f  a  -  -)
+   (sch     -  0  0  0  f  p  -  +)
+   (zh      -  0  0  0  f  a  +  -)
+   (h 	    -  0  0  0  f  v  -  -)
+   (hh 	    -  0  0  0  f  v  -  +)
+
+   (m       -  0  0  0  n  l  +  -)
+   (mm 	    -  0  0  0  n  l  +  +)
+   (n       -  0  0  0  n  d  +  -)
+   (nn 	    -  0  0  0  n  d  +  +)
+   (l 	    -  0  0  0  l  d  +  -)
+   (ll 	    -  0  0  0  l  d  +  +)
+   (r 	    -  0  0  0  l  a  +  -)
+   (rr 	    -  0  0  0  l  a  +  +)
+   (ij 	    -  0  0  0  f  p  +  +)
+  )
+)
+
+
+LTS conversion has several stages.
+
+On the first stage we take a string, split it on words and convert
+every letter to lower case. 
+
+Then we have to covert letter to initial phonemes. We split every word
+on letters and then move letter by letter and try to apply one
+of the rules. We look through the list of rules and apply the first
+one found. We append the result to result list. Here are the rules
+
+;; Simple vowels
+
+    ( [ а ] = a )
+    ( [ ы ] = y )
+    ( [ ь о ] = ij o )
+    ( [ о ] = o )
+    ( [ у ] = u )
+    ( [ э ] = e )
+
+;; Vowel expansion
+
+    ( STARTSYL [ ю ] = ij u )
+    ( STARTSYL [ я ] = ij a )
+    ( STARTSYL [ е ] = ij e )
+    ( STARTSYL [ ё ] = ij o )
+
+    ( [ ё ] = o )
+    ( [ е ] = e )
+    ( [ я ] = a )
+    ( [ ю ] = u )
+    ( [ и ] = i )
+
+;; Soft 
+
+    ( # [ ч т ] = sh t )
+    ( [л н ц] = l c )
+
+    ( [ б ] SOFTLETTERS = bb )
+    ( [ в ] SOFTLETTERS = vv )
+    ( [ г ] SOFTLETTERS = gg )
+    ( [ д ] SOFTLETTERS = dd )
+    ( [ з ] SOFTLETTERS = zz )
+    ( [ к ] SOFTLETTERS = kk )
+    ( [ л ] SOFTLETTERS = ll )
+    ( [ м ] SOFTLETTERS = mm )
+    ( [ н ] SOFTLETTERS = nn )
+    ( [ п ] SOFTLETTERS = pp )
+    ( [ р ] SOFTLETTERS = rr )
+    ( [ с ] SOFTLETTERS = ss )
+    ( [ т ] SOFTLETTERS = tt )
+    ( [ ф ] SOFTLETTERS = ff )
+    ( [ х ] SOFTLETTERS = hh )
+
+;; Simple consonant
+
+    ( [ б ] = b )
+    ( [ в ] = v )
+    ( [ г ] = g )
+    ( [ д ] = d )
+    ( [ ж ] = zh )
+    ( [ з ] = z )
+    ( [ к ] = k )
+    ( [ л ] = l )
+    ( [ м ] = m )
+    ( [ н ] = n )
+    ( [ п ] = p )
+    ( [ р ] = r )
+    ( [ с ] = s )
+    ( [ т ] = t )
+    ( [ ф ] = f )
+    ( [ х ] = h )
+    ( [ ц ] = c )
+    ( [ ч ] = ch )
+    ( [ ш ] = sh )
+    ( [ щ ] = sch )
+    ( [ й ] = ij )
+
+    ( [ ъ ] =  )
+    ( [ ь ] =  )
+    ( [ - ]  = )
+
+Here are SOFTLETTERS means any of 
+
+    я ё ю и ь е
+    
+and STARTSYL means any of
+
+   pau ъ ь а я о ё у ю э е и
+
+Then we can break phones on syllables, we have to go through the list of
+phones and markup syllable boundaries. The syllable is finished on vowel
+we've met, but the next sonorant or ij can be attached to the previous
+syllable. It's so called law of growing sonority (sonority in the
+syllable can only grow).  Actually this syllabification process isn't so
+trivial and can be improved in the future too. Here is the lisp function
+for the reference. Another implementation of the same growing sonority
+algorithm can be found in Festival sources.
+
+(define (russian_syllabify phones syls)
+"(russian_syllabify phones syls)
+Syllabify phones into syllables for Russian."
+ (cond
+  ((null phones)
+   (mapcar
+    (lambda (syl) (list (reverse syl) 0))
+    (reverse syls)))
+  ((and (member_string (car phones) '(a e i o u y))
+	(russian_contains_vowel (cdr phones)))
+   (let ((nsyls (cons (cons (car phones) (car syls)) (cdr syls)))
+	 (nphones (cdr phones)))
+     (cond
+      ((and (member_string (car nphones) '(l ll m mm n nn r rr))
+	    (not (member_string (car (cdr nphones)) 
+				'(a e i o y u l ll m mm n nn r rr))))
+       (set! nsyls (cons (cons (car nphones) (car nsyls)) (cdr nsyls)))
+       (set! nphones (cdr nphones)))
+      ((and (string-equal (car nphones) "ij")
+	    (not (member_string (car (cdr nphones)) 
+				'(a e i o u y))))
+       (set! nsyls (cons (cons (car nphones) (car nsyls)) (cdr nsyls)))
+       (set! nphones (cdr nphones)))
+       )
+     (russian_syllabify nphones (cons nil nsyls))))
+  (t
+   (russian_syllabify
+    (cdr phones)
+    (cons (cons (car phones) (car syls)) (cdr syls))))))
+
+This way we'll make initial LTS conversoin, now we have to assing
+stress. We'll use classification and regression tree (CART tree) to do
+that. This tree is trained from dictionary we made.
+
+We have to go through the list of phonemes and if phoneme is vowel 
+(a y o e i u) we should start tree prediction function which will
+return us the probability of stress on that vowel. Then we can
+just take the vowel with biggest probability and assign stress there.
+
+The tree has the following form
+
+  question
+     result if yes
+     result if no
+
+where result can be either the same form or a result (probability of stress).
+Here is the example of tree:
+
+(set! english_stress_tree
+'((sylpos < 1.7)
+ ((1))
+ ((ph_vlng is a)
+  ((0))
+  ((ph_vheight is 1)
+   ((num2end < 1.5)
+    ((ph_vfront is 1)
+     ((ph_vlng is s) ((0)) ((pos is v) ((1)) ((0))))
+     ((pos is n) ((0)) ((sylpos < 2.2) ((1)) ((0)))))
+    ((ph_vlng is l)
+     ((1))
+     ((ph_vfront is 1)
+      ((num2end < 2.4)
+       ((0))
+       ((pos is a)
+        ((num2end < 3.3) ((sylpos < 2.3) ((1)) ((0))) ((0)))
+        ((sylpos < 3.2)
+         ((num2end < 3.3) ((0)) ((pos is v) ((1)) ((0))))
+         ((0)))))
+      ((0)))))
+   ((num2end < 1.5)
+    ((pos is n)
+     ((0))
+     ((sylpos < 2.4)
+      ((pos is v)
+       ((1))
+       ((ph_vlng is d)
+        ((ph_vheight is 2) ((ph_vfront is 1) ((1)) ((0))) ((0)))
+        ((1))))
+      ((ph_vlng is d)
+       ((sylpos < 3.3)
+        ((pos is v)
+         ((ph_vheight is 2) ((ph_vfront is 1) ((0)) ((1))) ((0)))
+         ((0)))
+        ((0)))
+       ((ph_vheight is 2)
+        ((1))
+        ((ph_vrnd is +) ((1)) ((ph_vlng is l) ((0)) ((1))))))))
+    ((ph_vlng is d)
+     ((pos is v)
+      ((sylpos < 2.4) ((1)) ((0)))
+      ((ph_vfront is 2)
+       ((pos is n)
+        ((num2end < 2.4)
+         ((ph_vrnd is +)
+          ((0))
+          ((sylpos < 2.2) ((1)) ((ph_vheight is 2) ((1)) ((0)))))
+         ((sylpos < 2.4) ((ph_vheight is 2) ((0)) ((1))) ((0))))
+        ((1)))
+       ((ph_vheight is 2) ((1)) ((ph_vfront is 1) ((0)) ((1))))))
+     ((pos is n)
+      ((num2end < 2.4)
+       ((ph_vfront is 3)
+        ((sylpos < 2.3) ((1)) ((ph_vlng is l) ((1)) ((0))))
+        ((1)))
+       ((1)))
+      ((1)))))))))
+
+For more information, see the article on CART trees. Let me also 
+note that this tree can be represented very efficiently, you
+can code quesion in say one byte, pointer to the right and
+left leaf will take another two bytes, so you have around
+4 bytes per node. Recent tree has around 6000 nodes, so you'll take
+only 24 kB per lexicon. The search in the tree should be also
+rather efficient. Probably it's worth to look into flite code
+as well, it has CART tree implementation.
+
+The questions we will use:
+
+(num2end float) ;; Position in syllable
+(sylpos float)
+
+(ph_vfront 1 2 3) ;; Questions about vowel
+(ph_vheight 1 2 3)
+(ph_vrnd + -)
+
+(p.ph_vc + -)  ;; Questions about previous phone
+(p.ph_vheight 1 2 3 0)
+(p.ph_vfront 1 2 3 0)
+(p.ph_vrnd + - 0)
+(p.ph_cvox + - 0)
+(p.ph_ctype s f a n l 0)
+(p.ph_cplace l a p b d v 0)
+(p.ph_csoft + - 0)
+(n.ph_vc + -)  ;; Questions about next phone
+(n.ph_vheight 1 2 3 0)
+(n.ph_vfront 1 2 3 0)
+(n.ph_vrnd + - 0)
+(n.ph_cvox + - 0)
+(n.ph_ctype s f a n l 0)
+(n.ph_cplace l a p b d v 0)
+(n.ph_csoft + - 0)
+(pos name sname surname-uk surname-yan surname-ovev surname-in surname-ski surname-nko))
+
+Last parameter pos will take the type of word into account:
+
+(define (guess_pos word)
+""
+    (let ((w (string-append word "#")))    
+    (cond 
+	    ((string-matches w ".*вич#") 'sname)
+	    ((string-matches w ".*вна#") 'sname)
+	    ((string-matches w ".*ин#") 'surname-in)
+	    ((string-matches w ".*ина#") 'surname-in)
+	    ((string-matches w ".*ян#") 'surname-yan)
+	    ((string-matches w ".*янц#") 'surname-yan)
+	    ((string-matches w ".*ев#") 'surname-ovev)
+	    ((string-matches w ".*ева#") 'surname-ovev)
+	    ((string-matches w ".*ёв#") 'surname-ovev)
+	    ((string-matches w ".*ёва#") 'surname-ovev)
+	    ((string-matches w ".*ов#") 'surname-ovev)
+	    ((string-matches w ".*ова#") 'surname-ovev)
+	    ((string-matches w ".*ский#") 'surname-ski)
+	    ((string-matches w ".*ская#") 'surname-ski)
+	    ((string-matches w ".*ко#") 'surname-ko)
+	    ((string-matches w ".*их#") 'surname-ih)
+	    ((string-matches w ".*ых#") 'surname-ih)
+	    ((string-matches w ".*юк#") 'surname-uk)
+	    ((string-matches w ".*чук#") 'surname-uk)
+	    (t 'name))
+))
+
+
+The actual tree can be found in stress directory
+
+The last step is reduction. We have to concatenate phones in full sequence
+and reduce the according to rules:
+
+1. We change a and o to ao if syllable is not stressed
+and (next syllable is stressed or we are in the end of utterance)
+
+2. We change i and e to ei on the same conditions
+
+3. We change a, o, i and e to ae if syllable is not stressed and 
+next syllable is not stressed too
+
+In Russian LTS rules often previous consonant softness is taken
+to specify proper reduction. We will not take it into account since
+we'd like to take diphones, thus we already have previous soft or
+previous hard consonant in particular diphone.
+
+Also we have to adjust voicing according to the rules, basically
+consonant before voiceless consonant became voiceless and contrary
+consonant became voiced before voiced consonant. Here is the code:
+
+(set! msu_ru::reducelist '((b p) (bb pp) (v f) (vv ff) (zh sh) (z s) (zz ss) (g k) (gg kk) (d t) (dd tt)))
+(set! msu_ru::sonorlist '(l ll m mm n nn r rr ij))
+(set! msu_ru::voicelist '(zh zhz z zz d dd g gg))
+(set! msu_ru::voicelesslist '(sh s ss t tt k kk sch))
+
+(define (msu_ru::postlex_rule1 utt)
+  "(msu_ru::postlex_rule1 utt)
+   Modification of consonants voiced/voiceless"
+
+  (mapcar
+   (lambda (s)
+
+     (set! s1 (item.next s))
+
+     (if (and (string-equal "1" (item.feat s "syl_final"))
+	      (not (string-equal "0" 
+				 (item.feat s "R:SylStructure.parent.syl_break"))))
+	 (mapcar 
+	  (lambda (r)
+	    (if (string-equal (car r) (item.name s)) 
+		(if (or 
+		     (member_string (item.name s1) msu_ru::sonorlist) 
+		     (string-equal "#" (item.name s1)) 
+		
+		     (and 
+		      (or (string-equal "v" (item.name s1)) 
+			  (string-equal "vv" (item.name s1)))
+			
+		      (or (string-equal "+" (item.feat s1 "n.ph_vc"))
+			  (member_string (item.feat s1 "n.name") msu_ru::sonorlist)))
+		    )
+		    (item.set_name s (car (cdr r))))
+
+	      (if (string-equal (car (cdr r)) (item.name s)) 
+		  (if 
+		     (and 
+		      (or (string-equal "v" (item.name s1)) 
+			  (string-equal "vv" (item.name s1)))
+			      (member_string (item.feat s1 "n.name") msu_ru::voicelist))
+		      (item.set_name s (car r))))
+		      ))
+	  msu_ru::reducelist))
+	  
+	  (mapcar 
+		  (lambda (r)
+    		    (if (and (string-equal (car r) (item.name s))
+			     (member_string (item.name s1) msu_ru::voicelesslist))
+			     (item.set_name s (car (cdr r))))
+	    
+		    (if (and (string-equal (car (cdr r)) (item.name s)) 
+			     (member_string (item.name s1) msu_ru::voicelist))
+			      (item.set_name s (car r))))
+		   msu_ru::reducelist))
+   
+   (utt.relation.items utt 'Segment)))
