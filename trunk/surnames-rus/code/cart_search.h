@@ -1,7 +1,8 @@
 #ifndef CART_H
 #define CART_H
 
-enum {
+enum
+{
     CART_QUESTION_NUM2END_SMALLER,
     CART_QUESTION_SYLPOS_SMALLER,
     CART_QUESTION_PH_VFRONT,
@@ -27,17 +28,19 @@ enum {
     CART_VALUE
 };
 
-typedef struct cart_node {
-    int type : 6;    
+typedef struct cart_node
+{
+    int type:6;
     short no_index;
 
     float value_float;
     char *value_string;
 } cart_node;
 
+
+/**********************************************************************/
 void dump_feat (char *phones, int index, int feat);
 
-float 
-find_stress_probability (char *phones, int index, int tree_index);
+float find_stress_probability (char *phones, int index, int tree_index);
 
 #endif
