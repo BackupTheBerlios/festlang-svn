@@ -4,14 +4,14 @@
 typedef struct phone
 {
     char *name;
-    char *vc;
-    char *vheight;
-    char *vfront;
-    char *vrnd;
-    char *ctype;
-    char *cplace;
-    char *cvox;
-    char *csoft;
+    char vc;
+    char vheight;
+    char vfront;
+    char vrnd;
+    char ctype;
+    char cplace;
+    char cvox;
+    char csoft;
 } phone;
 
 extern phone phoneset[];

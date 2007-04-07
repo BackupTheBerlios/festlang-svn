@@ -1,3 +1,6 @@
+
+(defvar float_scale 20)
+
 (define (carttoC tree)
   "(carttoC NAME TREE ODIR)
 Coverts a CART tree to a single C file called cart.c."
@@ -22,7 +25,7 @@ Do the tree dump"
     (format ofdc "#include \"cart.h\"\n\n")
     (format ofdc "const cart_node ru_stress_cart_nodes[] = {\n")
     (carttoC_tree_nodes tree ofdc ofdh)
-    (format ofdc "{CART_VALUE, 0, 0, NULL}};\n\n")
+    (format ofdc "{CART_VALUE, 0, 0, 0}};\n\n")
 
     (format ofdc "\n\n")
 
@@ -54,29 +57,47 @@ Do the tree dump"
     ("pos" "CART_QUESTION_POS")
     ))
 
+(defvar pos_to_chars
+  '(
+    ("name" 1)
+    ("sname" 2)
+    ("surname-ovev" 3)
+    ("surname-yan" 4)
+    ("surname-ko" 5)
+    ("surname-uk" 6)
+    ("surname-ski" 7)
+    ("surname-ih" 8)
+    ("surname-in" 9)
+    ))
+
 (define (carttoC_tree_nodes tree ofdc ofdh)
   "(carttoC_tree_nodes tree ofdc ofdh)
 Dump the nodes in the tree."
   (let ((this_node (set! current_node (+ 1 current_node))))
     (cond
      ((cdr tree) ;; a question node
-      (format ofdc "{%s, %s, %s, %s},\n"
+      (format ofdc "{%s, %s, %d, %s},\n"
 	      (cadr (assoc_string             ;; operator
 		    (caar tree)
 		     cart_operators))
 	      (format nil "CTNODE_NO_%04d" this_node); the no node
-	      (if (or (string-equal (caar tree) "sylpos") (string-equal (caar tree) "num2end"))
+	      (* (if (or (string-equal (caar tree) "sylpos") (string-equal (caar tree) "num2end"))
 	        (caddr (car tree))
-	        0)
+	        0) float_scale)
 	      (if (not (or (string-equal (caar tree) "sylpos") (string-equal (caar tree) "num2end")))
-	        (format nil  "\"%s\"" (caddr (car tree)))
-	        "NULL")
+	        (if (string-equal (caar tree) "pos")
+	    	(format nil "%s" (cadr (assoc_string
+	    			 (caddr (car tree))
+	    			 pos_to_chars)))
+	        (format nil  "\'%s\'" (caddr (car tree))))
+	        
+	        "0")
 	       )
       (carttoC_tree_nodes (car (cdr tree)) ofdc ofdh)
       (format ofdh "#define CTNODE_NO_%04d %d\n"
 	      this_node (+ 1 current_node))
       (carttoC_tree_nodes (car (cdr (cdr tree))) ofdc ofdh))
      (t  ;; a leaf node
-      (format ofdc "{CART_VALUE, 0, %l, NULL},\n" (cadr (caar tree)))))))
+      (format ofdc "{CART_VALUE, 0, %d, 0},\n" (* (cadr (caar tree)) float_scale))))))
 
 (provide 'make_cart)

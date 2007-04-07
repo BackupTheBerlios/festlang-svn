@@ -1,5 +1,5 @@
 SOURCES = \
-	lts.c phoneset.c cart.c cart_search.c
+	lts_main.c phoneset.c cart.c cart_search.c
 
 HEADERS = \
 phoneset.h cart.h cart_search.h

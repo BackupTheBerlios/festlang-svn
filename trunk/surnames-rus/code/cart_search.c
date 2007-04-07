@@ -35,61 +35,61 @@ dump_feat (char *phones, int index, int feat)
 	  printf ("%d ", result);
 	  break;
       case CART_QUESTION_PH_VFRONT:
-	  printf ("%s ", phoneset[phones[index] - 1].vfront);
+	  printf ("%c ", phoneset[phones[index] - 1].vfront);
 	  break;
       case CART_QUESTION_PH_VHEIGHT:
-	  printf ("%s ", phoneset[phones[index] - 1].vheight);
+	  printf ("%c ", phoneset[phones[index] - 1].vheight);
 	  break;
       case CART_QUESTION_PH_VRND:
-	  printf ("%s ", phoneset[phones[index] - 1].vrnd);
+	  printf ("%c ", phoneset[phones[index] - 1].vrnd);
 	  break;
       case CART_QUESTION_P_VC:
-	  printf ("%s ", phoneset[phones[index - 1] - 1].vc);
+	  printf ("%c ", phoneset[phones[index - 1] - 1].vc);
 	  break;
       case CART_QUESTION_P_VHEIGTH:
-	  printf ("%s ", phoneset[phones[index - 1] - 1].vheight);
+	  printf ("%c ", phoneset[phones[index - 1] - 1].vheight);
 	  break;
       case CART_QUESTION_P_VFRONT:
-	  printf ("%s ", phoneset[phones[index - 1] - 1].vfront);
+	  printf ("%c ", phoneset[phones[index - 1] - 1].vfront);
 	  break;
       case CART_QEUSTION_P_VRND:
-	  printf ("%s ", phoneset[phones[index - 1] - 1].vrnd);
+	  printf ("%c ", phoneset[phones[index - 1] - 1].vrnd);
 	  break;
       case CART_QUESTION_P_CVOX:
-	  printf ("%s ", phoneset[phones[index - 1] - 1].cvox);
+	  printf ("%c ", phoneset[phones[index - 1] - 1].cvox);
 	  break;
       case CART_QUESTION_P_CTYPE:
-	  printf ("%s ", phoneset[phones[index - 1] - 1].ctype);
+	  printf ("%c ", phoneset[phones[index - 1] - 1].ctype);
 	  break;
       case CART_QUESTION_P_CPLACE:
-	  printf ("%s ", phoneset[phones[index - 1] - 1].cplace);
+	  printf ("%c ", phoneset[phones[index - 1] - 1].cplace);
 	  break;
       case CART_QUESTION_P_CSOFT:
 	  printf ("%s ", phoneset[phones[index - 1] - 1].csoft);
 	  break;
       case CART_QUESTION_N_VC:
-	  printf ("%s ", phoneset[phones[index + 1] - 1].vc);
+	  printf ("%c ", phoneset[phones[index + 1] - 1].vc);
 	  break;
       case CART_QUESTION_N_VHEIGTH:
-	  printf ("%s ", phoneset[phones[index + 1] - 1].vheight);
+	  printf ("%c ", phoneset[phones[index + 1] - 1].vheight);
 	  break;
       case CART_QUESTION_N_VFRONT:
-	  printf ("%s ", phoneset[phones[index + 1] - 1].vfront);
+	  printf ("%c ", phoneset[phones[index + 1] - 1].vfront);
 	  break;
       case CART_QEUSTION_N_VRND:
-	  printf ("%s ", phoneset[phones[index + 1] - 1].vrnd);
+	  printf ("%c ", phoneset[phones[index + 1] - 1].vrnd);
 	  break;
       case CART_QUESTION_N_CVOX:
-	  printf ("%s ", phoneset[phones[index + 1] - 1].cvox);
+	  printf ("%c ", phoneset[phones[index + 1] - 1].cvox);
 	  break;
       case CART_QUESTION_N_CTYPE:
-	  printf ("%s ", phoneset[phones[index + 1] - 1].ctype);
+	  printf ("%c ", phoneset[phones[index + 1] - 1].ctype);
 	  break;
       case CART_QUESTION_N_CPLACE:
-	  printf ("%s ", phoneset[phones[index + 1] - 1].cplace);
+	  printf ("%c ", phoneset[phones[index + 1] - 1].cplace);
 	  break;
       case CART_QUESTION_N_CSOFT:
-	  printf ("%s ", phoneset[phones[index + 1] - 1].csoft);
+	  printf ("%c ", phoneset[phones[index + 1] - 1].csoft);
 	  break;
       case CART_QUESTION_POS:
 	  break;
@@ -102,11 +102,11 @@ dump_feat (char *phones, int index, int feat)
 
 
 /**********************************************************************/
-const char *
+const char
 get_pos (char *phones, int index)
 {
     int pau_index;
-    const char *result;
+    char result;
 
     pau_index = index;
     while (!is_pau (phones[pau_index]))
@@ -116,84 +116,80 @@ get_pos (char *phones, int index)
 
     if (pau_index < 4)
       {
-	  result = "name";
+	  result = POS_NAME;
       }
     else if (phones[pau_index - 1] == PHONE_CH &&
 	     phones[pau_index - 2] == PHONE_I &&
 	     phones[pau_index - 3] == PHONE_VV)
       {
-	  result = "sname";
+	  result = POS_SNAME;
       }
     else if (phones[pau_index - 1] == PHONE_A &&
 	     phones[pau_index - 2] == PHONE_N &&
 	     phones[pau_index - 3] == PHONE_V)
       {
-	  result = "sname";
+	  result = POS_SNAME;
       }
     else if (phones[pau_index - 1] == PHONE_V &&
 	     (phones[pau_index - 2] == PHONE_O
 	      || phones[pau_index - 2] == PHONE_E))
       {
-	  result = "surname-ovev";
+	  result = POS_SURNAME_OVEV;
       }
     else if (phones[pau_index - 1] == PHONE_A &&
 	     phones[pau_index - 2] == PHONE_V)
       {
-	  result = "surname-ovev";
+	  result = POS_SURNAME_OVEV;
       }
     else if (phones[pau_index - 1] == PHONE_C &&
 	     phones[pau_index - 2] == PHONE_N &&
 	     phones[pau_index - 3] == PHONE_A)
       {
-	  result = "surname-yan";
+	  result = POS_SURNAME_YAN;
       }
     else if (phones[pau_index - 1] == PHONE_N &&
 	     phones[pau_index - 2] == PHONE_A)
       {
-	  result = "surname-yan";
+	  result = POS_SURNAME_YAN;
       }
     else if (phones[pau_index - 1] == PHONE_O &&
 	     phones[pau_index - 2] == PHONE_K)
       {
-	  result = "surname-ko";
+	  result = POS_SURNAME_KO;
       }
     else if (phones[pau_index - 1] == PHONE_K &&
 	     phones[pau_index - 2] == PHONE_U)
       {
-	  result = "surname-uk";
+	  result = POS_SURNAME_UK;
       }
     else if (phones[pau_index - 1] == PHONE_IJ &&
 	     phones[pau_index - 2] == PHONE_I &&
 	     phones[pau_index - 3] == PHONE_KK)
       {
-	  result = "surname-ski";
+	  result = POS_SURNAME_SKI;
       }
     else if (phones[pau_index - 1] == PHONE_A &&
 	     phones[pau_index - 2] == PHONE_IJ &&
 	     phones[pau_index - 3] == PHONE_A)
       {
-	  result = "surname-ski";
+	  result = POS_SURNAME_SKI;
       }
     else if (phones[pau_index - 1] == PHONE_H &&
 	     (phones[pau_index - 2] == PHONE_I
 	      || phones[pau_index - 2] == PHONE_Y))
       {
-	  result = "surname-ih";
+	  result = POS_SURNAME_IH;
       }
     else if (phones[pau_index - 1] == PHONE_N &&
 	     (phones[pau_index - 2] == PHONE_I
 	      || phones[pau_index - 2] == PHONE_Y))
       {
-	  result = "surname-in";
+	  result = POS_SURNAME_IN;
       }
     else
       {
-	  result = "name";
+	  result = POS_NAME;
       }
-
-#if DEBUG
-    printf ("pos is %s\n", result);
-#endif
 
     return result;
 }	/*get_pos */
@@ -214,7 +210,7 @@ ask_question (char *phones, int index, int tree_index)
 		if (is_vowel (phones[i]))
 		    result++;
 	    }
-	  return result < ru_stress_cart_nodes[tree_index].value_float;
+	  return result * FLOAT_SCALE < ru_stress_cart_nodes[tree_index].value_float;
       case CART_QUESTION_NUM2END_SMALLER:
 	  result = 0;
 	  for (i = index; phones[i] > PHONE_SYLBREAK; i++)
@@ -222,87 +218,67 @@ ask_question (char *phones, int index, int tree_index)
 		if (is_vowel (phones[i]))
 		    result++;
 	    }
-	  return result < ru_stress_cart_nodes[tree_index].value_float;
+	  return result * FLOAT_SCALE < ru_stress_cart_nodes[tree_index].value_float;
       case CART_QUESTION_PH_VFRONT:
-	  return (strcmp (phoneset[phones[index] - 1].vfront,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index] - 1].vfront ==
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_PH_VHEIGHT:
-	  return (strcmp (phoneset[phones[index] - 1].vheight,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index] - 1].vheight,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_PH_VRND:
-	  return (strcmp (phoneset[phones[index] - 1].vrnd,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index] - 1].vrnd,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_P_VC:
-	  return (strcmp (phoneset[phones[index - 1] - 1].vc,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index - 1] - 1].vc,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_P_VHEIGTH:
-	  return (strcmp (phoneset[phones[index - 1] - 1].vheight,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index - 1] - 1].vheight,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_P_VFRONT:
-	  return (strcmp (phoneset[phones[index - 1] - 1].vfront,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index - 1] - 1].vfront,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QEUSTION_P_VRND:
-	  return (strcmp (phoneset[phones[index - 1] - 1].vrnd,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index - 1] - 1].vrnd,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_P_CVOX:
-	  return (strcmp (phoneset[phones[index - 1] - 1].cvox,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index - 1] - 1].cvox,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_P_CTYPE:
-	  return (strcmp (phoneset[phones[index - 1] - 1].ctype,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index - 1] - 1].ctype,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_P_CPLACE:
-	  return (strcmp (phoneset[phones[index - 1] - 1].cplace,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index - 1] - 1].cplace,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_P_CSOFT:
-	  return (strcmp (phoneset[phones[index - 1] - 1].csoft,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index - 1] - 1].csoft,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_N_VC:
-	  return (strcmp (phoneset[phones[index + 1] - 1].vc,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index + 1] - 1].vc,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_N_VHEIGTH:
-	  return (strcmp (phoneset[phones[index + 1] - 1].vheight,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index + 1] - 1].vheight,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_N_VFRONT:
-	  return (strcmp (phoneset[phones[index + 1] - 1].vfront,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index + 1] - 1].vfront,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QEUSTION_N_VRND:
-	  return (strcmp (phoneset[phones[index + 1] - 1].vrnd,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index + 1] - 1].vrnd,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_N_CVOX:
-	  return (strcmp (phoneset[phones[index + 1] - 1].cvox,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index + 1] - 1].cvox,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_N_CTYPE:
-	  return (strcmp (phoneset[phones[index + 1] - 1].ctype,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index + 1] - 1].ctype,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_N_CPLACE:
-	  return (strcmp (phoneset[phones[index + 1] - 1].cplace,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index + 1] - 1].cplace,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_N_CSOFT:
-	  return (strcmp (phoneset[phones[index + 1] - 1].csoft,
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (phoneset[phones[index + 1] - 1].csoft,
+			  ru_stress_cart_nodes[tree_index].value_feature);
       case CART_QUESTION_POS:
-	  return (strcmp (get_pos (phones, index),
-			  ru_stress_cart_nodes[tree_index].value_string) ==
-		  0);
+	  return (get_pos (phones, index),
+			  ru_stress_cart_nodes[tree_index].value_feature);
 	  break;
       default:
 	  return 0;
@@ -311,12 +287,12 @@ ask_question (char *phones, int index, int tree_index)
 }	/*ask_question */
 
 /**********************************************************************/
-float
+char
 find_stress_probability (char *phones, int index, int tree_index)
 {
     if (ru_stress_cart_nodes[tree_index].type == CART_VALUE)
       {
-	  return (float) ru_stress_cart_nodes[tree_index].value_float;
+	  return ru_stress_cart_nodes[tree_index].value_float;
       }
 
     if (ask_question (phones, index, tree_index))
@@ -330,5 +306,5 @@ find_stress_probability (char *phones, int index, int tree_index)
 					  no_index);
       }
 
-    return 0.0;
+    return 0;
 }	/*find_stress_probability */

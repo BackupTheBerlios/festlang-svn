@@ -6,6 +6,7 @@
 #include "phoneset.h"
 #include "cart_search.h"
 
+/*---------------------------------------------------------------------------*/
 typedef struct utterance
 {
     char text[256];
@@ -13,6 +14,7 @@ typedef struct utterance
     char stress[256];
 } utterance;
 
+/*---------------------------------------------------------------------------*/
 typedef struct lts_rule
 {
     char **predessors;
@@ -22,20 +24,24 @@ typedef struct lts_rule
     char second_phone;
 } lts_rule;
 
+/*---------------------------------------------------------------------------*/
 char *startsyl[] = {
     "#", "ъ", "ь", "а", "я", "о", "ё", "у", "ю", "э", "е", "и",
     NULL
 };
 
+/*---------------------------------------------------------------------------*/
 char *softletters[] = {
     "я", "ё", "ю", "и", "ь", "е", NULL
 };
 
+/*---------------------------------------------------------------------------*/
 char *softsign[] = {
     "ь", NULL
 };
 
 
+/*---------------------------------------------------------------------------*/
 lts_rule lts_ruleset[] = {
     {NULL, " ", NULL, PHONE_SYLBREAK},
 
@@ -102,10 +108,12 @@ lts_rule lts_ruleset[] = {
     {NULL, NULL, NULL, 0}
 };
 
+/**********************************************************************/
 int
 check_context (char *text, int text_idx, int i)
 {
     int j, len;
+
     if (strncmp (text + text_idx,
 		 lts_ruleset[i].letter, strlen (lts_ruleset[i].letter)) != 0)
 	return 0;
@@ -146,8 +154,9 @@ check_context (char *text, int text_idx, int i)
 	    }
       }
     return 0;
-}
+}	/*check_context */
 
+/**********************************************************************/
 void
 utterance_lts (utterance * utt)
 {
@@ -156,7 +165,8 @@ utterance_lts (utterance * utt)
 
     int text_idx;
     int phones_idx;
-    int i, found_len;
+    int i;
+    int found_len;
 
     phones_idx = 0;
     phones[phones_idx++] = PHONE_PAU;
@@ -173,10 +183,8 @@ utterance_lts (utterance * utt)
 			{
 			    phones[phones_idx++] = lts_ruleset[i].phone;
 			    if (lts_ruleset[i].second_phone != 0)
-			      {
-				  phones[phones_idx++] =
-				      lts_ruleset[i].second_phone;
-			      }
+				phones[phones_idx++] =
+				    lts_ruleset[i].second_phone;
 			}
 
 		      found_len = strlen (lts_ruleset[i].letter);
@@ -190,13 +198,14 @@ utterance_lts (utterance * utt)
     phones[phones_idx++] = 0;
 
     return;
-}
+}	/*utterance_lts */
 
+/**********************************************************************/
 void
 utterance_stress (utterance * utt)
 {
     int i, last_index;
-    float min_probability, probability;
+    char  min_probability, probability;
 
     for (i = 0; utt->phones[i] != 0; i++)
       {
@@ -217,11 +226,12 @@ utterance_stress (utterance * utt)
 		      utt->stress[last_index] = 1;
 		  }
 		last_index = -1;
-		min_probability = 2.0;
+		min_probability = (int) (2.0 * FLOAT_SCALE);
 	    }
       }
-}
+}	/*utterance_stress */
 
+/**********************************************************************/
 int
 next_is_stressed (utterance * utt, int i)
 {
@@ -233,8 +243,9 @@ next_is_stressed (utterance * utt, int i)
 	      return utt->stress[j];
       }
     return 1;
-}
+}	/*next_is_stressed */
 
+/**********************************************************************/
 void
 utterance_reduce (utterance * utt)
 {
@@ -242,14 +253,14 @@ utterance_reduce (utterance * utt)
 
     for (i = 1; utt->phones[i] != 0; i++)
       {
-	  if ((utt->phones[i] == PHONE_A || utt->phones[i] == PHONE_O)
-	      && utt->stress[i] == 0 && next_is_stressed (utt, i))
+	  if ((utt->phones[i] == PHONE_A || utt->phones[i] == PHONE_O) &&
+	      utt->stress[i] == 0 && next_is_stressed (utt, i))
 	    {
 		utt->phones[i] = PHONE_AO;
 		continue;
 	    }
-	  if ((utt->phones[i] == PHONE_E || utt->phones[i] == PHONE_I)
-	      && utt->stress[i] == 0 && next_is_stressed (utt, i))
+	  if ((utt->phones[i] == PHONE_E || utt->phones[i] == PHONE_I) &&
+	      utt->stress[i] == 0 && next_is_stressed (utt, i))
 	    {
 		utt->phones[i] = PHONE_EI;
 		continue;
@@ -260,8 +271,9 @@ utterance_reduce (utterance * utt)
 	       utt->phones[i] == PHONE_A) && utt->stress[i] == 0)
 	      utt->phones[i] = PHONE_AE;
       }
-}
+}	/*utterance_reduce */
 
+/**********************************************************************/
 int
 main ()
 {
@@ -276,4 +288,4 @@ main ()
 
 	  dump_phones (utt.phones);
       }
-}
+}	/*main */

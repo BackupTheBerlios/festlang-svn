@@ -1,7 +1,21 @@
 #ifndef CART_H
 #define CART_H
 
-enum
+#define FLOAT_SCALE 20
+
+enum {
+    POS_NAME = 1,
+    POS_SNAME,
+    POS_SURNAME_OVEV,
+    POS_SURNAME_YAN,
+    POS_SURNAME_KO,
+    POS_SURNAME_UK,
+    POS_SURNAME_SKI,
+    POS_SURNAME_IH,
+    POS_SURNAME_IN,
+};
+
+typedef enum
 {
     CART_QUESTION_NUM2END_SMALLER,
     CART_QUESTION_SYLPOS_SMALLER,
@@ -26,21 +40,21 @@ enum
     CART_QUESTION_N_CSOFT,
     CART_QUESTION_POS,
     CART_VALUE
-};
+} cart_question_type;
 
 typedef struct cart_node
 {
-    int type:6;
-    short no_index;
+    int type : 6;
+    int no_index : 18;
 
-    float value_float;
-    char *value_string;
+    char value_float;
+    char value_feature;
 } cart_node;
 
-
 /**********************************************************************/
+
 void dump_feat (char *phones, int index, int feat);
 
-float find_stress_probability (char *phones, int index, int tree_index);
+char find_stress_probability (char *phones, int index, int tree_index);
 
 #endif
