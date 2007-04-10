@@ -13,6 +13,7 @@ enum {
     POS_SURNAME_SKI,
     POS_SURNAME_IH,
     POS_SURNAME_IN,
+    POS_SURNAME_IK,
 };
 
 typedef enum

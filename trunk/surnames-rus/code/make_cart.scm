@@ -68,6 +68,7 @@ Do the tree dump"
     ("surname-ski" 7)
     ("surname-ih" 8)
     ("surname-in" 9)
+    ("surname-ik" 10)
     ))
 
 (define (carttoC_tree_nodes tree ofdc ofdh)

@@ -164,13 +164,15 @@ get_pos (char *phones, int index)
       }
     else if (phones[pau_index - 1] == PHONE_IJ &&
 	     phones[pau_index - 2] == PHONE_I &&
-	     phones[pau_index - 3] == PHONE_KK)
+	     phones[pau_index - 3] == PHONE_KK &&
+	     phones[pau_index - 4] == PHONE_S || phones[pau_index - 4] == PHONE_C)
       {
 	  result = POS_SURNAME_SKI;
       }
     else if (phones[pau_index - 1] == PHONE_A &&
 	     phones[pau_index - 2] == PHONE_IJ &&
-	     phones[pau_index - 3] == PHONE_A)
+	     phones[pau_index - 3] == PHONE_A &&
+	     phones[pau_index - 4] == PHONE_K)
       {
 	  result = POS_SURNAME_SKI;
       }
@@ -192,6 +194,11 @@ get_pos (char *phones, int index)
 	      || phones[pau_index - 3] == PHONE_Y))
       {
 	  result = POS_SURNAME_IN;
+      }
+    else if (phones[pau_index - 1] == PHONE_K &&
+	     phones[pau_index - 2] == PHONE_I)
+      {
+	  result = POS_SURNAME_IK;
       }
     else
       {
@@ -307,14 +314,14 @@ find_stress_probability (char *phones, int index, int tree_index)
     if (ask_question (phones, index, tree_index))
       {
 #if DEBUG
-          printf ("CART question answer is yes\n");
+          printf ("CART question %d answer is yes\n", ru_stress_cart_nodes[tree_index].type);
 #endif
 	  return find_stress_probability (phones, index, tree_index + 1);
       }
     else
       {
 #if DEBUG
-          printf ("CART question answer is no\n");
+          printf ("CART question %d answer is no\n", ru_stress_cart_nodes[tree_index].type);
 #endif
 	  return find_stress_probability (phones, index,
 					  ru_stress_cart_nodes[tree_index].
