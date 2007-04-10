@@ -235,3 +235,14 @@ Dump predicted results."
         
         (dump_results (cdr words))
         ))))
+
+(Parameter.set 'Synth_Method 'None)
+
+(define (dump_dict words)
+  "(dump_dict words)
+Dump dictionary with results."
+  (cond
+    ((null words) nil)
+    (t 
+	(utt.synth (eval (list 'Utterance 'Text (car words))))
+        (dump_dict (cdr words)))))
