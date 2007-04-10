@@ -52,7 +52,7 @@ Add lexical stressing."
 
     (set! stress (wagon_predict si tree))
 
-    (if nil
+    (if t
     (format stderr "%l %d %d %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\n" 
 	    stress
 	    (item.feat si 'num2end) 
@@ -207,8 +207,8 @@ Dump features for lexical stress prediction."
 	    ((string-matches w ".*ко#") 'surname-ko)
 	    ((string-matches w ".*их#") 'surname-ih)
 	    ((string-matches w ".*ых#") 'surname-ih)
-	    ((string-matches w ".*юк#") 'surname-uk)
-	    ((string-matches w ".*чук#") 'surname-uk)
+	    ((string-matches w ".*ук#") 'surname-uk)
+	    ((string-matches w ".*ик#") 'surname-ik)
 	    (t 'name))
 ))
 

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-vowels = ("Ð°", "Ñƒ", "Ð¾", "Ðµ", "ÑŽ", "Ñ", "Ñ‘", "Ñ‹", "Ñ", "Ð¸")
+vowels = ("Á", "Õ", "Ï", "Å", "À", "Ñ", "£", "Ù", "Ü", "É")
 
 def ends_with (string, postfix):
     return (string + "#").find (postfix + "#") >= 0
@@ -13,38 +13,40 @@ def stress_syllable (string):
     while i < len(string):
 	if string[i] == '\'':
 	    break;
-	if vowels.__contains__(string[i:i+2]):
+	if vowels.__contains__(string[i:i+1]):
 	    count = count + 1
-	i = i + 2
+	i = i + 1
     return count + 1
 
 def get_pos (input_word):
 
-    if ends_with (input_word, "Ð²Ð¸Ñ‡") or ends_with (input_word, "Ð²Ð½Ð°"):
+    if ends_with (input_word, "×ÉÞ") or ends_with (input_word, "×ÎÁ"):
 	    return "sname"
 
-    if ends_with (input_word, "Ð¸Ð½") or ends_with (input_word, "Ð¸Ð½Ð°"):
+    if ends_with (input_word, "ÉÎ") or ends_with (input_word, "ÉÎÁ"):
 	    return "surname-in"
-    if ends_with (input_word, "Ñ‹Ð½") or ends_with (input_word, "Ñ‹Ð½Ð°"):
+    if ends_with (input_word, "ÙÎ") or ends_with (input_word, "ÙÎÁ"):
 	    return "surname-in"
-    if ends_with (input_word, "ÑÐ½") or ends_with (input_word, "ÑÐ½Ñ†"):
+    if ends_with (input_word, "ÑÎ") or ends_with (input_word, "ÑÎÃ"):
 	    return "surname-yan"
-    if ends_with (input_word, "Ñ‹Ñ…") or  ends_with (input_word, "Ð¸Ñ…"):
+    if ends_with (input_word, "ÙÈ") or  ends_with (input_word, "ÉÈ"):
 	    return "surname-ih"
-    if ends_with (input_word, "ÐµÐ²") or ends_with (input_word, "ÐµÐ²Ð°"):
+    if ends_with (input_word, "Å×") or ends_with (input_word, "Å×Á"):
 	    return "surname-ovev"
-    if ends_with (input_word, "Ñ‘Ð²") or ends_with (input_word, "Ñ‘Ð²Ð°"):
+    if ends_with (input_word, "£×") or ends_with (input_word, "£×Á"):
 	    return "surname-ovev"
-    if ends_with (input_word, "Ð¾Ð²") or ends_with (input_word, "Ð¾Ð²Ð°"):
+    if ends_with (input_word, "Ï×") or ends_with (input_word, "Ï×Á"):
 	    return "surname-ovev"
-    if ends_with (input_word, "ÑÐºÐ¸Ð¹") or ends_with (input_word, "ÑÐºÐ°Ñ"):
+    if ends_with (input_word, "ÓËÉÊ") or ends_with (input_word, "ÓËÁÑ"):
 	    return "surname-ski"
-    if ends_with (input_word, "Ñ†ÐºÐ¸Ð¹") or ends_with (input_word, "Ñ†ÐºÐ°Ñ"):
+    if ends_with (input_word, "ÃËÉÊ") or ends_with (input_word, "ÃËÁÑ"):
 	    return "surname-ski"
-    if ends_with (input_word, "ÐºÐ¾"):
+    if ends_with (input_word, "ËÏ"):
 	    return "surname-ko"
-    if ends_with (input_word, "Ñ‡ÑƒÐº") or ends_with (input_word, "ÑŽÐº"):
+    if ends_with (input_word, "ÕË") or ends_with (input_word, "ÀË"):
 	    return "surname-uk"
+    if ends_with (input_word, "ÉË"):
+	    return "surname-ik"
 
     return "name"
 
