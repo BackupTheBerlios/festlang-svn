@@ -18,10 +18,13 @@ def stress_syllable (string):
 	i = i + 1
     return count + 1
 
-def get_pos (input_word):
+def get_pos (input_word, i):
 
     if ends_with (input_word, "вич") or ends_with (input_word, "вна"):
 	    return "sname"
+
+    if i < 2300:
+	    return "name"
 
     if ends_with (input_word, "ин") or ends_with (input_word, "ина"):
 	    return "surname-in"
@@ -32,11 +35,11 @@ def get_pos (input_word):
     if ends_with (input_word, "ых") or  ends_with (input_word, "их"):
 	    return "surname-ih"
     if ends_with (input_word, "ев") or ends_with (input_word, "ева"):
-	    return "surname-ovev"
+	    return "surname-ev"
     if ends_with (input_word, "ёв") or ends_with (input_word, "ёва"):
-	    return "surname-ovev"
+	    return "surname-ov"
     if ends_with (input_word, "ов") or ends_with (input_word, "ова"):
-	    return "surname-ovev"
+	    return "surname-ov"
     if ends_with (input_word, "ский") or ends_with (input_word, "ская"):
 	    return "surname-ski"
     if ends_with (input_word, "цкий") or ends_with (input_word, "цкая"):
@@ -56,12 +59,14 @@ def main():
     lines = file.readlines ()
 
 
+    j = 0
     for line in lines:
 
 	test_word = line.strip()
 	input_word = test_word.replace ("'","")
-	pos = get_pos (input_word)
+	pos = get_pos (input_word, j)
 
+	j = j + 1;
 	print ("(\"%s\" %s (%d))" % (input_word, pos, stress_syllable (test_word)))
 
 main()

@@ -61,7 +61,7 @@ Do the tree dump"
   '(
     ("name" 1)
     ("sname" 2)
-    ("surname-ovev" 3)
+    ("surname-ov" 3)
     ("surname-yan" 4)
     ("surname-ko" 5)
     ("surname-uk" 6)
@@ -69,6 +69,7 @@ Do the tree dump"
     ("surname-ih" 8)
     ("surname-in" 9)
     ("surname-ik" 10)
+    ("surname-ev" 11)
     ))
 
 (define (carttoC_tree_nodes tree ofdc ofdh)

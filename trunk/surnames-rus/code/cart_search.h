@@ -6,7 +6,7 @@
 enum {
     POS_NAME = 1,
     POS_SNAME,
-    POS_SURNAME_OVEV,
+    POS_SURNAME_OV,
     POS_SURNAME_YAN,
     POS_SURNAME_KO,
     POS_SURNAME_UK,
@@ -14,6 +14,7 @@ enum {
     POS_SURNAME_IH,
     POS_SURNAME_IN,
     POS_SURNAME_IK,
+    POS_SURNAME_EV
 };
 
 typedef enum

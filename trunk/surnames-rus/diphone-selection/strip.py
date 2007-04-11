@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-file = open("selected-clusters", "r")
+file = open("frequent-clusters", "r")
 
 all_lines = file.readlines()
 

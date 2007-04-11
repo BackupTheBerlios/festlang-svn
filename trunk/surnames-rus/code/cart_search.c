@@ -131,15 +131,26 @@ get_pos (char *phones, int index)
 	  result = POS_SNAME;
       }
     else if (phones[pau_index - 1] == PHONE_V &&
-	     (phones[pau_index - 2] == PHONE_O
-	      || phones[pau_index - 2] == PHONE_E))
+	     phones[pau_index - 2] == PHONE_O)
       {
-	  result = POS_SURNAME_OVEV;
+	  result = POS_SURNAME_OV;
       }
     else if (phones[pau_index - 1] == PHONE_A &&
-	     phones[pau_index - 2] == PHONE_V)
+	     phones[pau_index - 2] == PHONE_V &&
+	     phones[pau_index - 3] == PHONE_O)
       {
-	  result = POS_SURNAME_OVEV;
+	  result = POS_SURNAME_OV;
+      }
+    else if (phones[pau_index - 1] == PHONE_V &&
+	     phones[pau_index - 2] == PHONE_E)
+      {
+	  result = POS_SURNAME_EV;
+      }
+    else if (phones[pau_index - 1] == PHONE_A &&
+	     phones[pau_index - 2] == PHONE_V &&
+	     phones[pau_index - 3] == PHONE_E)
+      {
+	  result = POS_SURNAME_EV;
       }
     else if (phones[pau_index - 1] == PHONE_C &&
 	     phones[pau_index - 2] == PHONE_N &&

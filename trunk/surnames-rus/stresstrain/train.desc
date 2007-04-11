@@ -20,4 +20,4 @@
 (n.ph_ctype s f a n l 0)
 (n.ph_cplace l a p b d v 0)
 (n.ph_csoft + - 0)
-(pos name sname surname-uk surname-yan surname-ovev surname-in surname-ski surname-ko surname-ih surname-ik))
+(pos name sname surname-uk surname-yan surname-ov surname-ev surname-in surname-ski surname-ko surname-ih surname-ik))
