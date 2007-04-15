@@ -1,0 +1,48 @@
+# gnome-voice-control translation to Russian.
+# Copyright (C) 2007 Free Software Foundation
+# This file is distributed under the same license as the gnome-voice-control package.
+# Nickolay V. Shmyrev <nshmyrev@yandex.ru> 2007
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-voice-control trunk\n"
+"Report-Msgid-Bugs-To: http://bugzilla.gnome.org\n"
+"POT-Creation-Date: 2007-03-05 15:31+0300\n"
+"PO-Revision-Date: 2007-03-05 15:31+0300\n"
+"Last-Translator: Nickolay V. Shmyrev <nshmyrev@yandex.ru>\n"
+"Language-Team: Russian <gnome-cyr@gnome.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:1
+msgid "Control your desktop with voice"
+msgstr ""
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:2
+msgid "Factory for creating voice control applets."
+msgstr ""
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:3
+msgid "VoiceControl"
+msgstr ""
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:4
+msgid "VoiceControl Applet Factory"
+msgstr ""
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:1
+msgid "_About"
+msgstr ""
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:2
+msgid "_Help"
+msgstr ""
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:3
+msgid "_Start Control"
+msgstr ""
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:4
+msgid "_Stop Control"
+msgstr ""
