@@ -21,6 +21,8 @@ Predict lexical stress by decision tree."
     (item.set_feat si 'pos pos)
     (item.set_feat si 'numsyls (count_syls phones))
     (item.set_feat si 'sylpos 1)
+    (item.set_feat si 'last (get_last phones))
+    
     (set! nphones (add_lex_stress_syl phones si tree))
 ;   (format t "%l\n" phones)
 ;   (format t "%l\n" nphones)
@@ -41,6 +43,11 @@ Add lexical stressing."
    ((string-matches (car phones) "[aeiouy]")
     (item.set_feat si 'phone (car phones))
     (item.set_feat si 'name (car phones))
+    
+    (item.set_feat si 'lasttt-name (car (item.feat si 'last)))
+    (item.set_feat si 'lastt-name (cadr (item.feat si 'last)))
+    (item.set_feat si 'last-name (caddr (item.feat si 'last)))
+    
     (item.set_feat si 'num2end 
 			 (- (+ 1 (item.feat si 'numsyls))
 			    (item.feat si 'sylpos)))
@@ -53,7 +60,7 @@ Add lexical stressing."
     (set! stress (wagon_predict si tree))
 
     (if t
-    (format stderr "%l %d %d %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\n" 
+    (format stderr "%l %d %d %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\n" 
 	    stress
 	    (item.feat si 'num2end) 
 	    (item.feat si 'sylpos)
@@ -80,7 +87,9 @@ Add lexical stressing."
 	    (item.feat si 'n.ph_csoft)
 
 	    (item.feat si 'pos)
-	    (item.feat (item.next si) 'name)
+	    (item.feat si 'lasttt-name)
+	    (item.feat si 'lastt-name)
+	    (item.feat si 'last-name)
 	    ))
 
     (item.set_feat (item.prev si) 'name (car phones)) 
@@ -117,7 +126,7 @@ Dump lex stress."
 		((eq (+ stress 1) (item.feat si 'sylpos)) 1)
 		 (t 0)
 	    )))
-    (format stderr "%d %d %d %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\n" 
+    (format stderr "%d %d %d %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\n" 
 ;	    (car (car (cdr stress)))
 	    is_stress
 	    (item.feat si 'num2end) 
@@ -145,6 +154,9 @@ Dump lex stress."
 	    (item.feat si 'n.ph_csoft)
 
 	    (item.feat si 'pos)
+	    (car (item.feat si 'last))
+	    (cadr (item.feat si 'last))
+	    (caddr (item.feat si 'last))
 	    ))
     (item.set_feat (item.prev si) 'name (car phones)) 
     (dump_lex_stress (cdr phones) si stress))
@@ -153,6 +165,12 @@ Dump lex stress."
      (dump_lex_stress (cdr phones) si stress))))
 
 (voice_msu_ru_nsh_cg)
+
+(define (get_last phones) 
+    (cond 
+     ((null (cdddr phones)) phones)
+     (t (get_last (cdr phones)))
+))
 
 (define (dump_lex_stress_feats words)
   "(dump_lex_stress_feats words)
@@ -170,7 +188,7 @@ Dump features for lexical stress prediction."
         (set! syls (russian_syllabify phones nil))
         (set! stress (lex.lookup word))
         
-        (format stderr "%l %l\n" phones stress)
+        (format stderr "%l %l %l\n" phones stress (get_last phones))
 
         (utt.relation.create utt 'Letter)
         (set! si (utt.relation.append utt 'Letter))
@@ -181,6 +199,7 @@ Dump features for lexical stress prediction."
         (item.set_feat si 'numsyls (count_syls phones))
         (item.set_feat si 'sylpos 1)
         (item.set_feat si 'pos (car (cdr stress)))
+	(item.set_feat si 'last (get_last phones))
 
 	(dump_lex_stress phones si (caar (cddr stress)))
     		

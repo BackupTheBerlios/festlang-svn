@@ -20,4 +20,13 @@
 (n.ph_ctype s f a n l 0)
 (n.ph_cplace l a p b d v 0)
 (n.ph_csoft + - 0)
-(pos name sname surname-uk surname-yan surname-ov surname-ev surname-in surname-ski surname-ko surname-ih surname-ik))
+(pos name sname surname-uk surname-yan surname-ov surname-ev surname-in surname-ski surname-ko surname-ih surname-ik)
+(lasttt.name 0 "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
+"g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
+"h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij")
+(lastt.name 0 "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
+"g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
+"h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij")
+(last.name 0 "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
+"g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
+"h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij"))
