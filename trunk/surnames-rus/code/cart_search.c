@@ -222,6 +222,19 @@ get_pos (char *phones, int index)
 }	/*get_pos */
 
 /**********************************************************************/
+char get_last (char *phones, int index, int offset)
+{
+    int i;
+    
+    for (i = index; phones[i] != PHONE_PAU && phones[i] != PHONE_SYLBREAK; i++);
+    
+    if (i > offset)
+	    return phones[i - offset];
+	    
+    return 0;
+}       /*get_last*/
+
+/**********************************************************************/
 int
 ask_question (char *phones, int index, int tree_index)
 {
@@ -305,6 +318,26 @@ ask_question (char *phones, int index, int tree_index)
 			  ru_stress_cart_nodes[tree_index].value);
       case CART_QUESTION_POS:
 	  return (get_pos (phones, index) ==
+			  ru_stress_cart_nodes[tree_index].value);
+	  break;
+      case CART_QUESTION_LASTTTTT_NAME:
+	  return (get_last (phones, index, 5) ==
+			  ru_stress_cart_nodes[tree_index].value);
+	  break;
+      case CART_QUESTION_LASTTTT_NAME:
+	  return (get_last (phones, index, 4) ==
+			  ru_stress_cart_nodes[tree_index].value);
+	  break;
+      case CART_QUESTION_LASTTT_NAME:
+	  return (get_last (phones, index,3) ==
+			  ru_stress_cart_nodes[tree_index].value);
+	  break;
+      case CART_QUESTION_LASTT_NAME:
+	  return (get_last (phones, index, 2) ==
+			  ru_stress_cart_nodes[tree_index].value);
+	  break;
+      case CART_QUESTION_LAST_NAME:
+	  return (get_last (phones, index, 1) ==
 			  ru_stress_cart_nodes[tree_index].value);
 	  break;
       default:
