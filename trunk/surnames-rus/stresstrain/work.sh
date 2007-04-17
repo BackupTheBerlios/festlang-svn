@@ -1,6 +1,6 @@
 #!/bin/sh
 
-wagon -data train.feats -test train.feats \
+wagon -data train.feats.train -test train.feats.test \
  -desc train.desc -output train.tree -stop 1
 
 
