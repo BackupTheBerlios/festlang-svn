@@ -1,3 +1,5 @@
+Features with POS guess:
+
 FEATURE    1 sylpos: 0.7228
 FEATURE    2 num2end: 0.7660
 FEATURE    3 pos: 0.7903
@@ -15,3 +17,29 @@ FEATURE    14 ph_vrnd: 0.9458
 FEATURE    15 p.ph_vheight: 0.9460
 FEATURE    16 p.ph_vfront: 0.9460
 FEATURE    17 n.ph_vheight: 0.9460
+
+Average result around 88% on independant test data
+
+Features with last phones:
+
+FEATURE    1 p.ph_vfront: 0.7133
+FEATURE    2 last.name: 0.7165
+FEATURE    3 num2end: 0.8170
+FEATURE    4 lastt.name: 0.8402
+FEATURE    5 lasttttt.name: 0.8593
+FEATURE    6 lastttt.name: 0.8825
+FEATURE    7 lasttt.name: 0.9023
+FEATURE    8 sylpos: 0.9117
+FEATURE    9 n.ph_cplace: 0.9149
+FEATURE    10 n.ph_cvox: 0.9160
+FEATURE    11 p.ph_vc: 0.9162
+FEATURE    12 p.ph_vheight: 0.9165
+FEATURE    13 n.ph_vfront: 0.9167
+FEATURE    14 n.ph_vrnd: 0.9169
+
+      0 3146  161 3307      [3146/3307]      95.132
+      1  226 1123 1349      [1123/1349]      83.247
+        3372 1284
+
+  total 4656 correct 4269.000 91.688%
+
