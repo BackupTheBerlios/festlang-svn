@@ -61,10 +61,11 @@ Add lexical stressing."
     (set! stress (wagon_predict si tree))
 
     (if t
-    (format stderr "%l %d %d %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\n" 
+    (format stderr "%l %d %d %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\n" 
 	    stress
 	    (item.feat si 'num2end) 
 	    (item.feat si 'sylpos)
+
 	    (item.feat si 'ph_vfront)
 	    (item.feat si 'ph_vheight)
 	    (item.feat si 'ph_vrnd)
@@ -88,6 +89,13 @@ Add lexical stressing."
 	    (item.feat si 'n.ph_csoft)
 
 	    (item.feat si 'pos)
+	    
+	    (item.feat si 'p.name)
+	    (item.feat si 'name)
+	    (item.feat si 'n.name)
+	    (caddr phones)
+	    (cadddr phones)
+
 	    (item.feat si 'lastttt-name)
 	    (item.feat si 'lasttt-name)
 	    (item.feat si 'lastt-name)
@@ -128,8 +136,7 @@ Dump lex stress."
 		((eq (+ stress 1) (item.feat si 'sylpos)) 1)
 		 (t 0)
 	    )))
-    (format stderr "%d %d %d %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\n" 
-;	    (car (car (cdr stress)))
+    (format stderr "%d %d %d %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s %s\n" 
 	    is_stress
 	    (item.feat si 'num2end) 
 	    (item.feat si 'sylpos)
@@ -156,6 +163,13 @@ Dump lex stress."
 	    (item.feat si 'n.ph_csoft)
 
 	    (item.feat si 'pos)
+
+	    (item.feat si 'p.name)
+	    (item.feat si 'name)
+	    (item.feat si 'n.name)
+	    (caddr phones)
+	    (car (cdddr phones))
+
 	    (car (item.feat si 'last))
 	    (cadr (item.feat si 'last))
 	    (caddr (item.feat si 'last))
