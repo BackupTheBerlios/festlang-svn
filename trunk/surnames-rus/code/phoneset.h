@@ -1,9 +1,6 @@
 #ifndef PHONESET_H
 #define PHONESET_H
 
-
-extern char * phoneset[];
-
 enum phoneset
 {
     PHONE_PAU = 1,
@@ -60,10 +57,8 @@ enum phoneset
     PHONE_IJ,
 };
 
-void dump_phones (char *phones);
-
-int is_vowel (char phone);
-int is_pau (char phone);
-
+void   dump_phones (char *phones);
+int    is_vowel (char phone);
+int    is_pau (char phone);
 
 #endif

@@ -10,7 +10,12 @@
 #define UNSTRESSED 1
 #define STRESSED   2
 
-/*---------------------------------------------------------------------------*/
+/***************************************************************************
+ *
+ * Utterance are basic chunks of processed text. They has all information
+ * about text markup we made.
+ *
+ ***************************************************************************/
 typedef struct utterance
 {
     char text[256];
@@ -18,7 +23,13 @@ typedef struct utterance
     char stress[256];
 } utterance;
 
-/*---------------------------------------------------------------------------*/
+/***************************************************************************
+ *
+ * LTS rules for Russian. Each rule has predessors, ancessors and letter.
+ * The values of prediction are first and second phone if the are not zero.
+ * This list should be ordered because the first rule matched is applied.
+ *
+ **************************************************************************/
 typedef struct lts_rule
 {
     char **predessors;
@@ -28,24 +39,19 @@ typedef struct lts_rule
     char second_phone;
 } lts_rule;
 
-/*---------------------------------------------------------------------------*/
 char *startsyl[] = {
     "#", "ß", "Ø", "Á", "Ñ", "Ï", "£", "Õ", "À", "Ü", "Å", "É",
     NULL
 };
 
-/*---------------------------------------------------------------------------*/
 char *softletters[] = {
     "Ñ", "£", "À", "É", "Ø", "Å", NULL
 };
 
-/*---------------------------------------------------------------------------*/
 char *softsign[] = {
     "Ø", NULL
 };
 
-
-/*---------------------------------------------------------------------------*/
 lts_rule lts_ruleset[] = {
 
     {NULL, "Á", NULL, PHONE_A, 0},
@@ -112,7 +118,21 @@ lts_rule lts_ruleset[] = {
 };
 
 
-/**********************************************************************/
+/**********************************************************************
+ *
+ * check_context:
+ *
+ * Used in lts. Checks that current context which is pointed by text_idx
+ * in string text is matched to the rule with index i.
+ *
+ * @text: null-terminated string
+ * @text_idx: index in string
+ * @i: index in LTS ruleset
+ *
+ * Returns: TRUE if context matches
+ *
+ **********************************************************************/
+ 
 int
 check_context (char *text, int text_idx, int i)
 {
@@ -160,7 +180,19 @@ check_context (char *text, int text_idx, int i)
     return 0;
 }	/*check_context */
 
-/**********************************************************************/
+/**********************************************************************
+ *
+ * word_stress_lts:
+ *
+ * Convert string to the sequence of phones. According to LTS rules.
+ * We go through the list of rules and search the first which can be
+ * applied. If both contexts matches, we apply rule and append new phones
+ * to the existing sequence. The first and last phones are always PAU.
+ *
+ * @text: null-terminated string
+ * @phones: sequence of phones. Should be allocated already.
+ *
+ **********************************************************************/
 void
 word_lts (char *text, char *phones)
 {
@@ -201,7 +233,18 @@ word_lts (char *text, char *phones)
     return;
 }	/*utterance_lts */
 
-/**********************************************************************/
+/**********************************************************************
+ *
+ * word_dict_search:
+ *
+ * Implements binary search in dictionary. Note that it should be 
+ * sorted in order to make this function working.
+ *
+ * @word: word to search for.
+ *
+ * Returns: which vowel is stressed.
+ *
+ **********************************************************************/
 int
 word_dict_search (char *text)
 {
@@ -226,7 +269,18 @@ word_dict_search (char *text)
 	    return -1;
 }      /* word_dict_search */
 
-/**********************************************************************/
+/**********************************************************************
+ *
+ * word_stress_cart:
+ *
+ * Fills stress array with values based on CART tree. It just takes
+ * the last vowel with maximal stress probability. Although different
+ * selection algorightms are possible
+ *
+ * @phones: sequence of phones
+ * @stress: output array with stress flags. Should be allocated already.
+ *
+ **********************************************************************/
 void
 word_stress_cart (char *phones, char *stress)
 {
@@ -262,7 +316,17 @@ word_stress_cart (char *phones, char *stress)
       }
 }	/*utterance_stress */
 
-/**********************************************************************/
+/**********************************************************************
+ *
+ * word_stress_dict:
+ *
+ * Fills stress array with values based on dictionary
+ *
+ * @phones: sequence of phones
+ * @stress: output array with stress flags. Should be allocated already
+ * @stress_ind: stressed vowel index predicted by dictionary.
+ *
+ **********************************************************************/
 void
 word_stress_dict (char *phones, char *stress, int stress_ind)
 {
@@ -282,7 +346,16 @@ word_stress_dict (char *phones, char *stress, int stress_ind)
 	}
 }	/*utterance_stress */
 
-/**********************************************************************/
+/**********************************************************************
+ * 
+ * next_is_stressed:
+ *
+ * Determines if next vowel is stressed, used in reduction algorithm.
+ *
+ * @utt: utterance with stress and phones filled. 
+ * @i: vowel's index.
+ *
+ **********************************************************************/
 int
 next_is_stressed (utterance * utt, int i)
 {
@@ -296,7 +369,15 @@ next_is_stressed (utterance * utt, int i)
     return 1;
 }	/*next_is_stressed */
 
-/**********************************************************************/
+/**********************************************************************
+ *
+ * utterance_reduce:
+ *
+ * Reduces vowels in utterance according to predicted stress
+ *
+ * @utt: utterance with phones and stress filled
+ *
+ *********************************************************************/
 void
 utterance_reduce (utterance * utt)
 {
@@ -323,6 +404,21 @@ utterance_reduce (utterance * utt)
 	      utt->phones[i] = PHONE_AE;
       }
 }	/*utterance_reduce */
+
+/*********************************************************
+ *
+ * utterance_lts:
+ *
+ * Main function which does lts conversion. It takes
+ * utterance's text, split it on words and converts them
+ * to the sequence of phones according to the LTS rules.
+ * The stress is assigned either with dictionary or with 
+ * CART tree. After that phones are concatenated into single 
+ * sequence and vowels are reduced by predicted stress.
+ *
+ * @utt: utterance with text filled
+ *
+ ********************************************************/
 
 void
 utterance_lts (utterance *utt)
@@ -378,7 +474,6 @@ utterance_lts (utterance *utt)
     utterance_reduce (utt);
 }
 
-/**********************************************************************/
 int
 main ()
 {

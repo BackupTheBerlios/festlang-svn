@@ -11,5 +11,3 @@ typedef struct dict_node {
 extern const dict_node dict[];
 
 #endif
-
-

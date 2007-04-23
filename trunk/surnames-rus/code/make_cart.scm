@@ -1,3 +1,9 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; This code is used to convert festival CART tree to it's C representation
+;; It's derived from flite code by Alan W. Black
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defvar float_scale 40)
 
@@ -53,7 +59,6 @@ Do the tree dump"
 (defvar phone_to_chars
   '(
     ("nil" "PHONE_PAU")
-    ("0" "PHONE_PAU")
     ("pau" "PHONE_PAU")
     ("i" "PHONE_I")
     ("y" "PHONE_Y")

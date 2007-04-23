@@ -6,7 +6,21 @@
 
 extern const cart_node ru_stress_cart_nodes[];
 
-/**********************************************************************/
+/**********************************************************************
+ *
+ * get_last
+ *
+ * Gets the phone with offset relative to the end of word. It takes
+ * into account that we can step over word boundaries. This function
+ * should be certainly optimized for reentrancy.
+ *
+ * @phones: string of phones
+ * @index: current phone index
+ * @offset: relative offset
+ *
+ * Returns: phone at offset
+ *
+ **********************************************************************/
 char get_last (char *phones, int index, int offset)
 {
     int i;
@@ -19,7 +33,20 @@ char get_last (char *phones, int index, int offset)
     return 0;
 }       /*get_last*/
 
-/**********************************************************************/
+/**********************************************************************
+ *
+ * get_index
+ *
+ * Gets the phone with offset relative to the current phone. It takes
+ * into account that we can step over word boundaries.
+ *
+ * @phones: string of phones
+ * @index: current phone index
+ * @offset: relative offset
+ *
+ * Returns: phone at offset
+ *
+ **********************************************************************/
 char get_ind (char *phones, int index, int offset)
 {
     int i;
@@ -34,7 +61,22 @@ char get_ind (char *phones, int index, int offset)
     return 0;
 }       /*get_ind*/
 
-/**********************************************************************/
+/*********************************************************************
+ * 
+ * ask_question:
+ *
+ * ask a question about phone. The questions have different types. Usually
+ * it's either distance from the word boundary or the name of phone in 
+ * neighbourhood. 
+ *
+ *
+ * @phones: string of phones
+ * @index: index in string
+ * @tree_index: tree node index to ask question
+ * 
+ * Returns: 1 if answer is yes 0 otherwise.
+ *
+ *********************************************************************/
 int
 ask_question (char *phones, int index, int tree_index)
 {
@@ -96,6 +138,8 @@ ask_question (char *phones, int index, int tree_index)
 			  ru_stress_cart_nodes[tree_index].value);
 	  break;
       case CART_QUESTION_NNN_NAME:
+          printf ("result is %d %d\n",get_ind (phones, index, 3),
+			  ru_stress_cart_nodes[tree_index].value);
 	  return (get_ind (phones, index, 3) ==
 			  ru_stress_cart_nodes[tree_index].value);
 	  break;
@@ -105,7 +149,22 @@ ask_question (char *phones, int index, int tree_index)
     return 0;
 }	/*ask_question */
 
-/**********************************************************************/
+/***************************************************************************
+ *
+ * find_stress_probability:
+ *
+ * Finds probability of the stress at the given index with the CART tree.
+ * This is recursive function that asks question in order to move from main
+ * tree node to leafs.
+ *
+ * @phones: sequence of phones.
+ * @index: index of vowel in the sequence. 
+ * @tree_index: index of node in cart tree. Used in recursion.
+ * Should be 0 for actual call.
+ *
+ * Returns: Probabilty of stress converted to integer with FLOAT_SCALE
+ *
+ **************************************************************************/
 char
 find_stress_probability (char *phones, int index, int tree_index)
 {

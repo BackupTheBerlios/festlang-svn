@@ -27,10 +27,6 @@ typedef struct cart_node
     unsigned char value;
 } cart_node;
 
-/**********************************************************************/
-
-void dump_feat (char *phones, int index, int feat);
-
 char find_stress_probability (char *phones, int index, int tree_index);
 
 #endif
