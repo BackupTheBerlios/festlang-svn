@@ -1,8 +1,8 @@
 SOURCES = \
-	lts_main.c phoneset.c cart.c cart_search.c
+	lts_main.c phoneset.c cart.c cart_search.c dict.c
 
 HEADERS = \
-phoneset.h cart.h cart_search.h
+phoneset.h cart.h cart_search.h dict.h
 
 lts: $(SOURCES) $(HEADERS)
 	gcc -O0 -g -o lts $(SOURCES)

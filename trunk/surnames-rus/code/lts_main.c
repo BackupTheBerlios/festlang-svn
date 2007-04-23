@@ -5,6 +5,10 @@
 
 #include "phoneset.h"
 #include "cart_search.h"
+#include "dict.h"
+
+#define UNSTRESSED 1
+#define STRESSED   2
 
 /*---------------------------------------------------------------------------*/
 typedef struct utterance
@@ -43,7 +47,6 @@ char *softsign[] = {
 
 /*---------------------------------------------------------------------------*/
 lts_rule lts_ruleset[] = {
-    {NULL, " ", NULL, PHONE_SYLBREAK},
 
     {NULL, "Á", NULL, PHONE_A, 0},
     {NULL, "Ü", NULL, PHONE_E, 0},
@@ -108,6 +111,7 @@ lts_rule lts_ruleset[] = {
     {NULL, NULL, NULL, 0}
 };
 
+
 /**********************************************************************/
 int
 check_context (char *text, int text_idx, int i)
@@ -158,11 +162,8 @@ check_context (char *text, int text_idx, int i)
 
 /**********************************************************************/
 void
-utterance_lts (utterance * utt)
+word_lts (char *text, char *phones)
 {
-    char *text = utt->text;
-    char *phones = utt->phones;
-
     int text_idx;
     int phones_idx;
     int i;
@@ -201,19 +202,45 @@ utterance_lts (utterance * utt)
 }	/*utterance_lts */
 
 /**********************************************************************/
+int
+word_dict_search (char *text)
+{
+    int a = 0;
+    int b = DICT_SIZE;
+    int c;
+    
+    while (a + 1 < b) 
+	{
+	    c = (a + b) / 2;
+	    if (strcmp (text, dict[c].word) <= 0)
+		    b = c;
+	    else
+		    a = c;
+	}
+
+    if (strcmp (text, dict[a].word) == 0)
+	    return dict[a].stress;
+    else if (strcmp (text, dict[b].word) == 0)
+	    return dict[b].stress;
+    else 
+	    return -1;
+}      /* word_dict_search */
+
+/**********************************************************************/
 void
-utterance_stress (utterance * utt)
+word_stress_cart (char *phones, char *stress)
 {
     int i, last_index;
     char  min_probability, probability;
 
-    for (i = 0; utt->phones[i] != 0; i++)
-      {
-	  if (is_vowel (utt->phones[i]))
+    last_index = -1;
+    for (i = 0; phones[i] != 0; i++)
+      {	
+    	 if (is_vowel (phones[i]))
 	    {
-		probability = find_stress_probability (utt->phones, i, 0);
+		probability = find_stress_probability (phones, i, 0);
 #if DEBUG
-		printf ("Phone %d probability %d \n", utt->phones[i], probability);
+		printf ("Phone %d probability %d \n", phones[i], probability);
 #endif
 		if (probability <= min_probability)
 		  {
@@ -221,17 +248,38 @@ utterance_stress (utterance * utt)
 		      last_index = i;
 		  }
 	    }
-	  utt->stress[i] = 0;
-	  if (is_pau (utt->phones[i]))
+        	
+	  stress[i] = UNSTRESSED;
+	  if (is_pau (phones[i]))
 	    {
 		if (last_index >= 0)
 		  {
-		      utt->stress[last_index] = 1;
+		      stress[last_index] = STRESSED;
 		  }
 		last_index = -1;
 		min_probability = (int) (2.0 * FLOAT_SCALE);
 	    }
       }
+}	/*utterance_stress */
+
+/**********************************************************************/
+void
+word_stress_dict (char *phones, char *stress, int stress_ind)
+{
+    int i, vowel_index;
+
+    for (i = 0, vowel_index = 0; phones[i] != 0; i++)
+	{
+	    if (is_vowel (phones[i]))
+		    vowel_index ++;
+	    if (vowel_index == stress_ind)
+		{
+		    stress[i] = STRESSED;
+		    vowel_index++;
+		}
+	    else
+		    stress[i] = UNSTRESSED;
+	}
 }	/*utterance_stress */
 
 /**********************************************************************/
@@ -243,7 +291,7 @@ next_is_stressed (utterance * utt, int i)
     for (j = i + 1; utt->phones[j] != 0; j++)
       {
 	  if (is_vowel (utt->phones[j]))
-	      return utt->stress[j];
+	      return (utt->stress[j] == STRESSED);
       }
     return 1;
 }	/*next_is_stressed */
@@ -257,13 +305,13 @@ utterance_reduce (utterance * utt)
     for (i = 1; utt->phones[i] != 0; i++)
       {
 	  if ((utt->phones[i] == PHONE_A || utt->phones[i] == PHONE_O) &&
-	      utt->stress[i] == 0 && next_is_stressed (utt, i))
+	      utt->stress[i] == UNSTRESSED && next_is_stressed (utt, i))
 	    {
 		utt->phones[i] = PHONE_AO;
 		continue;
 	    }
 	  if ((utt->phones[i] == PHONE_E || utt->phones[i] == PHONE_I) &&
-	      utt->stress[i] == 0 && next_is_stressed (utt, i))
+	      utt->stress[i] == UNSTRESSED && next_is_stressed (utt, i))
 	    {
 		utt->phones[i] = PHONE_EI;
 		continue;
@@ -271,10 +319,64 @@ utterance_reduce (utterance * utt)
 	  if ((utt->phones[i] == PHONE_O ||
 	       utt->phones[i] == PHONE_E ||
 	       utt->phones[i] == PHONE_I ||
-	       utt->phones[i] == PHONE_A) && utt->stress[i] == 0)
+	       utt->phones[i] == PHONE_A) && utt->stress[i] == UNSTRESSED)
 	      utt->phones[i] = PHONE_AE;
       }
 }	/*utterance_reduce */
+
+void
+utterance_lts (utterance *utt)
+{
+    char phones[256];
+    char stress[256];
+    char* str, *saveptr, *word;
+    int dict_stress;
+    int index;
+
+    memset (utt->phones, 0, sizeof(utt->phones));
+    memset (utt->stress, 0, sizeof(utt->stress));
+    
+    index = 1;
+    utt->phones[0] = PHONE_PAU;
+    utt->stress[0] = UNSTRESSED;
+
+    for (str = utt->text; ; str = NULL) 
+        {
+             word = strtok_r(str, " \t\n", &saveptr);
+             if (word == NULL)
+            	    break;
+            	    
+#if DEBUG
+	     printf ("Processing word |%s|\n", word);
+#endif
+
+             memset (phones, 0, sizeof(phones));
+             memset (stress, 0, sizeof(stress));
+             
+             word_lts(word, phones);
+
+             dict_stress = word_dict_search (word);
+             
+             if (dict_stress > 0)
+               {
+                  word_stress_dict (phones, stress, dict_stress);	
+               }
+             else
+               {
+                  word_stress_cart (phones, stress);
+               }
+
+    	      strcpy (utt->phones + index, phones + 1);
+    	      strcpy (utt->stress + index, stress + 1);
+
+    	      index += strlen (phones) - 2; /* Without leading and trailing pau */
+    	      utt->phones[index] = PHONE_SYLBREAK;
+    	      index ++;
+	}
+    utt->phones[index - 1] = PHONE_PAU;
+
+    utterance_reduce (utt);
+}
 
 /**********************************************************************/
 int
@@ -286,9 +388,13 @@ main ()
       {
 
 	  utterance_lts (&utt);
-	  utterance_stress (&utt);
-	  utterance_reduce (&utt);
-
 	  dump_phones (utt.phones);
+
+#if DEBUG
+	  int i;
+	  for (i = 0; utt.stress[i] != 0; i++)
+		printf ("%d ",utt.stress[i]);
+	  printf ("\n");
+#endif
       }
 }	/*main */
