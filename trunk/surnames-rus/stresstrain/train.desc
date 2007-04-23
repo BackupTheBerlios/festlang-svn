@@ -1,41 +1,47 @@
 ((lex_stress 0 1) 
 (num2end float)
 (sylpos float)
-(ph_vfront ignore  1 2 3)
-(ph_vheight ignore 1 2 3)
-(ph_vrnd ignore  + -)
-(p.ph_vc ignore  + -)  
-(p.ph_vheight ignore  1 2 3 0)
-(p.ph_vfront ignore  1 2 3 0)
-(p.ph_vrnd ignore  + - 0)
-(p.ph_cvox ignore  + - 0)
-(p.ph_ctype ignore  s f a n l 0)
-(p.ph_cplace ignore  l a p b d v 0)
-(p.ph_csoft ignore  + - 0)
-(n.ph_vc ignore  + -)  
-(n.ph_vheight ignore  1 2 3 0)
-(n.ph_vfront ignore  1 2 3 0)
-(n.ph_vrn ignore d + - 0)
-(n.ph_cvox ignore  + - 0)
-(n.ph_ctype ignore  s f a n l 0)
-(n.ph_cplace ignore  l a p b d v 0)
-(n.ph_csoft ignore  + - 0)
-(pos ignore name sname surname-uk surname-yan surname-ov surname-ev surname-in surname-ski surname-ko surname-ih surname-ik)
-(p.name nil "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
-"g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
-"h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij")
 (name nil "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
 "g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
 "h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij")
+(ph_vfront ignore 1 2 3)
+(ph_vheight ignore 1 2 3)
+(ph_vrnd  ignore + -)
+(pp.name ignore nil "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
+"g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
+"h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij")
+(p.name nil "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
+"g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
+"h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij")
+(p.ph_vc ignore + -)  
+(p.ph_vheight ignore 1 2 3 0)
+(p.ph_vfront ignore 1 2 3 0)
+(p.ph_vrnd ignore + - 0)
+(p.ph_cvox ignore  + - 0)
+(p.ph_ctype ignore s f a n l 0)
+(p.ph_cplace ignore  l a p b d v 0)
+(p.ph_csoft ignore + - 0)
 (n.name nil "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
 "g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
 "h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij")
+(n.ph_vc ignore + -)  
+(n.ph_vheight ignore 1 2 3 0)
+(n.ph_vfront ignore 1 2 3 0)
+(n.ph_vrnd ignore + - 0)
+(n.ph_cvox ignore  + - 0)
+(n.ph_ctype ignore s f a n l 0)
+(n.ph_cplace ignore l a p b d v 0)
+(n.ph_csoft ignore + - 0)
 (nn.name nil "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
 "g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
 "h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij")
-(nn.name nil "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
+(nnn.name nil "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
 "g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
 "h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij")
+(nnnn.name ignore nil "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
+"g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
+"h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij")
+(pos ignore name sname surname-uk surname-yan surname-ov surname-ev surname-in surname-ski surname-ko surname-ih surname-ik)
 (lasttttt.name nil "pau" "i" "y" "e" "a" "o" "u" "p" "pp" "b" "bb" "t" "tt" "d" "dd"  "k" "kk"
 "g" "gg" "c" "ch" "f" "ff" "v" "vv" "s" "ss" "z" "zz" "sh" "sch" "zh"
 "h" "hh" "m" "mm" "n" "nn" "l" "ll" "r" "rr" "ij")

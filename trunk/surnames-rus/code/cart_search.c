@@ -235,6 +235,21 @@ char get_last (char *phones, int index, int offset)
 }       /*get_last*/
 
 /**********************************************************************/
+char get_ind (char *phones, int index, int offset)
+{
+    int i;
+    
+    for (i = 0; i <= offset; i++)
+	if (is_pau (phones [index + i]))
+	    return PHONE_PAU;
+	
+    if (index + offset > 0)
+	    return phones[index + offset];
+	    
+    return 0;
+}       /*get_ind*/
+
+/**********************************************************************/
 int
 ask_question (char *phones, int index, int tree_index)
 {
@@ -340,6 +355,26 @@ ask_question (char *phones, int index, int tree_index)
 	  return (get_last (phones, index, 1) ==
 			  ru_stress_cart_nodes[tree_index].value);
 	  break;
+      case CART_QUESTION_P_NAME:
+	  return (get_ind (phones, index, -1) ==
+			  ru_stress_cart_nodes[tree_index].value);
+	  break;
+      case CART_QUESTION_NAME:
+	  return (get_ind (phones, index, 0) ==
+			  ru_stress_cart_nodes[tree_index].value);
+	  break;
+      case CART_QUESTION_N_NAME:
+	  return (get_ind (phones, index, 1) ==
+			  ru_stress_cart_nodes[tree_index].value);
+	  break;
+      case CART_QUESTION_NN_NAME:
+	  return (get_ind (phones, index, 2) ==
+			  ru_stress_cart_nodes[tree_index].value);
+	  break;
+      case CART_QUESTION_NNN_NAME:
+	  return (get_ind (phones, index, 3) ==
+			  ru_stress_cart_nodes[tree_index].value);
+	  break;
       default:
 	  return 0;
       }
@@ -357,14 +392,14 @@ find_stress_probability (char *phones, int index, int tree_index)
 
     if (ask_question (phones, index, tree_index))
       {
-#if DEBUG
+#if 1
           printf ("CART question %d answer is yes\n", ru_stress_cart_nodes[tree_index].type);
 #endif
 	  return find_stress_probability (phones, index, tree_index + 1);
       }
     else
       {
-#if DEBUG
+#if 1
           printf ("CART question %d answer is no\n", ru_stress_cart_nodes[tree_index].type);
 #endif
 	  return find_stress_probability (phones, index,

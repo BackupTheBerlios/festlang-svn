@@ -46,13 +46,18 @@ typedef enum
     CART_QUESTION_LASTTT_NAME,
     CART_QUESTION_LASTT_NAME,
     CART_QUESTION_LAST_NAME,
+    CART_QUESTION_P_NAME,
+    CART_QUESTION_NAME,
+    CART_QUESTION_N_NAME,
+    CART_QUESTION_NN_NAME,
+    CART_QUESTION_NNN_NAME,
     CART_VALUE
 } cart_question_type;
 
 typedef struct cart_node
 {
-    int type : 6;
-    int no_index : 18;
+    int type : 7;
+    int no_index : 17;
     unsigned char value;
 } cart_node;
 

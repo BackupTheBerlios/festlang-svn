@@ -60,6 +60,11 @@ Do the tree dump"
     ("lasttt.name" "CART_QUESTION_LASTTT_NAME")
     ("lastt.name" "CART_QUESTION_LASTT_NAME")
     ("last.name" "CART_QUESTION_LAST_NAME")
+    ("p.name" "CART_QUESTION_P_NAME")
+    ("name" "CART_QUESTION_NAME")
+    ("n.name" "CART_QUESTION_N_NAME")
+    ("nn.name" "CART_QUESTION_NN_NAME")
+    ("nnn.name" "CART_QUESTION_NNN_NAME")
     ))
 
 (defvar pos_to_chars
@@ -79,7 +84,8 @@ Do the tree dump"
 
 (defvar phone_to_chars
   '(
-    ("0" 0)
+    ("nil" 1)
+    ("0" 1)
     ("pau" 1)
     ("i" 3)
     ("y" 4)
@@ -145,7 +151,7 @@ Dump the nodes in the tree."
 		    	(format nil "%s" (cadr (assoc_string
 	    	    		 (caddr (car tree))
 	    		    	     pos_to_chars)))
-	          (if (string-matches (caar tree) "last.*")
+	          (if (string-matches (caar tree) ".*name")
 
 		    	(format nil "%s" (cadr (assoc_string
 	    	    		 (caddr (car tree))
