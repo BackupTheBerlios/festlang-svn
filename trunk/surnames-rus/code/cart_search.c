@@ -138,8 +138,6 @@ ask_question (char *phones, int index, int tree_index)
 			  ru_stress_cart_nodes[tree_index].value);
 	  break;
       case CART_QUESTION_NNN_NAME:
-          printf ("result is %d %d\n",get_ind (phones, index, 3),
-			  ru_stress_cart_nodes[tree_index].value);
 	  return (get_ind (phones, index, 3) ==
 			  ru_stress_cart_nodes[tree_index].value);
 	  break;

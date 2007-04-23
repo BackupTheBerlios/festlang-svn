@@ -1,12 +1,11 @@
-For initial introduction into Russian phonetics and Russian itself
-I'd recommend Edna Andrews book about Russian. Also it would be nice
-to understand Lisp, it's really a very simple programming language, but
+For initial introduction into Russian phonetics and Russian itself I'd
+recommend Edna Andrews book about Russian. Also it would be nice to
+understand Lisp, it's really a very simple programming language, but
 Lisp knowledge is not required.
 
-We need to convert string to the list of phonemes. There are 
-following phonemes in Russian phoneset we'll use (there are different
-phonesets actually depending on the level of details, we have
-to fix one)
+We need to convert string to the list of phonemes. There are  following
+phonemes in Russian phoneset we'll use (there are different phonesets
+actually depending on the level of details, we have to fix one)
 
 Each phone has some properties listed in table, headers are
 
@@ -83,13 +82,13 @@ Each phone has some properties listed in table, headers are
 
 LTS conversion has several stages.
 
-On the first stage we take a string, split it on words and convert
-every letter to lower case. 
+On the first stage we take a string, split it on words and convert every
+letter to lower case. 
 
 Then we have to covert letter to initial phonemes. We split every word
-on letters and then move letter by letter and try to apply one
-of the rules. We look through the list of rules and apply the first
-one found. We append the result to result list. Here are the rules
+on letters and then move letter by letter and try to apply one of the
+rules. We look through the list of rules and apply the first one found.
+We append the result to result list. Here are the rules
 
 ;; Simple vowels
 
@@ -213,10 +212,10 @@ This way we'll make initial LTS conversoin, now we have to assing
 stress. We'll use classification and regression tree (CART tree) to do
 that. This tree is trained from dictionary we made.
 
-We have to go through the list of phonemes and if phoneme is vowel 
-(a y o e i u) we should start tree prediction function which will
-return us the probability of stress on that vowel. Then we can
-just take the vowel with biggest probability and assign stress there.
+We have to go through the list of phonemes and if phoneme is vowel  (a y
+o e i u) we should start tree prediction function which will return us
+the probability of stress on that vowel. Then we can just take the vowel
+with biggest probability and assign stress there.
 
 The tree has the following form
 
@@ -286,88 +285,35 @@ Here is the example of tree:
        ((1)))
       ((1)))))))))
 
-For more information, see the article on CART trees. Let me also 
-note that this tree can be represented very efficiently, you
-can code quesion in say one byte, pointer to the right and
-left leaf will take another two bytes, so you have around
-4 bytes per node. Recent tree has around 6000 nodes, so you'll take
-only 24 kB per lexicon. The search in the tree should be also
-rather efficient. Probably it's worth to look into flite code
-as well, it has CART tree implementation.
+For more information, see the article on CART trees. Let me also  note
+that this tree can be represented very efficiently, you can code quesion
+in say one byte, pointer to the right and left leaf will take another
+two bytes, so you have around 4 bytes per node. Recent tree has around
+6000 nodes, so you'll take only 24 kB per lexicon. The search in the
+tree should be also rather efficient. Probably it's worth to look into
+flite code as well, it has CART tree implementation.
 
 The questions we will use:
 
-(num2end float) ;; Position in syllable
-(sylpos float)
-
-(ph_vfront 1 2 3) ;; Questions about vowel
-(ph_vheight 1 2 3)
-(ph_vrnd + -)
-
-(p.ph_vc + -)  ;; Questions about previous phone
-(p.ph_vheight 1 2 3 0)
-(p.ph_vfront 1 2 3 0)
-(p.ph_vrnd + - 0)
-(p.ph_cvox + - 0)
-(p.ph_ctype s f a n l 0)
-(p.ph_cplace l a p b d v 0)
-(p.ph_csoft + - 0)
-(n.ph_vc + -)  ;; Questions about next phone
-(n.ph_vheight 1 2 3 0)
-(n.ph_vfront 1 2 3 0)
-(n.ph_vrnd + - 0)
-(n.ph_cvox + - 0)
-(n.ph_ctype s f a n l 0)
-(n.ph_cplace l a p b d v 0)
-(n.ph_csoft + - 0)
-(pos name sname surname-uk surname-yan surname-ovev surname-in surname-ski surname-nko))
-
-Last parameter pos will take the type of word into account:
-
-(define (guess_pos word)
-""
-    (let ((w (string-append word "#")))    
-    (cond 
-	    ((string-matches w ".*вич#") 'sname)
-	    ((string-matches w ".*вна#") 'sname)
-	    ((string-matches w ".*ин#") 'surname-in)
-	    ((string-matches w ".*ина#") 'surname-in)
-	    ((string-matches w ".*ян#") 'surname-yan)
-	    ((string-matches w ".*янц#") 'surname-yan)
-	    ((string-matches w ".*ев#") 'surname-ovev)
-	    ((string-matches w ".*ева#") 'surname-ovev)
-	    ((string-matches w ".*ёв#") 'surname-ovev)
-	    ((string-matches w ".*ёва#") 'surname-ovev)
-	    ((string-matches w ".*ов#") 'surname-ovev)
-	    ((string-matches w ".*ова#") 'surname-ovev)
-	    ((string-matches w ".*ский#") 'surname-ski)
-	    ((string-matches w ".*ская#") 'surname-ski)
-	    ((string-matches w ".*ко#") 'surname-ko)
-	    ((string-matches w ".*их#") 'surname-ih)
-	    ((string-matches w ".*ых#") 'surname-ih)
-	    ((string-matches w ".*юк#") 'surname-uk)
-	    ((string-matches w ".*чук#") 'surname-uk)
-	    (t 'name))
-))
 
 
 The actual tree can be found in stress directory
 
-The last step is reduction. We have to concatenate phones in full sequence
-and reduce the according to rules:
+The last step is reduction. We have to concatenate phones in full
+sequence and reduce the according to rules:
 
-1. We change a and o to ao if syllable is not stressed
-and (next syllable is stressed or we are in the end of utterance)
+1. We change a and o to ao if syllable is not stressed and (next
+syllable is stressed or we are in the end of utterance)
 
 2. We change i and e to ei on the same conditions
 
-3. We change a, o, i and e to ae if syllable is not stressed and 
-next syllable is not stressed too
+3. We change a, o, i and e to ae if syllable is not stressed and  next
+syllable is not stressed too
 
-In Russian LTS rules often previous consonant softness is taken
-to specify proper reduction. We will not take it into account since
-we'd like to take diphones, thus we already have previous soft or
-previous hard consonant in particular diphone.
+In Russian LTS rules often previous consonant softness is taken to
+specify proper reduction. We will not take it into account since we'd
+like to take diphones, thus we already have previous soft or previous
+hard consonant in particular diphone.
 
 Also we have to adjust voicing according to the rules, basically
 consonant before voiceless consonant became voiceless and contrary

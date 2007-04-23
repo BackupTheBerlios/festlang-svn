@@ -1,0 +1,58 @@
+This code transcribes Russian text.
+
+============
+Compilation
+============
+
+	Under UNIX just type 'make'. It should be compiled with Visual Studio
+	as well, there is dsw project.
+
+=======
+ Usage
+=======
+	
+	lts program just reads string by string from standard input and
+	outputs transcription to standard output. The text should be in 
+	KOI8-R encoding. Program can be actually converted to any other encoding
+	without a problem, but it requires some code modification (dictionary
+	should be sorted to make binary search work properly).
+	
+
+	Example:
+	
+	[shmyrev@gnome code]$ ./lts
+	василий петрович голохвастов
+	pau v ao ss i ll ae ij sylbreak pp ei t r o vv ae ch sylbreak g ae l ao h v a s t ao v pau
+	
+	If you want to exit program, just type Ctrl+D
+
+====================
+ Implementation notes
+====================
+
+	The text is splitted onto words, then each word is converted to initial list
+	of phonemes according to LTS rules. Then stress is predicted either with the
+	dictionary or with classification and regression tree. As a last step vowels
+	are reduced according to the predicted stress.
+	
+===================
+References
+===================
+
+	(everything is in books directory)
+	1. Edna Andrews, Russian (about phoneset and reduction rules)
+	2. Roger J. Lewis, An Introduction to Classification and Regression Tree Analysis (about CART trees)
+	3. Vincent Pagel, Kevin Lenzo and Alan W. Black, Letter to sound reuls for 
+    	   accented lexicon compression (Stress prediction with CART)
+    	4. Ariadna Font, Improving Pronunciation Accuracy of Proper Names with Language Origin Classes (Current LTS investigation)
+    	
+==================
+Results
+==================
+
+	Current tree shows around 92.3% correct prediction at independant data. And dictionary contains
+	500 most frequent names and second names and 500 most frequent families. It incorrectly predicts
+	only 1300 proper names from our 13000 proper names lexicon. Considering that some names
+	can have different stress I think results are satisfactory.
+	
+	Nickolay V. Shmyrev <nshmyrev@yandex.ru>
