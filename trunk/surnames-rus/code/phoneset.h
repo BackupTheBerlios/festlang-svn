@@ -1,20 +1,8 @@
 #ifndef PHONESET_H
 #define PHONESET_H
 
-typedef struct phone
-{
-    char *name;
-    char vc;
-    char vheight;
-    char vfront;
-    char vrnd;
-    char ctype;
-    char cplace;
-    char cvox;
-    char csoft;
-} phone;
 
-extern phone phoneset[];
+extern char * phoneset[];
 
 enum phoneset
 {

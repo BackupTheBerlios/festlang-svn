@@ -212,7 +212,7 @@ utterance_stress (utterance * utt)
 	  if (is_vowel (utt->phones[i]))
 	    {
 		probability = find_stress_probability (utt->phones, i, 0);
-#if 1
+#if DEBUG
 		printf ("Phone %d probability %d \n", utt->phones[i], probability);
 #endif
 		if (probability <= min_probability)
