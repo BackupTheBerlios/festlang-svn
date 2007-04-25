@@ -1,0 +1,296 @@
+\documentclass{seminar}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{graphicx}
+\usepackage{sem-a4}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\slideframe{none}
+\sffamily
+
+
+\begin{slide}
+
+\center{\large Методы статистического моделирования речи в системе Festival}
+\center{Николай Шмырёв}
+\center{http://festvox.org}
+
+\end{slide}
+
+\begin{slide}
+
+{\bf Festival -- среда для создания синтезаторов речи}
+
+Разрабатывается начиная с 1996 года
+\begin{itemize}
+\item Alan W Black (CMU)
+\item Rob Clark (CSTR)
+\item Korin Richmond (CSTR)
+\item Volker Strom (CSTR)
+\item Simon King (CSTR)
+\item Heiga Zen (Nagoya Institute of Technology)
+\item Paul Taylor (Cambridge)
+\item и многие другие...
+\end{itemize}
+
+Свободно распространяется, работает под Windows и Linux. Поддерживает
+стандартные интерфейсы - Microsoft SAPI, SSML.
+
+\end{slide}
+
+\begin{slide}
+\textbf{Составляющие:}
+\begin{itemize}
+\item SpeechTools - библиотека цифровой обработки сигналов, различные вспомогательные средства, средства статистической обработки, интерпретатор языка Scheme
+\item Festival - система синтеза речи
+\item Festvox - средства для построения голосов для festival, разметки речевых баз, преобразования голоса
+\item CmuDict, Poslex - словари английского языка
+\item Базы данных arctic - 5 дикторов по часу речи каждый. ked TIMIT - 
+вручную размеченная база из 450 предложений. kal/ked дифоны.
+\item Различные голоса для festival
+\end{itemize}
+
+\end{slide}
+
+\begin{slide}
+\textbf{Языки:}
+
+\begin{tabular}{ll}
+Валлийский & Вьетнамский \\
+Датский & Испанский  \\
+Каталанский & Немецкий \\
+Польский & Португальский \\
+Русский & Суахили/Ибибио \\
+Финский & Французский \\
+Хинди/Синхала/Телугу & Чешский \\
+Шведский & Японский
+\end{tabular}
+\end{slide}
+
+\begin{slide}
+{\bf Цели системы}
+\begin{itemize}
+\item Образовательная
+\item Стандартизующая (Blizzard challenge)
+\item Исследовательская (AT\&T Crystal)
+\item Производственная (WHISPR project)
+\end{itemize}
+\end{slide}                    
+
+\begin{slide}
+{\bf Этапы синтеза речи и их возможные реализации.}
+
+Подготовка базы:
+\begin{itemize}
+\item Подбор корпуса для записи речевой базы: использование
+      частотных анализаторов текста, подбор фонетически сбалансированных
+      предлоежений
+\item Сегментация записанной речи: сегментация по образцу, автоматическая
+      сегментация с помощью HMM (ehmm и sphinx).
+\item Вычисление акустических параметров и создание базы. 
+\end{itemize}
+
+Синтез:
+\begin{itemize}
+\item Разбиение на слова
+\item Анализ структуры предложения, выделение содержательных слов - ngrams, Viterbi поиск, WFST
+\item Преобразование в последовательность звуков, разбиение на слоги, выделение
+      ударения: LTS правила, деревья решений для разбиения на слоги, LTS деревья, 
+      деревья для редукции и предсказания ударения.
+\item Разметка интонации: ToBI, tilt, ToDI - правила и деревья
+\item Предсказание контура основного тона - деревья, правила
+\item Предсказание длительности сегментов - деревья решений, правила, моделирование HMM, моделирования логарифма длительности
+\item Синтез
+\end{itemize}
+
+\end{slide}
+\begin{slide}
+
+{\bf Методы синтеза}
+
+\begin{itemize}
+\item Дифоны
+\item Выборка из базы с различными методами склейки - clunits, multisyn
+\item Статистическое моделирование параметров - clustergen, htk
+\item Моделирование речевого тракта
+\end{itemize}    
+
+\end{slide}
+
+\begin{slide}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=.9\textwidth]{./images/utterance.eps}
+\end{center}
+\end{figure}
+
+\end{slide}
+\begin{slide}
+    
+{\bf Модели, описывающие речевые процессы.}
+
+Способы описания
+
+\begin{itemize}
+\item cоздание правил
+\item создание словаря
+\item создание модели
+\end{itemize}
+
+Модели
+
+\begin{itemize}
+\item Ngrams
+\item CART деревья
+\item WFST, скрытые марковские модели (HMM), поиск Viterbi
+\end{itemize}
+
+Немного в стороне, но из той же области - нейронные сети.
+\end{slide}
+\begin{slide}
+Триграммы
+
+\begin{tabular}{|c|c|c|c|}
+\hline
+a & b & d & 0.6 \\
+\hline
+a & d & c & 0.3 \\
+\hline
+d & b & c & 0.1 \\
+\hline
+c & a & a & 0.7 \\
+\hline
+\end{tabular}
+
+\end{slide}
+\begin{slide}
+Марковская цепь
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=.9\textwidth]{./images/hmm.eps}
+\end{center}
+\end{figure}
+
+\end{slide}
+\begin{slide}
+Дерево решений CART
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=.9\textwidth]{./images/cart.eps}
+\end{center}
+\end{figure}
+
+\end{slide}
+\begin{slide}
+Поиск Витерби
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=.9\textwidth]{./images/viterbi.eps}
+\end{center}
+\end{figure}
+
+\end{slide}
+
+\begin{slide}
+
+{\bf Тренировка дерева решений на примере дерева для расстановки ударений в русских фамилиях.}
+
+Ariadna Font Llitjós, Improving Pronunciation Accuracy of Proper Names with Language Origin Classes, Master Thesis 2003
+
+\end{slide}
+\begin{slide}
+
+{\bf Образец вектора признаков и результатов тренировки}
+{
+\small
+\begin{verbatim}
+(o b r a z c o v a)
+0 4 2 o 3 1 + pau pau 0 0 0 0 0 0 b - 0 + s l - r a z surname-ov z c o v a
+0 3 3 a 2 1 - b r - 0 + l a - z - 0 0 f d - c o v surname-ov z c o v a
+1 2 4 o 3 1 + z c - 0 - a d - v - 0 0 f b - a nil nil surname-ov z c o v a
+0 1 5 a 2 1 - o v - 0 + f b - pau - 0 0 0 0 0 nil nil nil surname-ov z c o v a
+
+FEATURE    1 p.ph_vfront: 0.7133
+FEATURE    2 last.name: 0.7165
+FEATURE    3 num2end: 0.8170
+FEATURE    4 lastt.name: 0.8402
+FEATURE    5 lasttttt.name: 0.8593
+
+      0 3146  161 3307      [3146/3307]      95.132
+      1  226 1123 1349      [1123/1349]      83.247
+        3372 1284
+      total 4656 correct 4269.000 91.688%
+\end{verbatim}
+}
+
+\end{slide}
+
+
+\begin{slide}
+{\bf Образец дерева решений}
+{\small
+\begin{verbatim}
+(set! english_phrase_type_tree
+'((pbreak is NB)
+  ((num_break is 1)
+   ((mB))
+   ((R:Token.parent.EMPH is 1)
+    ((NB))
+    ((n.R:Token.parent.EMPH is 1)
+     ((NB))
+     ((NB)))))
+  ((pbreak is BB)
+   ((BB))
+   ((pbreak is mB)
+    ((mB))
+    ((name in ("." "!" "?"));; only (potentially) change Bs to BBs
+     ((BB))
+     ((B)))))))
+\end{verbatim}
+}
+\end{slide}
+
+
+\begin{slide}
+{\bf Оптимальный набор параметров:}
+
+\begin{itemize}
+\item Число слогов до конца слова
+\item Число слогов до начала слова
+\item Предыдущий, предсказываемый, три следующих сегмента
+\item Три сегмента перед концом слова
+\end{itemize}
+
+Точность - 92.5 на независимых данных
+
+\end{slide}
+
+\begin{slide}
+
+{\bf Спасибо за внимание!}
+
+Пишите:
+
+\begin{itemize}
+\item \textit{nshmyrev@yandex.ru}
+\item \textit{festival-talk@festvox.org} {\small (необходимо сначала подписаться на список рассылки)}
+\end{itemize}
+
+Заходите:
+
+\begin{itemize}
+\item \textit{http://festvox.org}
+\item \textit{http://festlang.berlios.de}
+\end{itemize}
+
+\end{slide}
+\end{document}
