@@ -394,8 +394,14 @@ utterance_reduce (utterance * utt)
 		continue;
 	    }
 	  if ((utt->phones[i] == PHONE_A || utt->phones[i] == PHONE_O) &&
-	      (next_is_stressed (utt, i) || is_pau(utt->phones[i - 1]) ||
+	       (is_pau(utt->phones[i - 1]) ||
 	       is_pau(utt->phones[i + 1]) || is_vowel(utt->phones [i - 1])))
+	     {
+	        utt->phones[i] = PHONE_A;
+	    	continue;
+	     }
+	  if ((utt->phones[i] == PHONE_A || utt->phones[i] == PHONE_O) &&
+	      next_is_stressed (utt, i))
 	     {
 	        if (is_soft (utt->phones[i - 1]))
 	            utt->phones[i] = PHONE_I;

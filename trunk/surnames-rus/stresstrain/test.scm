@@ -2,9 +2,10 @@
 
 (load "words.scm")
 
-(Parameter.set 'Synth_Method 'None)
 
 (voice_msu_ru_nsh_cg)
+
+(Parameter.set 'Synth_Method 'None)
 
 ;;; Lexical stress assignment
 ;;;
