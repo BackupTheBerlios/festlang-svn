@@ -377,6 +377,9 @@ next_is_stressed (utterance * utt, int i)
  *
  * @utt: utterance with phones and stress filled
  *
+ * The reduction rules are mostly taken from the article of Zaharov L.M.
+ * Acoustic variativity of Russian M. 2004
+ *
  *********************************************************************/
 void
 utterance_reduce (utterance * utt)
@@ -385,23 +388,54 @@ utterance_reduce (utterance * utt)
 
     for (i = 1; utt->phones[i] != 0; i++)
       {
+	  if (is_vowel (utt->phones[i]) && utt->stress[i] == STRESSED)
+	    {
+		utt->phones[i] = utt->phones[i] - 6; 
+		continue;
+	    }
 	  if ((utt->phones[i] == PHONE_A || utt->phones[i] == PHONE_O) &&
-	      utt->stress[i] == UNSTRESSED && next_is_stressed (utt, i))
-	    {
-		utt->phones[i] = PHONE_AO;
-		continue;
-	    }
-	  if ((utt->phones[i] == PHONE_E || utt->phones[i] == PHONE_I) &&
-	      utt->stress[i] == UNSTRESSED && next_is_stressed (utt, i))
-	    {
-		utt->phones[i] = PHONE_EI;
-		continue;
-	    }
-	  if ((utt->phones[i] == PHONE_O ||
-	       utt->phones[i] == PHONE_E ||
-	       utt->phones[i] == PHONE_I ||
-	       utt->phones[i] == PHONE_A) && utt->stress[i] == UNSTRESSED)
-	      utt->phones[i] = PHONE_AE;
+	      (next_is_stressed (utt, i) || is_pau(utt->phones[i - 1]) ||
+	       is_pau(utt->phones[i + 1]) || is_vowel(utt->phones [i - 1])))
+	     {
+	        if (is_soft (utt->phones[i - 1]))
+	            utt->phones[i] = PHONE_I;
+	        else 
+	    	    utt->phones[i] = PHONE_A;
+	    	continue;
+	     }
+	  if ((utt->phones[i] == PHONE_Y || utt->phones[i] == PHONE_I ||
+	      utt->phones[i] == PHONE_U ) &&
+	      (next_is_stressed (utt, i) || is_pau(utt->phones[i - 1]) ||
+	       is_pau(utt->phones[i + 1]) || is_vowel(utt->phones [i - 1])))
+	     {
+	    	continue;
+	     }
+	  if (utt->phones[i] == PHONE_E &&
+	       (is_pau(utt->phones[i - 1]) || is_pau(utt->phones[i + 1]) ||
+	       is_vowel(utt->phones [i - 1])))
+	     {
+		continue;     
+	     }
+	  if (utt->phones[i] == PHONE_E && next_is_stressed (utt, i))
+	     {
+	        if (is_soft (utt->phones[i - 1]))
+	            utt->phones[i] = PHONE_I;
+	        else 
+	    	    utt->phones[i] = PHONE_Y;
+	    	continue;
+	     }
+	  if (utt->phones[i] == PHONE_Y || utt->phones[i] == PHONE_I ||
+	      utt->phones[i] == PHONE_A || utt->phones[i] == PHONE_E ||
+	      utt->phones[i] == PHONE_O)
+	     {
+	        if (is_soft (utt->phones[i - 1]))
+	            utt->phones[i] = PHONE_AE;
+	        else 
+	    	    utt->phones[i] = PHONE_AY;
+	    	continue;
+	     }
+	  if (utt->phones[i] == PHONE_U)
+		utt->phones[i] = PHONE_UR;
       }
 }	/*utterance_reduce */
 

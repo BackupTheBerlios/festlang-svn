@@ -5,7 +5,7 @@
 
 typedef struct dict_node {
     char *word;
-    int stress;
+    char stress;
 } dict_node;
 
 extern const dict_node dict[];

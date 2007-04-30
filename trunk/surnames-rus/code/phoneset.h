@@ -6,6 +6,13 @@ enum phoneset
     PHONE_PAU = 1,
     PHONE_SYLBREAK,
 
+    PHONE_II,
+    PHONE_YY,
+    PHONE_EE,
+    PHONE_AA,
+    PHONE_OO,
+    PHONE_UU,
+
     PHONE_I,
     PHONE_Y,
     PHONE_E,
@@ -13,9 +20,9 @@ enum phoneset
     PHONE_O,
     PHONE_U,
 
-    PHONE_AO,
-    PHONE_EI,
     PHONE_AE,
+    PHONE_AY,
+    PHONE_UR,
 
     PHONE_P,
     PHONE_PP,
@@ -60,5 +67,6 @@ enum phoneset
 void   dump_phones (char *phones);
 int    is_vowel (char phone);
 int    is_pau (char phone);
+int    is_soft (char phone);
 
 #endif

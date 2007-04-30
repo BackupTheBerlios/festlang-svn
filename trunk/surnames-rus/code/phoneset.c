@@ -10,15 +10,21 @@
 char* phoneset[] = {
     "pau",
     "sylbreak",
+    "ii",
+    "yy",
+    "ee",
+    "aa",
+    "oo",
+    "uu",
     "i",
     "y",
     "e",
     "a",
     "o",
     "u",
-    "ao",
-    "ei",
     "ae",
+    "ay",
+    "ur",
     "p",
     "pp",
     "b",
@@ -92,7 +98,7 @@ dump_phones (char *phones)
 int
 is_vowel (char phone)
 {
-    return (phone >= PHONE_I) && (phone <= PHONE_AE);
+    return (phone >= PHONE_I) && (phone <= PHONE_UR);
 }	/*is_vowel */
 
 /**********************************************************************
@@ -110,3 +116,37 @@ is_pau (char phone)
     return (phone <= PHONE_SYLBREAK);
 }	/*is_pau */
 
+
+/**********************************************************************
+ *
+ * is_soft: 
+ *
+ * Returns TRUE if phone is soft and FALSE otherwise
+ *
+ * @phone: phone
+ *
+ **********************************************************************/
+int
+is_soft (char phone)
+{
+    return 	
+	(phone == PHONE_PP) ||
+	(phone == PHONE_BB) ||
+	(phone == PHONE_TT) ||
+	(phone == PHONE_DD) ||
+	(phone == PHONE_KK) ||
+	(phone == PHONE_GG) ||
+	(phone == PHONE_CH) ||
+	(phone == PHONE_FF) ||
+	(phone == PHONE_VV) ||
+	(phone == PHONE_SS) ||
+	(phone == PHONE_ZZ) ||
+	(phone == PHONE_SCH) ||
+	(phone == PHONE_ZH) ||
+	(phone == PHONE_HH) ||
+	(phone == PHONE_MM) ||
+	(phone == PHONE_NN) ||
+	(phone == PHONE_LL) ||
+	(phone == PHONE_RR) ||
+	(phone == PHONE_IJ);
+}
