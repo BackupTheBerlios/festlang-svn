@@ -366,7 +366,7 @@ next_is_stressed (utterance * utt, int i)
 	  if (is_vowel (utt->phones[j]))
 	      return (utt->stress[j] == STRESSED);
       }
-    return 1;
+    return 0;
 }	/*next_is_stressed */
 
 /**********************************************************************
