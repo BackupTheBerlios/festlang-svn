@@ -604,11 +604,26 @@ utterance_lts (utterance *utt)
 }
 
 int
-main ()
+main (int argc, char* argv[])
 {
     utterance utt;
+    FILE *f = NULL;
+    
+    if (argc == 2)
+      {
+  	    f = fopen (argv[1],"r");
+    	    if (!f) 
+    	       {
+    		    printf ("File %s not found\n", argv[1]);
+		    return 1;
+    	    }
+      }	
+    if (argc > 2)
+      {
+    	    printf ("Usage: lts [filename]");
+      }
 
-    while (fgets (utt.text, 256, stdin))
+    while (fgets (utt.text, 256, f ? f : stdin))
       {
 
 	  utterance_lts (&utt);
@@ -621,4 +636,5 @@ main ()
 	  printf ("\n");
 #endif
       }
+      
 }	/*main */
