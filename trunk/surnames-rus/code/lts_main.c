@@ -48,29 +48,49 @@ char *softletters[] = {
     "я", "ё", "ю", "и", "ь", "е", NULL
 };
 
-char *softsign[] = {
-    "ь", NULL
+char *letter_v[] = {
+    "в", NULL
 };
+
+char *letter_n[] = {
+    "н", NULL
+};
+
 
 lts_rule lts_ruleset[] = {
 
     {NULL, "а", NULL, PHONE_A, 0},
     {NULL, "э", NULL, PHONE_E, 0},
-    {softsign, "о", NULL, PHONE_IJ, PHONE_O},
+    {NULL, "ьо", NULL, PHONE_J, PHONE_O},
     {NULL, "о", NULL, PHONE_O, 0},
     {NULL, "у", NULL, PHONE_U, 0},
     {NULL, "ы", NULL, PHONE_Y, 0},
 
-    {startsyl, "ю", NULL, PHONE_IJ, PHONE_U},
-    {startsyl, "я", NULL, PHONE_IJ, PHONE_A},
-    {startsyl, "ё", NULL, PHONE_IJ, PHONE_O},
-    {startsyl, "е", NULL, PHONE_IJ, PHONE_E},
+    {startsyl, "ю", NULL, PHONE_J, PHONE_U},
+    {startsyl, "я", NULL, PHONE_J, PHONE_A},
+    {startsyl, "ё", NULL, PHONE_J, PHONE_O},
+    {startsyl, "е", NULL, PHONE_J, PHONE_E},
 
     {NULL, "ё", NULL, PHONE_O, 0},
     {NULL, "е", NULL, PHONE_E, 0},
     {NULL, "я", NULL, PHONE_A, 0},
     {NULL, "ю", NULL, PHONE_U, 0},
     {NULL, "и", NULL, PHONE_I, 0},
+    
+    {NULL, "вст", letter_v, PHONE_S, PHONE_T},
+    {NULL, "стс", NULL, PHONE_S, PHONE_S},
+    {NULL, "стьс", NULL, PHONE_S, PHONE_S},
+    {NULL, "лнц", NULL, PHONE_N, PHONE_C},
+    {NULL, "стц", NULL, PHONE_S, PHONE_C},
+    {NULL, "здц", NULL, PHONE_Z, PHONE_C},
+    {NULL, "нтц", NULL, PHONE_N, PHONE_C},
+    {NULL, "ндц", NULL, PHONE_N, PHONE_C},
+    {NULL, "ст", letter_n, PHONE_S, 0},
+    {NULL, "зд", letter_n, PHONE_Z, 0},
+    {NULL, "ндс", NULL, PHONE_N, PHONE_S},
+    {NULL, "нтс", NULL, PHONE_N, PHONE_S},
+    {NULL, "нгц", NULL, PHONE_N, PHONE_C},
+    {NULL, "нгт", NULL, PHONE_N, PHONE_T},
 
     {NULL, "б", softletters, PHONE_BB, 0},
     {NULL, "в", softletters, PHONE_VV, 0},
@@ -78,9 +98,12 @@ lts_rule lts_ruleset[] = {
     {NULL, "д", softletters, PHONE_DD, 0},
     {NULL, "з", softletters, PHONE_ZZ, 0},
     {NULL, "к", softletters, PHONE_KK, 0},
+    {NULL, "кк", softletters, PHONE_KK, 0},
     {NULL, "л", softletters, PHONE_LL, 0},
     {NULL, "м", softletters, PHONE_MM, 0},
+    {NULL, "мм", softletters, PHONE_MM, 0},
     {NULL, "н", softletters, PHONE_NN, 0},
+    {NULL, "нн", softletters, PHONE_NN, 0},
     {NULL, "п", softletters, PHONE_PP, 0},
     {NULL, "р", softletters, PHONE_RR, 0},
     {NULL, "с", softletters, PHONE_SS, 0},
@@ -94,13 +117,17 @@ lts_rule lts_ruleset[] = {
     {NULL, "д", NULL, PHONE_D, 0},
     {NULL, "ж", NULL, PHONE_ZH, 0},
     {NULL, "з", NULL, PHONE_Z, 0},
+    {NULL, "кк", NULL, PHONE_K, 0},
     {NULL, "к", NULL, PHONE_K, 0},
     {NULL, "л", NULL, PHONE_L, 0},
     {NULL, "м", NULL, PHONE_M, 0},
+    {NULL, "мм", NULL, PHONE_M, 0},
     {NULL, "н", NULL, PHONE_N, 0},
+    {NULL, "нн", NULL, PHONE_N, 0},
     {NULL, "п", NULL, PHONE_P, 0},
     {NULL, "р", NULL, PHONE_R, 0},
     {NULL, "с", NULL, PHONE_S, 0},
+    {NULL, "сс", NULL, PHONE_S, 0},
     {NULL, "т", NULL, PHONE_T, 0},
     {NULL, "ф", NULL, PHONE_F, 0},
     {NULL, "х", NULL, PHONE_H, 0},
@@ -108,7 +135,7 @@ lts_rule lts_ruleset[] = {
     {NULL, "ч", NULL, PHONE_CH, 0},
     {NULL, "ш", NULL, PHONE_SH, 0},
     {NULL, "щ", NULL, PHONE_SCH, 0},
-    {NULL, "й", NULL, PHONE_IJ, 0},
+    {NULL, "й", NULL, PHONE_J, 0},
 
     {NULL, "-", NULL, 0, 0},
     {NULL, "ъ", NULL, 0, 0},
@@ -371,7 +398,7 @@ next_is_stressed (utterance * utt, int i)
 
 /**********************************************************************
  *
- * utterance_reduce:
+ * utterance_reduce_vowel:
  *
  * Reduces vowels in utterance according to predicted stress
  *
@@ -382,7 +409,7 @@ next_is_stressed (utterance * utt, int i)
  *
  *********************************************************************/
 void
-utterance_reduce (utterance * utt)
+utterance_reduce_vowel (utterance * utt)
 {
     int i;
 
@@ -443,7 +470,68 @@ utterance_reduce (utterance * utt)
 	  if (utt->phones[i] == PHONE_U)
 		utt->phones[i] = PHONE_UR;
       }
-}	/*utterance_reduce */
+}	/*utterance_reduce_vowel */
+
+/**********************************************************************
+ *
+ * utterance_reduce_voicing:
+ *
+ * Reduces consonant's voicing
+ *
+ * @utt: utterance with phones and stress filled
+ *
+ *********************************************************************/
+void
+utterance_reduce_voicing (utterance * utt)
+{
+    int i;
+
+    for (i = 1; utt->phones[i + 1] != 0; i++)
+      {
+        
+            if (phone_is_voice_reducable (utt->phones[i]))
+	      {
+	    	    if (utt->phones[i + 1] == PHONE_PAU)
+		       {
+			    utt->phones[i] = phone_voice_reduce (utt->phones[i]);
+			    continue;
+		       }
+		    if (utt->phones[i + 1] == PHONE_SYLBREAK && 
+			phone_is_sonorant (utt->phones[i + 2]))
+		       {
+		    	    utt->phones[i] = phone_voice_reduce (utt->phones[i]);
+			    continue;
+		       }
+		    if (utt->phones[i + 1] == PHONE_SYLBREAK && 
+			phone_is_vv (utt->phones[i + 2]) &&
+			(phone_is_sonorant (utt->phones[i + 3]) ||
+			 is_vowel (utt->phones[i + 3])))
+		       {
+			    utt->phones[i] = phone_voice_reduce (utt->phones[i]);
+			    continue;
+		       }
+		    if (phone_is_noise_voiceless (utt->phones[i + 1]))
+		       {
+			    utt->phones[i] = phone_voice_reduce (utt->phones[i]);
+	    	       }
+		    continue;
+    	      }
+            if (phone_is_voiceless_reducable (utt->phones[i]))
+	      {
+		    if (utt->phones[i + 1] == PHONE_SYLBREAK && 
+			phone_is_vv (utt->phones[i + 2]) &&
+			phone_is_noise_voiced (utt->phones[i + 3]))
+		       {
+			    utt->phones[i] = phone_voice_reduce (utt->phones[i]);
+			    continue;
+		       }
+		    if (phone_is_noise_voiced (utt->phones[i + 1]))
+		      {
+			    utt->phones[i] = phone_voice_reduce (utt->phones[i]);
+		      }
+    	     }
+      }
+}	/*utterance_reduce_voicing */
 
 /*********************************************************
  *
@@ -511,7 +599,8 @@ utterance_lts (utterance *utt)
 	}
     utt->phones[index - 1] = PHONE_PAU;
 
-    utterance_reduce (utt);
+    utterance_reduce_vowel (utt);
+    utterance_reduce_voicing (utt);
 }
 
 int

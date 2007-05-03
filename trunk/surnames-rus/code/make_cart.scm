@@ -101,7 +101,7 @@ Do the tree dump"
     ("ll" "PHONE_LL")
     ("r" "PHONE_R")
     ("rr" "PHONE_RR")
-    ("ij" "PHONE_IJ")
+    ("ij" "PHONE_J")
   ))
 
 (define (carttoC_tree_nodes tree ofdc ofdh)

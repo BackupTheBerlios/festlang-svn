@@ -61,12 +61,20 @@ enum phoneset
     PHONE_LL,
     PHONE_R,
     PHONE_RR,
-    PHONE_IJ,
+    PHONE_J,
 };
 
 void   dump_phones (char *phones);
 int    is_vowel (char phone);
 int    is_pau (char phone);
 int    is_soft (char phone);
+
+int    phone_is_sonorant (char phone);
+int    phone_is_vv (char phone);
+int    phone_is_voice_reducable (char phone);
+int    phone_is_voiceless_reducable (char phone);
+int    phone_voice_reduce (char phone);
+int    phone_is_noise_voiced (char phone);
+int    phone_is_noise_voiceless (char phone);
 
 #endif
