@@ -40,106 +40,106 @@ typedef struct lts_rule
 } lts_rule;
 
 char *startsyl[] = {
-    "#", "ß", "Ø", "Á", "Ñ", "Ï", "£", "Õ", "À", "Ü", "Å", "É",
+    "#", "ÑŠ", "ÑŒ", "Ð°", "Ñ", "Ð¾", "Ñ‘", "Ñƒ", "ÑŽ", "Ñ", "Ðµ", "Ð¸",
     NULL
 };
 
 char *softletters[] = {
-    "Ñ", "£", "À", "É", "Ø", "Å", NULL
+    "Ñ", "Ñ‘", "ÑŽ", "Ð¸", "ÑŒ", "Ðµ", NULL
 };
 
 char *letter_v[] = {
-    "×", NULL
+    "Ð²", NULL
 };
 
 char *letter_n[] = {
-    "Î", NULL
+    "Ð½", NULL
 };
 
 
 lts_rule lts_ruleset[] = {
 
-    {NULL, "Á", NULL, PHONE_A, 0},
-    {NULL, "Ü", NULL, PHONE_E, 0},
-    {NULL, "ØÏ", NULL, PHONE_J, PHONE_O},
-    {NULL, "Ï", NULL, PHONE_O, 0},
-    {NULL, "Õ", NULL, PHONE_U, 0},
-    {NULL, "Ù", NULL, PHONE_Y, 0},
+    {NULL, "Ð°", NULL, PHONE_A, 0},
+    {NULL, "Ñ", NULL, PHONE_E, 0},
+    {NULL, "ÑŒÐ¾", NULL, PHONE_J, PHONE_O},
+    {NULL, "Ð¾", NULL, PHONE_O, 0},
+    {NULL, "Ñƒ", NULL, PHONE_U, 0},
+    {NULL, "Ñ‹", NULL, PHONE_Y, 0},
 
-    {startsyl, "À", NULL, PHONE_J, PHONE_U},
-    {startsyl, "Ñ", NULL, PHONE_J, PHONE_A},
-    {startsyl, "£", NULL, PHONE_J, PHONE_O},
-    {startsyl, "Å", NULL, PHONE_J, PHONE_E},
+    {startsyl, "ÑŽ", NULL, PHONE_J, PHONE_U},
+    {startsyl, "Ñ", NULL, PHONE_J, PHONE_A},
+    {startsyl, "Ñ‘", NULL, PHONE_J, PHONE_O},
+    {startsyl, "Ðµ", NULL, PHONE_J, PHONE_E},
 
-    {NULL, "£", NULL, PHONE_O, 0},
-    {NULL, "Å", NULL, PHONE_E, 0},
-    {NULL, "Ñ", NULL, PHONE_A, 0},
-    {NULL, "À", NULL, PHONE_U, 0},
-    {NULL, "É", NULL, PHONE_I, 0},
+    {NULL, "Ñ‘", NULL, PHONE_O, 0},
+    {NULL, "Ðµ", NULL, PHONE_E, 0},
+    {NULL, "Ñ", NULL, PHONE_A, 0},
+    {NULL, "ÑŽ", NULL, PHONE_U, 0},
+    {NULL, "Ð¸", NULL, PHONE_I, 0},
     
-    {NULL, "×ÓÔ", letter_v, PHONE_S, PHONE_T},
-    {NULL, "ÓÔÓ", NULL, PHONE_S, PHONE_S},
-    {NULL, "ÓÔØÓ", NULL, PHONE_S, PHONE_S},
-    {NULL, "ÌÎÃ", NULL, PHONE_N, PHONE_C},
-    {NULL, "ÓÔÃ", NULL, PHONE_S, PHONE_C},
-    {NULL, "ÚÄÃ", NULL, PHONE_Z, PHONE_C},
-    {NULL, "ÎÔÃ", NULL, PHONE_N, PHONE_C},
-    {NULL, "ÎÄÃ", NULL, PHONE_N, PHONE_C},
-    {NULL, "ÓÔ", letter_n, PHONE_S, 0},
-    {NULL, "ÚÄ", letter_n, PHONE_Z, 0},
-    {NULL, "ÎÄÓ", NULL, PHONE_N, PHONE_S},
-    {NULL, "ÎÔÓ", NULL, PHONE_N, PHONE_S},
-    {NULL, "ÎÇÃ", NULL, PHONE_N, PHONE_C},
-    {NULL, "ÎÇÔ", NULL, PHONE_N, PHONE_T},
+    {NULL, "Ð²ÑÑ‚", letter_v, PHONE_S, PHONE_T},
+    {NULL, "ÑÑ‚Ñ", NULL, PHONE_S, PHONE_S},
+    {NULL, "ÑÑ‚ÑŒÑ", NULL, PHONE_S, PHONE_S},
+    {NULL, "Ð»Ð½Ñ†", NULL, PHONE_N, PHONE_C},
+    {NULL, "ÑÑ‚Ñ†", NULL, PHONE_S, PHONE_C},
+    {NULL, "Ð·Ð´Ñ†", NULL, PHONE_Z, PHONE_C},
+    {NULL, "Ð½Ñ‚Ñ†", NULL, PHONE_N, PHONE_C},
+    {NULL, "Ð½Ð´Ñ†", NULL, PHONE_N, PHONE_C},
+    {NULL, "ÑÑ‚", letter_n, PHONE_S, 0},
+    {NULL, "Ð·Ð´", letter_n, PHONE_Z, 0},
+    {NULL, "Ð½Ð´Ñ", NULL, PHONE_N, PHONE_S},
+    {NULL, "Ð½Ñ‚Ñ", NULL, PHONE_N, PHONE_S},
+    {NULL, "Ð½Ð³Ñ†", NULL, PHONE_N, PHONE_C},
+    {NULL, "Ð½Ð³Ñ‚", NULL, PHONE_N, PHONE_T},
 
-    {NULL, "Â", softletters, PHONE_BB, 0},
-    {NULL, "×", softletters, PHONE_VV, 0},
-    {NULL, "Ç", softletters, PHONE_GG, 0},
-    {NULL, "Ä", softletters, PHONE_DD, 0},
-    {NULL, "Ú", softletters, PHONE_ZZ, 0},
-    {NULL, "Ë", softletters, PHONE_KK, 0},
-    {NULL, "ËË", softletters, PHONE_KK, 0},
-    {NULL, "Ì", softletters, PHONE_LL, 0},
-    {NULL, "Í", softletters, PHONE_MM, 0},
-    {NULL, "ÍÍ", softletters, PHONE_MM, 0},
-    {NULL, "Î", softletters, PHONE_NN, 0},
-    {NULL, "ÎÎ", softletters, PHONE_NN, 0},
-    {NULL, "Ð", softletters, PHONE_PP, 0},
-    {NULL, "Ò", softletters, PHONE_RR, 0},
-    {NULL, "Ó", softletters, PHONE_SS, 0},
-    {NULL, "Ô", softletters, PHONE_TT, 0},
-    {NULL, "Æ", softletters, PHONE_FF, 0},
-    {NULL, "È", softletters, PHONE_HH, 0},
+    {NULL, "Ð±", softletters, PHONE_BB, 0},
+    {NULL, "Ð²", softletters, PHONE_VV, 0},
+    {NULL, "Ð³", softletters, PHONE_GG, 0},
+    {NULL, "Ð´", softletters, PHONE_DD, 0},
+    {NULL, "Ð·", softletters, PHONE_ZZ, 0},
+    {NULL, "Ðº", softletters, PHONE_KK, 0},
+    {NULL, "ÐºÐº", softletters, PHONE_KK, 0},
+    {NULL, "Ð»", softletters, PHONE_LL, 0},
+    {NULL, "Ð¼", softletters, PHONE_MM, 0},
+    {NULL, "Ð¼Ð¼", softletters, PHONE_MM, 0},
+    {NULL, "Ð½", softletters, PHONE_NN, 0},
+    {NULL, "Ð½Ð½", softletters, PHONE_NN, 0},
+    {NULL, "Ð¿", softletters, PHONE_PP, 0},
+    {NULL, "Ñ€", softletters, PHONE_RR, 0},
+    {NULL, "Ñ", softletters, PHONE_SS, 0},
+    {NULL, "Ñ‚", softletters, PHONE_TT, 0},
+    {NULL, "Ñ„", softletters, PHONE_FF, 0},
+    {NULL, "Ñ…", softletters, PHONE_HH, 0},
 
-    {NULL, "Â", NULL, PHONE_B, 0},
-    {NULL, "×", NULL, PHONE_V, 0},
-    {NULL, "Ç", NULL, PHONE_G, 0},
-    {NULL, "Ä", NULL, PHONE_D, 0},
-    {NULL, "Ö", NULL, PHONE_ZH, 0},
-    {NULL, "Ú", NULL, PHONE_Z, 0},
-    {NULL, "ËË", NULL, PHONE_K, 0},
-    {NULL, "Ë", NULL, PHONE_K, 0},
-    {NULL, "Ì", NULL, PHONE_L, 0},
-    {NULL, "Í", NULL, PHONE_M, 0},
-    {NULL, "ÍÍ", NULL, PHONE_M, 0},
-    {NULL, "Î", NULL, PHONE_N, 0},
-    {NULL, "ÎÎ", NULL, PHONE_N, 0},
-    {NULL, "Ð", NULL, PHONE_P, 0},
-    {NULL, "Ò", NULL, PHONE_R, 0},
-    {NULL, "Ó", NULL, PHONE_S, 0},
-    {NULL, "ÓÓ", NULL, PHONE_S, 0},
-    {NULL, "Ô", NULL, PHONE_T, 0},
-    {NULL, "Æ", NULL, PHONE_F, 0},
-    {NULL, "È", NULL, PHONE_H, 0},
-    {NULL, "Ã", NULL, PHONE_C, 0},
-    {NULL, "Þ", NULL, PHONE_CH, 0},
-    {NULL, "Û", NULL, PHONE_SH, 0},
-    {NULL, "Ý", NULL, PHONE_SCH, 0},
-    {NULL, "Ê", NULL, PHONE_J, 0},
+    {NULL, "Ð±", NULL, PHONE_B, 0},
+    {NULL, "Ð²", NULL, PHONE_V, 0},
+    {NULL, "Ð³", NULL, PHONE_G, 0},
+    {NULL, "Ð´", NULL, PHONE_D, 0},
+    {NULL, "Ð¶", NULL, PHONE_ZH, 0},
+    {NULL, "Ð·", NULL, PHONE_Z, 0},
+    {NULL, "ÐºÐº", NULL, PHONE_K, 0},
+    {NULL, "Ðº", NULL, PHONE_K, 0},
+    {NULL, "Ð»", NULL, PHONE_L, 0},
+    {NULL, "Ð¼", NULL, PHONE_M, 0},
+    {NULL, "Ð¼Ð¼", NULL, PHONE_M, 0},
+    {NULL, "Ð½", NULL, PHONE_N, 0},
+    {NULL, "Ð½Ð½", NULL, PHONE_N, 0},
+    {NULL, "Ð¿", NULL, PHONE_P, 0},
+    {NULL, "Ñ€", NULL, PHONE_R, 0},
+    {NULL, "Ñ", NULL, PHONE_S, 0},
+    {NULL, "ÑÑ", NULL, PHONE_S, 0},
+    {NULL, "Ñ‚", NULL, PHONE_T, 0},
+    {NULL, "Ñ„", NULL, PHONE_F, 0},
+    {NULL, "Ñ…", NULL, PHONE_H, 0},
+    {NULL, "Ñ†", NULL, PHONE_C, 0},
+    {NULL, "Ñ‡", NULL, PHONE_CH, 0},
+    {NULL, "Ñˆ", NULL, PHONE_SH, 0},
+    {NULL, "Ñ‰", NULL, PHONE_SCH, 0},
+    {NULL, "Ð¹", NULL, PHONE_J, 0},
 
     {NULL, "-", NULL, 0, 0},
-    {NULL, "ß", NULL, 0, 0},
-    {NULL, "Ø", NULL, 0, 0},
+    {NULL, "ÑŠ", NULL, 0, 0},
+    {NULL, "ÑŒ", NULL, 0, 0},
 
     {NULL, NULL, NULL, 0}
 };
@@ -553,7 +553,7 @@ utterance_lts (utterance *utt)
 {
     char phones[256];
     char stress[256];
-    char* str, *saveptr, *word;
+    char* str, *word;
     int dict_stress;
     int index;
 
@@ -566,7 +566,7 @@ utterance_lts (utterance *utt)
 
     for (str = utt->text; ; str = NULL) 
         {
-             word = strtok_r(str, " \t\n", &saveptr);
+             word = strtok(str, " \t\n");
              if (word == NULL)
             	    break;
             	    
