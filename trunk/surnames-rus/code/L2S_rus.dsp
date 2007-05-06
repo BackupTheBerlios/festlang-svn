@@ -97,6 +97,10 @@ SOURCE=.\lts_main.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\dict.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\phoneset.c
 # End Source File
 # End Group
@@ -110,6 +114,10 @@ SOURCE=.\cart.h
 # Begin Source File
 
 SOURCE=.\cart_search.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\dict.h
 # End Source File
 # Begin Source File
 
