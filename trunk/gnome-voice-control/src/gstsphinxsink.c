@@ -76,9 +76,14 @@ gst_sphinx_decoder_init (void)
 static GstStaticPadTemplate sinktemplate = GST_STATIC_PAD_TEMPLATE ("sink",
     GST_PAD_SINK,
     GST_PAD_ALWAYS,
-    GST_STATIC_CAPS_ANY);
-
-GST_DEBUG_CATEGORY_STATIC (gst_sphinx_sink_debug);
+    GST_STATIC_CAPS ("audio/x-raw-int, "
+        "endianness = (int) LITTLE_ENDIAN, "
+        "signed = (boolean) TRUE, "
+        "width = (int) 16, "
+        "depth = (int) 16, "
+        "rate = (int) 16000, "
+        "channels = (int) 1")
+);
 
 static const GstElementDetails gst_sphinx_sink_details =
 GST_ELEMENT_DETAILS ("Sphinx Sink",
@@ -102,23 +107,24 @@ enum
   PROP_DUMP,
 };
 
-static void gst_sphinx_sink_init_interfaces (GType type)
-{
+static void
+_do_init (GType filesink_type)
+{	
     return;
 }
 
-GST_BOILERPLATE_FULL (GstSphinxSink, gst_sphinx_sink, GstAudioSink,
-    GST_TYPE_AUDIO_SINK, 
-    gst_sphinx_sink_init_interfaces);
+GST_BOILERPLATE_FULL (GstSphinxSink, gst_sphinx_sink, GstBaseSink,
+    GST_TYPE_BASE_SINK,
+    _do_init);
 
 static void gst_sphinx_sink_set_property (GObject * object, guint prop_id,
     const GValue * value, GParamSpec * pspec);
 static void gst_sphinx_sink_get_property (GObject * object, guint prop_id,
     GValue * value, GParamSpec * pspec);
 
-static gboolean gst_sphinx_sink_prepare (GstAudioSink * asink, GstRingBufferSpec * spec);
-static gboolean gst_sphinx_sink_unprepare (GstAudioSink * asink);
-static guint	gst_sphinx_sink_write (GstAudioSink * asink, gpointer data, guint length);
+static gboolean gst_sphinx_sink_start(GstBaseSink * asink);
+static gboolean gst_sphinx_sink_stop (GstBaseSink * asink);
+static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * sink, GstBuffer * buffer);
 
 static guint gst_sphinx_sink_signals[LAST_SIGNAL] = { 0 };
 
@@ -139,11 +145,11 @@ gst_sphinx_sink_class_init (GstSphinxSinkClass * klass)
 {
   GObjectClass *gobject_class;
   GstElementClass *gstelement_class;
-  GstAudioSinkClass *gstaudio_sink_class;
+  GstBaseSinkClass *gstbase_sink_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gstelement_class = GST_ELEMENT_CLASS (klass);
-  gstaudio_sink_class = GST_AUDIO_SINK_CLASS (klass);
+  gstbase_sink_class = GST_BASE_SINK_CLASS (klass);
 
   gobject_class->set_property = GST_DEBUG_FUNCPTR (gst_sphinx_sink_set_property);
   gobject_class->get_property = GST_DEBUG_FUNCPTR (gst_sphinx_sink_get_property);
@@ -152,16 +158,16 @@ gst_sphinx_sink_class_init (GstSphinxSinkClass * klass)
       g_param_spec_boolean ("dump", "Dump", "Dump buffer contents to stdout",
           DEFAULT_DUMP, G_PARAM_READWRITE));
 
-  gstaudio_sink_class->prepare = GST_DEBUG_FUNCPTR (gst_sphinx_sink_prepare);
-  gstaudio_sink_class->unprepare = GST_DEBUG_FUNCPTR (gst_sphinx_sink_unprepare);
-  gstaudio_sink_class->write = GST_DEBUG_FUNCPTR (gst_sphinx_sink_write);
+  gstbase_sink_class->start = GST_DEBUG_FUNCPTR (gst_sphinx_sink_start);
+  gstbase_sink_class->stop = GST_DEBUG_FUNCPTR (gst_sphinx_sink_stop);
+  gstbase_sink_class->render = GST_DEBUG_FUNCPTR (gst_sphinx_sink_render);
 }
 
 static void
 gst_sphinx_sink_init (GstSphinxSink * sphinxsink, GstSphinxSinkClass * g_class)
 {
   sphinxsink->dump = DEFAULT_DUMP;
-  GST_BASE_SINK (sphinxsink)->sync = TRUE;
+  GST_BASE_SINK (sphinxsink)->sync = FALSE;
 }
 
 static void
@@ -201,7 +207,7 @@ gst_sphinx_sink_get_property (GObject * object, guint prop_id, GValue * value,
 }
 
 static gboolean
-gst_sphinx_sink_prepare (GstAudioSink * asink, GstRingBufferSpec * spec)
+gst_sphinx_sink_start (GstBaseSink * asink)
 {
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
 
@@ -211,7 +217,7 @@ gst_sphinx_sink_prepare (GstAudioSink * asink, GstRingBufferSpec * spec)
 }
 
 static gboolean
-gst_sphinx_sink_unprepare (GstAudioSink * asink)
+gst_sphinx_sink_stop (GstBaseSink * asink)
 {
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
   
@@ -227,13 +233,23 @@ gst_sphinx_sink_unprepare (GstAudioSink * asink)
   return TRUE;
 }
 
-static guint
-gst_sphinx_sink_write (GstAudioSink * asink, gpointer data, guint length)
+
+static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * buffer)
 {
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
+  FILE *f;
+  void *data = GST_BUFFER_DATA (buffer);
+  int length = GST_BUFFER_SIZE (buffer);
   
-  uttproc_rawdata (data, length, 0);
+  f = fopen ("a.raw", "ab");
   
-  return length;
+  uttproc_rawdata ((int16 *)data, length / 2, 1);
+  
+  fwrite (data, 1, length, f);
+  fclose (f);
+
+  g_message ("written %d bytes", length);
+  
+  return GST_FLOW_OK;
 }
 

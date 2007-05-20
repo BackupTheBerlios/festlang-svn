@@ -25,7 +25,7 @@
 #define __GST_SPHINX_SINK_H__
 
 #include <gst/gst.h>
-#include <gst/audio/gstaudiosink.h>
+#include <gst/base/gstbasesink.h>
 
 G_BEGIN_DECLS
 
@@ -52,13 +52,13 @@ typedef struct _GstSphinxSinkClass GstSphinxSinkClass;
  * The opaque #GstSphinxSink data structure.
  */
 struct _GstSphinxSink {
-  GstAudioSink		element;
+  GstBaseSink		element;
 
   gboolean		dump;
 };
 
 struct _GstSphinxSinkClass {
-  GstAudioSinkClass parent_class;
+  GstBaseSinkClass parent_class;
 };
 
 GType gst_sphinx_sink_get_type (void);
