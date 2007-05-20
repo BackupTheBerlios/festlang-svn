@@ -4,6 +4,7 @@ INCLUDES =							\
 	$(WARN_CFLAGS)						\
 	$(DISABLE_DEPRECATED_CFLAGS)				\
 	-I$(SPHINX2_PREFIX)/include/sphinx2			\
+	-DSPHINX2_PREFIX=\"$(SPHINX2_PREFIX)\"			\
 	$(GNOME_PANEL_CFLAGS)
 
 

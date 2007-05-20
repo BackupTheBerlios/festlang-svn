@@ -34,6 +34,7 @@
 #include <locale.h>
 #include <s2types.h>
 #include <fbs.h>
+#include <CM_macros.h>
 
 static char *sphinx_command = 
 "-live TRUE -ctloffset 0 "
@@ -44,18 +45,18 @@ static char *sphinx_command =
 "-npbeam 2e-06 -lpbeam 2e-05 -lponlybeam 0.0005 -nwbeam 0.0005 -fwdflat FALSE "
 "-fwdflatbeam 1e-08 -fwdflatnwbeam 0.0003 -bestpath TRUE "
 "-8bsen TRUE "
-"-cepdir /home/shmyrev/local/share/sphinx2/model/lm/turtle/ctl "
-"-datadir /home/shmyrev/local/share/sphinx2/model/lm/turtle/ctl "
-"-kbdumpdir /home/shmyrev/local/share/sphinx2 "
-"-dictfn /home/shmyrev/local/share/sphinx2/model/lm/turtle/turtle.dic "
-"-ndictfn /home/shmyrev/local/share/sphinx2/model/hmm/6k/noisedict "
-"-lmfn /home/shmyrev/local/share/sphinx2/model/lm/turtle/turtle.lm "
-"-phnfn /home/shmyrev/local/share/sphinx2/model/hmm/6k/phone "
-"-mapfn /home/shmyrev/local/share/sphinx2/model/hmm/6k/map "
-"-hmmdir /home/shmyrev/local/share/sphinx2/model/hmm/6k "
-"-hmmdirlist /home/shmyrev/local/share/sphinx2/model/hmm/6k "
-"-sendumpfn /home/shmyrev/local/share/sphinx2/model/hmm/6k/sendump "
-"-cbdir /home/shmyrev/local/share/sphinx2/model/hmm/6k ";
+"-cepdir " SPHINX2_PREFIX "/share/sphinx2/model/lm/turtle/ctl "
+"-datadir " SPHINX2_PREFIX "/share/sphinx2/model/lm/turtle/ctl "
+"-kbdumpdir " SPHINX2_PREFIX "/share/sphinx2 "
+"-dictfn " SPHINX2_PREFIX "/share/sphinx2/model/lm/turtle/turtle.dic "
+"-ndictfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/noisedict "
+"-lmfn " SPHINX2_PREFIX "/share/sphinx2/model/lm/turtle/turtle.lm "
+"-phnfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/phone "
+"-mapfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/map "
+"-hmmdir " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k "
+"-hmmdirlist " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k "
+"-sendumpfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/sendump "
+"-cbdir " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k ";
 
 static void
 gst_sphinx_decoder_init (void)
@@ -212,7 +213,7 @@ gst_sphinx_sink_start (GstBaseSink * asink)
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
 
   uttproc_begin_utt (NULL);
-
+  
   return TRUE;
 }
 
@@ -222,8 +223,8 @@ gst_sphinx_sink_stop (GstBaseSink * asink)
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
   
   int32 fr;
-  char *hyp;
-
+  char *hyp = NULL;
+  
   uttproc_end_utt ();
   if (uttproc_result (&fr, &hyp, 1) < 0)
       g_warning ("uttproc_result failed");
@@ -237,13 +238,9 @@ gst_sphinx_sink_stop (GstBaseSink * asink)
 static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * buffer)
 {
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
-  void *data;
   int length = GST_BUFFER_SIZE (buffer);
 
-  data = g_malloc (length);
-  memcpy (data, GST_BUFFER_DATA (buffer), length);
-      
-  uttproc_rawdata ((int16 *)data, length / 2, 1);
+  uttproc_rawdata ((int16 *)GST_BUFFER_DATA (buffer), length / 2, 0);
 
 #if DUMPRAW 
   FILE *f;
