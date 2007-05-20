@@ -3,6 +3,7 @@ INCLUDES =							\
 	-DGNOMEDATADIR=\"$(datadir)\"				\
 	$(WARN_CFLAGS)						\
 	$(DISABLE_DEPRECATED_CFLAGS)				\
+	-I$(SPHINX2_PREFIX)/include/sphinx2			\
 	$(GNOME_PANEL_CFLAGS)
 
 
@@ -16,5 +17,9 @@ voice_control_applet_SOURCES = \
 	gstsphinxsink.h
 
 voice_control_applet_LDADD = \
-	$(GNOME_PANEL_LIBS)
+	$(GNOME_PANEL_LIBS)  \
+	-L$(SPHINX2_PREFIX)/lib \
+	-lsphinx2 \
+	-lsphinxfe \
+	-lgstaudio-0.10
 

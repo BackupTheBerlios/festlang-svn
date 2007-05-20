@@ -11,3 +11,4 @@ void
 do_action (VoiceAction action);
 
 #endif /* _ACTION_H_ */
+

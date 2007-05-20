@@ -3,5 +3,6 @@
 void 
 do_action (VoiceAction action)
 {
+	return;
 }
 

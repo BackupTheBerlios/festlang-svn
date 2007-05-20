@@ -25,7 +25,7 @@
 #define __GST_SPHINX_SINK_H__
 
 #include <gst/gst.h>
-#include <gst/base/gstbasesink.h>
+#include <gst/audio/gstaudiosink.h>
 
 G_BEGIN_DECLS
 
@@ -42,27 +42,6 @@ G_BEGIN_DECLS
   (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_SPHINX_SINK))
 #define GST_SPHINX_SINK_CAST(obj) ((GstSphinxSink *)obj)
 
-/**
- * GstSphinxSinkStateError:
- * @SPHINX_SINK_STATE_ERROR_NONE: no error
- * @SPHINX_SINK_STATE_ERROR_NULL_READY: cause the NULL to READY state change to fail
- * @SPHINX_SINK_STATE_ERROR_READY_PAUSED: cause the READY to PAUSED state change to fail:
- * @SPHINX_SINK_STATE_ERROR_PAUSED_PLAYING: cause the PAUSED to PLAYING state change to fail:
- * @SPHINX_SINK_STATE_ERROR_PLAYING_PAUSED: cause the PLAYING to PAUSED state change to fail:
- * @SPHINX_SINK_STATE_ERROR_PAUSED_READY: cause the PAUSED to READY state change to fail:
- * @SPHINX_SINK_STATE_ERROR_READY_NULL: cause the READY to NULL state change to fail:
- *
- * Possible state change errors for the state-error property.
- */
-typedef enum {
-  SPHINX_SINK_STATE_ERROR_NONE = 0,
-  SPHINX_SINK_STATE_ERROR_NULL_READY,
-  SPHINX_SINK_STATE_ERROR_READY_PAUSED,
-  SPHINX_SINK_STATE_ERROR_PAUSED_PLAYING,
-  SPHINX_SINK_STATE_ERROR_PLAYING_PAUSED,
-  SPHINX_SINK_STATE_ERROR_PAUSED_READY,
-  SPHINX_SINK_STATE_ERROR_READY_NULL
-} GstSphinxSinkStateError;
 
 typedef struct _GstSphinxSink GstSphinxSink;
 typedef struct _GstSphinxSinkClass GstSphinxSinkClass;
@@ -73,21 +52,13 @@ typedef struct _GstSphinxSinkClass GstSphinxSinkClass;
  * The opaque #GstSphinxSink data structure.
  */
 struct _GstSphinxSink {
-  GstBaseSink		element;
+  GstAudioSink		element;
 
-  gboolean		silent;
   gboolean		dump;
-  gboolean		signal_handoffs;
-  GstSphinxSinkStateError state_error;
-  gchar			*last_message;
 };
 
 struct _GstSphinxSinkClass {
-  GstBaseSinkClass parent_class;
-
-  /* signals */
-  void (*handoff) (GstElement *element, GstBuffer *buf, GstPad *pad);
-  void (*preroll_handoff) (GstElement *element, GstBuffer *buf, GstPad *pad);
+  GstAudioSinkClass parent_class;
 };
 
 GType gst_sphinx_sink_get_type (void);
@@ -95,3 +66,4 @@ GType gst_sphinx_sink_get_type (void);
 G_END_DECLS
 
 #endif /* __GST_SPHINX_SINK_H__ */
+

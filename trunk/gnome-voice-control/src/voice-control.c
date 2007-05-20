@@ -114,7 +114,7 @@ control_stop (BonoboUIComponent  *uic,
 	       const char         *verbname)
 {
     g_message ("Waiting");
-    gst_element_set_state (voice_control->pipeline, GST_STATE_PLAYING);
+    gst_element_set_state (voice_control->pipeline, GST_STATE_NULL);
 }
 
 static void
@@ -316,9 +316,13 @@ int main (int argc, char *argv [])
 	GnomeProgram *program;	
 	GOptionContext *context;
 	int           retval;
+	
+	
 	bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 	textdomain (GETTEXT_PACKAGE);
+	
+	
 	context = g_option_context_new ("");
 	program = gnome_program_init ("voice-control-applet", VERSION,
 				      LIBGNOMEUI_MODULE,
@@ -326,7 +330,9 @@ int main (int argc, char *argv [])
 				      GNOME_PARAM_GOPTION_CONTEXT, context,
 				      GNOME_CLIENT_PARAM_SM_CONNECT, FALSE,
 				      GNOME_PARAM_NONE);
+
 	gst_init (&argc, &argv);
+	
         retval = panel_applet_factory_main ("OAFIID:GNOME_VoiceControlApplet_Factory",
 			     voice_control_applet_get_type (),
 			     voice_control_applet_factory,
