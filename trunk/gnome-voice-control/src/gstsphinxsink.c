@@ -237,16 +237,20 @@ gst_sphinx_sink_stop (GstBaseSink * asink)
 static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * buffer)
 {
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
-  FILE *f;
-  void *data = GST_BUFFER_DATA (buffer);
+  void *data;
   int length = GST_BUFFER_SIZE (buffer);
-  
-  f = fopen ("a.raw", "ab");
-  
+
+  data = g_malloc (length);
+  memcpy (data, GST_BUFFER_DATA (buffer), length);
+      
   uttproc_rawdata ((int16 *)data, length / 2, 1);
-  
+
+#if DUMPRAW 
+  FILE *f;
+  f = fopen ("dump.raw", "ab");
   fwrite (data, 1, length, f);
   fclose (f);
+#endif
 
   g_message ("written %d bytes", length);
   
