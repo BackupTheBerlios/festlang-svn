@@ -24,7 +24,7 @@
 	</oaf_attribute>
 	<oaf_attribute name="name" type="string" _value="VoiceControl"/>
 	<oaf_attribute name="description" type="string" _value="Control your desktop with voice"/>
-	<oaf_attribute name="panel:icon" type="string" value="gnome-voice-control"/>
+	<oaf_attribute name="panel:icon" type="string" value="gnome-grecord"/>
 	<oaf_attribute name="bugzilla:bugzilla" type="string" value="GNOME"/>
 	<oaf_attribute name="bugzilla:product" type="string" value="gnome-panel"/>
 	<oaf_attribute name="bugzilla:component" type="string" value="voice-control"/>

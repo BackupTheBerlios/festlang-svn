@@ -26,6 +26,10 @@
 #include <gtk/gtk.h>
 #include <panel-applet.h>
 #include <glib/gi18n.h>
+#include <gst/gstelement.h>
+#include <gst/gstplugin.h>
+
+#include "gstsphinxsink.h"
 
 #define VOICE_CONTROL_APPLET(o) (G_TYPE_CHECK_INSTANCE_CAST ((o), \
 				 voice_control_applet_get_type(),          \
@@ -33,7 +37,7 @@
 #define VOICE_CONTROL_IS_APPLET(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), \
 				   VOICE_CONTROL_TYPE_APPLET))
 
-#define VOICE_CONTROL_ICON "emblem-sound"
+#define VOICE_CONTROL_ICON "gnome-grecord"
 
 #define N_VOICE_CONTROL_LISTENERS 4
 
@@ -46,6 +50,8 @@ typedef struct {
 	GtkWidget*	   frame;
 	
 	GtkTooltips* 	   tooltips;
+	
+	GstElement*        pipeline;	
 } VoiceControlApplet;
 
 typedef struct {
@@ -94,6 +100,24 @@ display_help_dialog (BonoboUIComponent   *uic,
 }
 
 static void
+control_start (BonoboUIComponent  *uic,
+	       VoiceControlApplet *voice_control,
+	       const char         *verbname)
+{
+    g_message ("Running");
+    gst_element_set_state (voice_control->pipeline, GST_STATE_PLAYING);
+}
+
+static void
+control_stop (BonoboUIComponent  *uic,
+	       VoiceControlApplet *voice_control,
+	       const char         *verbname)
+{
+    g_message ("Waiting");
+    gst_element_set_state (voice_control->pipeline, GST_STATE_PLAYING);
+}
+
+static void
 display_about_dialog (BonoboUIComponent  *uic,
 		      VoiceControlApplet *voice_control,
 		      const char         *verbname)
@@ -129,8 +153,6 @@ display_about_dialog (BonoboUIComponent  *uic,
 		      "translator-credits", _("translator-credits"),
 		      "logo-icon-name", VOICE_CONTROL_ICON,
 		      NULL);
-
-	g_free (descr);
 
 	gtk_window_set_icon_name (GTK_WINDOW (voice_control->about_dialog), VOICE_CONTROL_ICON);
 	gtk_window_set_wmclass (GTK_WINDOW (voice_control->about_dialog), "fish", "VoiceControl");
@@ -173,12 +195,13 @@ setup_voice_control_widget (VoiceControlApplet *voice_control)
 	gtk_container_add (GTK_CONTAINER (voice_control->frame), label);
 
 	set_tooltip (voice_control);
-//	set_ally_name_desc (GTK_WIDGET (voice_control), voice_control);
 
 	gtk_widget_show_all (widget);
 }
 
 static const BonoboUIVerb voice_control_menu_verbs [] = {
+	BONOBO_UI_UNSAFE_VERB ("VoiceControlStart",       control_start),
+	BONOBO_UI_UNSAFE_VERB ("VoiceControlStop",        control_stop),
 	BONOBO_UI_UNSAFE_VERB ("VoiceControlHelp",        display_help_dialog),
 	BONOBO_UI_UNSAFE_VERB ("VoiceControlAbout",       display_about_dialog),
         BONOBO_UI_VERB_END
@@ -225,7 +248,24 @@ voice_control_applet_destroy (GtkObject *object)
 		g_object_unref (voice_control->tooltips);
 	voice_control->tooltips = NULL;
 
+	if (voice_control->pipeline)
+		g_object_unref (voice_control->pipeline);
+	voice_control->pipeline = NULL;
+
 	GTK_OBJECT_CLASS (voice_control_applet_parent_class)->destroy (object);
+}
+
+static void
+voice_control_applet_create_pipeline (VoiceControlApplet *voice_control)
+{
+      GError *error = NULL;
+
+      voice_control->pipeline = gst_parse_launch ("gconfaudiosrc ! sphinxsink", &error);
+      
+      if (error != NULL)
+    	    g_warning ("Can't create pipeline: %s", error->message);
+    	    
+      return;
 }
 
 static void
@@ -233,6 +273,8 @@ voice_control_applet_init (VoiceControlApplet      *voice_control)
 {
 	int i;
 	
+	gst_init (0, NULL);
+		
 	voice_control->about_dialog = NULL;
 
 	for (i = 0; i < N_VOICE_CONTROL_LISTENERS; i++)
@@ -240,8 +282,25 @@ voice_control_applet_init (VoiceControlApplet      *voice_control)
 
 	panel_applet_set_flags (PANEL_APPLET (voice_control),
 				PANEL_APPLET_EXPAND_MINOR);
+				
+	voice_control_applet_create_pipeline (voice_control);
 }
 
+static gboolean
+plugin_init (GstPlugin * plugin)
+{
+  gboolean res = TRUE;
+
+  res &= gst_element_register (plugin, "sphinxsink", GST_RANK_PRIMARY, GST_TYPE_SPHINX_SINK);
+  return res;
+}
+
+GST_PLUGIN_DEFINE_STATIC (GST_VERSION_MAJOR,
+    GST_VERSION_MINOR,
+    "sphinxplugin",
+    "Sphinx Recognition plugin",
+    plugin_init, VERSION, GST_LICENSE_UNKNOWN, PACKAGE_NAME, PACKAGE_NAME);
+                
 static void
 voice_control_applet_class_init (VoiceControlAppletClass *klass)
 {
@@ -252,10 +311,29 @@ voice_control_applet_class_init (VoiceControlAppletClass *klass)
 	gtk_object_class->destroy = voice_control_applet_destroy;
 }
 
-PANEL_APPLET_BONOBO_FACTORY ("OAFIID:GNOME_VoiceControlApplet_Factory",
+int main (int argc, char *argv [])
+{				
+	GnomeProgram *program;	
+	GOptionContext *context;
+	int           retval;
+	bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
+	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+	textdomain (GETTEXT_PACKAGE);
+	context = g_option_context_new ("");
+	program = gnome_program_init ("voice-control-applet", VERSION,
+				      LIBGNOMEUI_MODULE,
+				      argc, argv,
+				      GNOME_PARAM_GOPTION_CONTEXT, context,
+				      GNOME_CLIENT_PARAM_SM_CONNECT, FALSE,
+				      GNOME_PARAM_NONE);
+	gst_init (&argc, &argv);
+        retval = panel_applet_factory_main ("OAFIID:GNOME_VoiceControlApplet_Factory",
 			     voice_control_applet_get_type (),
-			     "Simple Voice Control",
-			     "0",
 			     voice_control_applet_factory,
-			     NULL)
+			     NULL);		
+	g_object_unref (program);
+	return retval;
+}
+
+
 
