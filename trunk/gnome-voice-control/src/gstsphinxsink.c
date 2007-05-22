@@ -249,8 +249,6 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
   fclose (f);
 #endif
 
-  g_message ("written %d bytes", length);
-  
   return GST_FLOW_OK;
 }
 

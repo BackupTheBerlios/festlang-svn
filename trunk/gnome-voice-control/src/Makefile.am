@@ -21,7 +21,7 @@ voice_control_applet_LDADD = \
 	$(GNOME_PANEL_LIBS)  \
 	-L$(SPHINX2_PREFIX)/lib \
 	-lsphinx2 \
-	-lsphinxfe
+	-lsphinx2fe
 
 
 

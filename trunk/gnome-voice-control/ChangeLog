@@ -1,3 +1,10 @@
+2007-05-23  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* src/Makefile.am:
+	* src/gstsphinxsink.c: (gst_sphinx_sink_render):
+	
+	Links with correct library - fixes the crash on stop.
+
 2007-05-20  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* configure.ac:
