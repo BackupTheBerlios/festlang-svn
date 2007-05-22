@@ -138,6 +138,7 @@ display_about_dialog (BonoboUIComponent  *uic,
 	}
 
 	authors [0] = _("Nickolay V. Shmyrev <nshmyrev@yandex.ru>");
+	authors [1] = _("Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>");
 	authors [2] = NULL;
 
 	descr = _("Voice Control Applet used to manage desktop with speech");
