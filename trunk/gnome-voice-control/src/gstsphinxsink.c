@@ -32,9 +32,6 @@
 #include "gstsphinxsink.h"
 
 #include <locale.h>
-#include <s2types.h>
-#include <fbs.h>
-#include <CM_macros.h>
 
 static char *sphinx_command = 
 "-live TRUE -ctloffset 0 "
@@ -207,12 +204,30 @@ gst_sphinx_sink_get_property (GObject * object, guint prop_id, GValue * value,
   }
 }
 
+int32 
+gst_sphinx_sink_ad_read(ad_rec_t *ad, int16 *buf, int32 max)
+{
+  GstSphinxSink *sphinxsink = GST_SPHINX_SINK (((GstSphinxSinkAd *)ad)->self);
+  int len;
+
+  len = max > (GST_BUFFER_SIZE (sphinxsink->buffer) / 2) ? (GST_BUFFER_SIZE (sphinxsink->buffer) / 2) : max;
+  
+  memcpy ((void *)buf, GST_BUFFER_DATA (sphinxsink->buffer), len * 2);
+  
+  return len;
+}
+
 static gboolean
 gst_sphinx_sink_start (GstBaseSink * asink)
 {
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
 
-  uttproc_begin_utt (NULL);
+  sphinxsink->ad.self = sphinxsink;
+  sphinxsink->ad.sps = 16000;
+  sphinxsink->ad.self = sphinxsink;
+  sphinxsink->ad.bps = sizeof(int16);
+  sphinxsink->ad.calibrated = FALSE;
+  sphinxsink->cont = cont_ad_init ((ad_rec_t*)&sphinxsink->ad, gst_sphinx_sink_ad_read);
   
   return TRUE;
 }
@@ -222,15 +237,8 @@ gst_sphinx_sink_stop (GstBaseSink * asink)
 {
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
   
-  int32 fr;
-  char *hyp = NULL;
+  cont_ad_close (sphinxsink->cont);
   
-  uttproc_end_utt ();
-  if (uttproc_result (&fr, &hyp, 1) < 0)
-      g_warning ("uttproc_result failed");
-  else
-      g_message ("%d: %s", fr, hyp);
-
   return TRUE;
 }
 
@@ -238,9 +246,47 @@ gst_sphinx_sink_stop (GstBaseSink * asink)
 static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * buffer)
 {
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
+
   int length = GST_BUFFER_SIZE (buffer);
 
-  uttproc_rawdata ((int16 *)GST_BUFFER_DATA (buffer), length / 2, 0);
+  
+  if (!sphinxsink->ad.calibrated) {
+        int result;
+	result = cont_ad_calib_loop (sphinxsink->cont, (int16 *)GST_BUFFER_DATA (buffer), length / 2);
+	
+	if (result == 0) {
+	    sphinxsink->ad.calibrated = TRUE;
+	    g_message ("Successfully calibrated");
+	    uttproc_begin_utt (NULL);
+	}
+  } else {
+	int32 k;
+	int16 adbuf[4096];
+	
+	sphinxsink->buffer = buffer;
+	k = cont_ad_read (sphinxsink->cont, adbuf, 4096);
+	
+	if (k == 0 && sphinxsink->last_ts == 0) {
+	      return GST_FLOW_OK;
+	} else if (k == 0 && sphinxsink->cont->read_ts - sphinxsink->last_ts > 
+			    DEFAULT_SAMPLES_PER_SEC) {
+	      int32 fr;
+	      char *hyp = NULL;
+  
+	      uttproc_end_utt ();
+   	      if (uttproc_result (&fr, &hyp, 1) < 0) {
+		      g_warning ("uttproc_result failed");
+	      } else if (sphinxsink->dump) {
+	          g_message ("%d: %s", fr, hyp);
+	      }
+	      sphinxsink->last_ts = 0;
+	      uttproc_begin_utt (NULL);
+	} else if (k != 0) {
+	     g_message ("I've got speech %d words", k);
+	     uttproc_rawdata (adbuf, k, 1);
+	     sphinxsink->last_ts = sphinxsink->cont->read_ts;
+	}
+  }
 
 #if DUMPRAW 
   FILE *f;

@@ -1,6 +1,17 @@
 2007-05-23  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/Makefile.am:
+	* src/gstsphinxsink.c: (gst_sphinx_sink_ad_read),
+	(gst_sphinx_sink_start), (gst_sphinx_sink_stop),
+	(gst_sphinx_sink_render):
+	* src/gstsphinxsink.h:
+	
+	Continuous listening implemented, the only thing
+	is callbacks now.
+
+2007-05-23  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* src/Makefile.am:
 	* src/gstsphinxsink.c: (gst_sphinx_sink_render):
 	
 	Links with correct library - fixes the crash on stop.

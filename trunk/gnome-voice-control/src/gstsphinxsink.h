@@ -27,8 +27,13 @@
 #include <gst/gst.h>
 #include <gst/base/gstbasesink.h>
 
-G_BEGIN_DECLS
+#include <s2types.h>
+#include <fbs.h>
+#include <CM_macros.h>
+#include <ad.h>
+#include <cont_ad.h>
 
+G_BEGIN_DECLS
 
 #define GST_TYPE_SPHINX_SINK \
   (gst_sphinx_sink_get_type())
@@ -46,6 +51,15 @@ G_BEGIN_DECLS
 typedef struct _GstSphinxSink GstSphinxSink;
 typedef struct _GstSphinxSinkClass GstSphinxSinkClass;
 
+
+typedef struct _GstSphinxSinkAd {
+    GstSphinxSink *self;
+    int32 dummy;
+    int32 sps;
+    int32 bps;
+    int32 calibrated;
+} GstSphinxSinkAd;
+
 /**
  * GstSphinxSink:
  *
@@ -53,6 +67,14 @@ typedef struct _GstSphinxSinkClass GstSphinxSinkClass;
  */
 struct _GstSphinxSink {
   GstBaseSink		element;
+
+  cont_ad_t *cont;
+  GstSphinxSinkAd ad;
+
+  gint32 last_ts;
+  
+  /* Link for callbacks */
+  GstBuffer *buffer;  
 
   gboolean		dump;
 };
