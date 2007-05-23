@@ -24,6 +24,7 @@
 #include <math.h>
 
 #include <gtk/gtk.h>
+#include <gdk/gdk.h>
 #include <panel-applet.h>
 #include <glib/gi18n.h>
 #include <gst/gstelement.h>
@@ -333,6 +334,7 @@ int main (int argc, char *argv [])
 				      GNOME_PARAM_NONE);
 
 	gst_init (&argc, &argv);
+        gdk_init (&argc, &argv);
 	
         retval = panel_applet_factory_main ("OAFIID:GNOME_VoiceControlApplet_Factory",
 			     voice_control_applet_get_type (),

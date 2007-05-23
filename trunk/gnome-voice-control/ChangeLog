@@ -1,3 +1,14 @@
+2007-05-22  Raphael Nunes da Motta  <raphael@arthemis>
+
+	reviewed by: <delete if not using a buddy>
+
+	* configure.ac:
+	* src/action.c: (do_action):
+	* src/action.h:
+	* src/voice-control.c: (main):
+
+        Some actions over active windows implemented.
+
 2007-05-23  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/Makefile.am:
