@@ -1,0 +1,15 @@
+Multiligual LTS with CART tree
+
+============
+Compilation
+============
+
+	Under UNIX just type 'make'. It should be compiled with Visual Studio
+	as well, there is dsw project.
+
+=======
+ Usage
+=======
+	
+	lts program just reads string by string from standard input and
+	outputs transcription to standard output. 
