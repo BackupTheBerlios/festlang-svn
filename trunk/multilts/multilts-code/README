@@ -12,4 +12,7 @@ Compilation
 =======
 	
 	lts program just reads string by string from standard input and
-	outputs transcription to standard output. 
+	outputs transcription to standard output. You can also point
+	the language (English is default) and file to use as input
+	
+	lts [-l language] [file]

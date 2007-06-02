@@ -21,10 +21,24 @@ typedef struct cst_lts_rule_struct {
     cst_lts_addr   qfalse;
 } cst_lts_rule;
 
-extern const char * const cmu_lts_phone_table[];
-extern const char * const cmu_lts_letter_table[];
-extern const cst_lts_addr cmu_lts_letter_index[];
-extern const cst_lts_model cmu_lts_model[];
+extern const char * const cmu_lts_phone_table_english[];
+extern const char * const cmu_lts_letter_table_english[];
+extern const cst_lts_addr cmu_lts_letter_index_english[];
+extern const cst_lts_model cmu_lts_model_english[];
+
+extern const char * const cmu_lts_phone_table_spanish[];
+extern const char * const cmu_lts_letter_table_spanish[];
+extern const cst_lts_addr cmu_lts_letter_index_spanish[];
+extern const cst_lts_model cmu_lts_model_spanish[];
+
+extern const char * const cmu_lts_phone_table_russian[];
+extern const char * const cmu_lts_letter_table_russian[];
+extern const cst_lts_addr cmu_lts_letter_index_russian[];
+extern const cst_lts_model cmu_lts_model_russian[];
+
+#define LETTER_PAU 1
+#define LETTER_ZERO 2
+#define PHONE_PAU 100
 
 #endif
 

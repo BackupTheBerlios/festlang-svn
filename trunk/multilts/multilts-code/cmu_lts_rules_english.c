@@ -3,43 +3,39 @@
 /**  from wfst/    */
 /*******************************************************/
 
+#include <stdlib.h>
 #include "cst_lts.h"
 
-#include <stdlib.h>
-
-const char * const cmu_lts_phone_table[76] = 
+const char * const cmu_lts_phone_table_english[75] = 
 {
     "epsilon",
     "eh1",
     "aa1",
     "ey1",
+    "aa0",
     "aw1",
-    "ax0",
+    "ax",
     "ao1",
     "er0",
     "ay0",
-    "aa0",
     "ey0",
     "ih1",
     "ae1",
     "aw0",
     "ow0",
-    "ao0",
-    "ow1",
     "eh0",
+    "ow1",
     "iy1",
+    "ao0",
     "ih0",
     "w-ey1",
-    "w-ax0",
-    "y-ax0",
     "ae0",
-    "ay1",
-    "ah0",
     "ah1",
+    "ay1",
     "b",
     "ch",
-    "k",
     "s",
+    "k",
     "sh",
     "t-s",
     "d",
@@ -58,11 +54,10 @@ const char * const cmu_lts_phone_table[76] =
     "hh",
     "y",
     "l",
-    "ax0-l",
+    "ax-l",
+    "ax-m",
     "m",
-    "ax0-m",
     "m-ae1",
-    "m-ax0",
     "ng",
     "n",
     "n-y",
@@ -79,6 +74,9 @@ const char * const cmu_lts_phone_table[76] =
     "y-uh1",
     "y-er1",
     "y-er0",
+    "y-uh0",
+    "y-ax",
+    "ax-w",
     "v",
     "k-s",
     "g-zh",
@@ -87,7 +85,7 @@ const char * const cmu_lts_phone_table[76] =
     NULL
 };
 
-const char * const cmu_lts_letter_table[30] = 
+const char * const cmu_lts_letter_table_english[30] = 
 {
     "nothing",
     "#",
@@ -121,34 +119,34 @@ const char * const cmu_lts_letter_table[30] =
     NULL
 };
 
-const cst_lts_addr cmu_lts_letter_index[27] = 
+const cst_lts_addr cmu_lts_letter_index_english[27] = 
 {
     0, /* a */
-    5436, /* b */
-    5489, /* c */
-    6103, /* d */
-    6203, /* e */
-    11189, /* f */
-    11275, /* g */
-    11754, /* h */
-    11990, /* i */
-    15857, /* j */
-    15968, /* k */
-    15981, /* l */
-    16467, /* m */
-    16583, /* n */
-    16942, /* o */
-    20591, /* p */
-    20724, /* q */
-    20725, /* r */
-    22497, /* s */
-    23452, /* t */
-    24119, /* u */
-    25967, /* v */
-    25977, /* w */
-    26134, /* x */
-    26176, /* y */
-    26618, /* z */
+    4917, /* b */
+    5029, /* c */
+    5620, /* d */
+    5761, /* e */
+    10366, /* f */
+    10447, /* g */
+    10948, /* h */
+    11170, /* i */
+    14706, /* j */
+    14823, /* k */
+    14838, /* l */
+    15162, /* m */
+    15183, /* n */
+    15451, /* o */
+    18808, /* p */
+    18841, /* q */
+    18842, /* r */
+    20538, /* s */
+    21483, /* t */
+    21829, /* u */
+    23496, /* v */
+    23504, /* w */
+    23628, /* x */
+    23673, /* y */
+    24078, /* z */
     0
 };
 
