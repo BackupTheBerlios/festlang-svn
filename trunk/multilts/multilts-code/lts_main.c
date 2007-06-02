@@ -236,16 +236,16 @@ void utterance_init (utterance *utt, char *language)
     memset (utt->letters, 0, 256);
     memset (utt->phones, 0, 256);
 
-    if (language && strcmp (language, "russian"))
+    if (language && strcmp (language, "russian") == 0)
       {
         utt->phone_table = cmu_lts_phone_table_russian;
 	utt->letter_table = cmu_lts_letter_table_russian;
         utt->letter_index = cmu_lts_letter_index_russian;
-        utt->model = cmu_lts_model_english;
+        utt->model = cmu_lts_model_russian;
         return;
       }
     
-    if (language && strcmp (language, "spanish"))
+    if (language && strcmp (language, "spanish") == 0)
       {
         utt->phone_table = cmu_lts_phone_table_spanish;
         utt->letter_table = cmu_lts_letter_table_spanish;
