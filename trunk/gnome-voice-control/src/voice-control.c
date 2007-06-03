@@ -124,21 +124,30 @@ static void
 on_sink_calibration (GObject *sink, gpointer data)
 {
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+
+	gdk_threads_enter ();
 	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Calibration"));
+	gdk_threads_leave ();
 }
 
 static void
 on_sink_listening (GObject *sink, gpointer data)
 {
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+
+	gdk_threads_enter ();
 	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Listening"));
+	gdk_threads_leave ();
 }
 
 static void
 on_sink_ready (GObject *sink, gpointer data)
 {
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+
+	gdk_threads_enter ();
 	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Ready"));
+	gdk_threads_leave ();
 }
 
 static void
@@ -152,6 +161,14 @@ on_sink_message (GObject *sink, gchar *message, gpointer data)
 		do_action (ACTION_RUN_TERMINAL);
 	if (g_strrstr (message, "RUN MAIL"))
 		do_action (ACTION_RUN_MAIL);
+	if (g_strrstr (message, "CLOSE WINDOW"))
+		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_CLOSE_WINDOW));
+	if (g_strrstr (message, "NEXT WINDOW"))
+		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_NEXT_WINDOW));
+	if (g_strrstr (message, "MINIMIZE WINDOW"))
+		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_MINIMIZE_WINDOW));
+	if (g_strrstr (message, "MAXIMIZE WINDOW"))
+		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_MAXIMIZE_WINDOW));
 		
 	return;
 }
@@ -331,8 +348,6 @@ voice_control_applet_init (VoiceControlApplet      *voice_control)
 {
 	int i;
 	
-	gst_init (0, NULL);
-		
 	voice_control->about_dialog = NULL;
 
 	for (i = 0; i < N_VOICE_CONTROL_LISTENERS; i++)
@@ -374,13 +389,11 @@ int main (int argc, char *argv [])
 	GnomeProgram *program;	
 	GOptionContext *context;
 	int           retval;
-	
-	
+		
 	bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 	textdomain (GETTEXT_PACKAGE);
-	
-	g_thread_init(NULL);
+
 	gst_init (&argc, &argv);
 	
 	context = g_option_context_new ("");
@@ -391,13 +404,13 @@ int main (int argc, char *argv [])
 				      GNOME_CLIENT_PARAM_SM_CONNECT, FALSE,
 				      GNOME_PARAM_NONE);
 	
+	gdk_threads_enter ();
         retval = panel_applet_factory_main ("OAFIID:GNOME_VoiceControlApplet_Factory",
 			     voice_control_applet_get_type (),
 			     voice_control_applet_factory,
 			     NULL);		
+	gdk_threads_leave ();
 	g_object_unref (program);
+	
 	return retval;
 }
-
-
-

@@ -131,8 +131,6 @@ gst_sphinx_sink_base_init (gpointer g_class)
 {
   GstElementClass *gstelement_class = GST_ELEMENT_CLASS (g_class);
 
-  gst_sphinx_decoder_init ();
-
   gst_element_class_add_pad_template (gstelement_class,
       gst_static_pad_template_get (&sinktemplate));
   gst_element_class_set_details (gstelement_class, &gst_sphinx_sink_details);
@@ -247,10 +245,16 @@ gst_sphinx_sink_start (GstBaseSink * asink)
   sphinxsink->ad.self = sphinxsink;
   sphinxsink->ad.bps = sizeof(int16);
   sphinxsink->ad.calibrated = FALSE;
-  sphinxsink->cont = cont_ad_init ((ad_rec_t*)&sphinxsink->ad, gst_sphinx_sink_ad_read);
   
   g_signal_emit (sphinxsink,
         gst_sphinx_sink_signals[SIGNAL_CALIBRATION], 0, NULL);
+
+  if (!sphinxsink->ad.initialized) {
+	  gst_sphinx_decoder_init ();
+	  sphinxsink->ad.initialized = TRUE;
+  }
+
+  sphinxsink->cont = cont_ad_init ((ad_rec_t*)&sphinxsink->ad, gst_sphinx_sink_ad_read);
   
   return TRUE;
 }
@@ -271,7 +275,6 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
 
   int length = GST_BUFFER_SIZE (buffer);
-
   
   if (!sphinxsink->ad.calibrated) {
         int result;

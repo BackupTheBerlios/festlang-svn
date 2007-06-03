@@ -58,6 +58,7 @@ typedef struct _GstSphinxSinkAd {
     int32 sps;
     int32 bps;
     int32 calibrated;
+    int32 initialized;
 } GstSphinxSinkAd;
 
 /**
