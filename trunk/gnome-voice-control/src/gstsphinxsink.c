@@ -35,6 +35,8 @@
 #include <string.h>
 
 static char *sphinx_command = 
+"voice-control "
+"-verbose 0 "
 "-live TRUE "
 "-langwt 6.5 "
 "-fwdflatlw 8.5 -rescorelw 9.5 -ugwt 0.5 -fillpen 1e-10 -silpen 0.005 "
@@ -90,6 +92,7 @@ GST_ELEMENT_DETAILS ("Sphinx Sink",
 /* SphinxSink signals and args */
 enum
 {
+  SIGNAL_INITIALIZATION,
   SIGNAL_CALIBRATION,
   SIGNAL_LISTENING,
   SIGNAL_READY,
@@ -157,6 +160,11 @@ gst_sphinx_sink_class_init (GstSphinxSinkClass * klass)
   gstbase_sink_class->start = GST_DEBUG_FUNCPTR (gst_sphinx_sink_start);
   gstbase_sink_class->stop = GST_DEBUG_FUNCPTR (gst_sphinx_sink_stop);
   gstbase_sink_class->render = GST_DEBUG_FUNCPTR (gst_sphinx_sink_render);
+
+  gst_sphinx_sink_signals[SIGNAL_INITIALIZATION] =
+      g_signal_new ("initialization", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
+      G_STRUCT_OFFSET (GstSphinxSinkClass, initialization), NULL, NULL,
+      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
 
   gst_sphinx_sink_signals[SIGNAL_CALIBRATION] =
       g_signal_new ("calibration", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
@@ -245,15 +253,8 @@ gst_sphinx_sink_start (GstBaseSink * asink)
   sphinxsink->ad.self = sphinxsink;
   sphinxsink->ad.bps = sizeof(int16);
   sphinxsink->ad.calibrated = FALSE;
+  sphinxsink->ad.calibrate_started = FALSE;
   
-  g_signal_emit (sphinxsink,
-        gst_sphinx_sink_signals[SIGNAL_CALIBRATION], 0, NULL);
-
-  if (!sphinxsink->ad.initialized) {
-	  gst_sphinx_decoder_init ();
-	  sphinxsink->ad.initialized = TRUE;
-  }
-
   sphinxsink->cont = cont_ad_init ((ad_rec_t*)&sphinxsink->ad, gst_sphinx_sink_ad_read);
   
   return TRUE;
@@ -276,8 +277,22 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
 
   int length = GST_BUFFER_SIZE (buffer);
   
+    if (!sphinxsink->ad.initialized) {
+          g_signal_emit (sphinxsink,
+	        gst_sphinx_sink_signals[SIGNAL_INITIALIZATION], 0, NULL);
+	  gst_sphinx_decoder_init ();
+	  sphinxsink->ad.initialized = TRUE;
+  }
+
   if (!sphinxsink->ad.calibrated) {
         int result;
+
+        if (!sphinxsink->ad.calibrate_started) {
+    	    g_signal_emit (sphinxsink,
+		    gst_sphinx_sink_signals[SIGNAL_CALIBRATION], 0, NULL);
+	    sphinxsink->ad.calibrate_started = TRUE;
+	}
+
 	result = cont_ad_calib_loop (sphinxsink->cont, (int16 *)GST_BUFFER_DATA (buffer), length / 2);
 	
 	if (result == 0) {

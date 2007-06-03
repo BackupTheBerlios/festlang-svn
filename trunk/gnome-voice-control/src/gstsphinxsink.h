@@ -59,6 +59,7 @@ typedef struct _GstSphinxSinkAd {
     int32 bps;
     int32 calibrated;
     int32 initialized;
+    int32 calibrate_started;
 } GstSphinxSinkAd;
 
 /**
@@ -83,6 +84,7 @@ struct _GstSphinxSink {
 struct _GstSphinxSinkClass {
   GstBaseSinkClass parent_class;
 
+  void (*initialization)  (GstElement *element);
   void (*calibration)     (GstElement *element);
   void (*ready)           (GstElement *element);
   void (*listening)       (GstElement *element);

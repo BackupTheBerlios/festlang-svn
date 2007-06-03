@@ -1,5 +1,15 @@
 2007-06-03  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
+	* src/gstsphinxsink.c: (gst_sphinx_sink_class_init),
+	(gst_sphinx_sink_start), (gst_sphinx_sink_render):
+	* src/gstsphinxsink.h:
+	* src/voice-control.c: (on_sink_initialization),
+	(voice_control_applet_create_pipeline), (main):
+	
+	Threading problems seems to be solved.
+
+2007-06-03  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
 	* configure.ac:
 	* lang/desktop-control.fsg:
 	* src/action.c: (do_action):

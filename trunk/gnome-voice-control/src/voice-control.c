@@ -121,6 +121,16 @@ control_stop (BonoboUIComponent  *uic,
 }
 
 static void
+on_sink_initialization (GObject *sink, gpointer data)
+{
+	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+
+	gdk_threads_enter ();
+	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Init"));
+	gdk_threads_leave ();
+}
+
+static void
 on_sink_calibration (GObject *sink, gpointer data)
 {
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
@@ -331,6 +341,8 @@ voice_control_applet_create_pipeline (VoiceControlApplet *voice_control)
     	    return;
       }
     	
+      g_signal_connect (voice_control->sink, "initialization",
+    		        G_CALLBACK(on_sink_initialization), voice_control);
       g_signal_connect (voice_control->sink, "calibration",
     		        G_CALLBACK(on_sink_calibration), voice_control);
       g_signal_connect (voice_control->sink, "listening",
@@ -387,29 +399,26 @@ voice_control_applet_class_init (VoiceControlAppletClass *klass)
 int main (int argc, char *argv [])
 {				
 	GnomeProgram *program;	
-	GOptionContext *context;
 	int           retval;
 		
 	bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 	textdomain (GETTEXT_PACKAGE);
-
-	gst_init (&argc, &argv);
 	
-	context = g_option_context_new ("");
+	g_thread_init (NULL);
+	gst_init (&argc, &argv);
+	gdk_threads_init ();
+	
 	program = gnome_program_init ("voice-control-applet", VERSION,
 				      LIBGNOMEUI_MODULE,
 				      argc, argv,
-				      GNOME_PARAM_GOPTION_CONTEXT, context,
 				      GNOME_CLIENT_PARAM_SM_CONNECT, FALSE,
 				      GNOME_PARAM_NONE);
 	
-	gdk_threads_enter ();
         retval = panel_applet_factory_main ("OAFIID:GNOME_VoiceControlApplet_Factory",
 			     voice_control_applet_get_type (),
 			     voice_control_applet_factory,
 			     NULL);		
-	gdk_threads_leave ();
 	g_object_unref (program);
 	
 	return retval;
