@@ -42,7 +42,6 @@ static char *sphinx_command =
 "-npbeam 2e-06 -lpbeam 2e-05 -lponlybeam 0.0005 -nwbeam 0.0005 -fwdflat FALSE "
 "-fwdflatbeam 1e-08 -fwdflatnwbeam 0.0003 -bestpath TRUE "
 "-8bsen TRUE "
-"-backtrace FALSE "
 "-sendumpfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/sendump "
 "-ndictfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/noisedict "
 "-phnfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/phone "
@@ -306,10 +305,10 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
 		      if (sphinxsink->dump)
 	                 g_message ("%d: %s", fr, hyp);
 
-//		      if (hyp != NULL)
-//	 	        g_signal_emit (sphinxsink,
-//			               gst_sphinx_sink_signals[SIGNAL_MESSAGE], 
-//			               0, g_strdup(hyp));
+		      if (hyp != NULL)
+		        g_signal_emit (sphinxsink,
+			               gst_sphinx_sink_signals[SIGNAL_MESSAGE], 
+			               0, hyp);
 	      }
 
 	      sphinxsink->last_ts = 0;

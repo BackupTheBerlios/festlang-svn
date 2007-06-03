@@ -31,6 +31,7 @@
 #include <gst/gstplugin.h>
 
 #include "gstsphinxsink.h"
+#include "action.h"
 
 #define VOICE_CONTROL_APPLET(o) (G_TYPE_CHECK_INSTANCE_CAST ((o), \
 				 voice_control_applet_get_type(),          \
@@ -141,6 +142,21 @@ on_sink_ready (GObject *sink, gpointer data)
 }
 
 static void
+on_sink_message (GObject *sink, gchar *message, gpointer data)
+{
+	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+	
+	if (g_strrstr (message, "RUN BROWSER"))
+		do_action (ACTION_RUN_BROWSER);
+	if (g_strrstr (message, "RUN TERMINAL"))
+		do_action (ACTION_RUN_TERMINAL);
+	if (g_strrstr (message, "RUN MAIL"))
+		do_action (ACTION_RUN_MAIL);
+		
+	return;
+}
+
+static void
 display_about_dialog (BonoboUIComponent  *uic,
 		      VoiceControlApplet *voice_control,
 		      const char         *verbname)
@@ -213,7 +229,7 @@ setup_voice_control_widget (VoiceControlApplet *voice_control)
 	voice_control->frame = gtk_frame_new (NULL);
 	gtk_frame_set_shadow_type (GTK_FRAME (voice_control->frame), GTK_SHADOW_IN);
 	gtk_container_add (GTK_CONTAINER (widget), voice_control->frame);
-	gtk_widget_set_size_request (voice_control->frame, 50, -1);
+	gtk_widget_set_size_request (voice_control->frame, 100, -1);
 	
 	voice_control->state_label = gtk_label_new ("Idle");
 	gtk_container_add (GTK_CONTAINER (voice_control->frame), voice_control->state_label);
@@ -304,6 +320,8 @@ voice_control_applet_create_pipeline (VoiceControlApplet *voice_control)
     			G_CALLBACK(on_sink_listening), voice_control);
       g_signal_connect (voice_control->sink, "ready",
     			G_CALLBACK(on_sink_ready), voice_control);
+      g_signal_connect (voice_control->sink, "message",
+    			G_CALLBACK(on_sink_message), voice_control);
     
       return;
 }
@@ -362,6 +380,8 @@ int main (int argc, char *argv [])
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 	textdomain (GETTEXT_PACKAGE);
 	
+	g_thread_init(NULL);
+	gst_init (&argc, &argv);
 	
 	context = g_option_context_new ("");
 	program = gnome_program_init ("voice-control-applet", VERSION,
@@ -370,9 +390,6 @@ int main (int argc, char *argv [])
 				      GNOME_PARAM_GOPTION_CONTEXT, context,
 				      GNOME_CLIENT_PARAM_SM_CONNECT, FALSE,
 				      GNOME_PARAM_NONE);
-
-	gst_init (&argc, &argv);
-        gdk_init (&argc, &argv);
 	
         retval = panel_applet_factory_main ("OAFIID:GNOME_VoiceControlApplet_Factory",
 			     voice_control_applet_get_type (),

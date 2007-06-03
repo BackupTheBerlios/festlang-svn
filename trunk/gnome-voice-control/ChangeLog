@@ -1,5 +1,18 @@
 2007-06-03  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
+	* lang/desktop-control.dict:
+	* lang/desktop-control.fsg:
+	* src/action.c: (do_action):
+	* src/action.h:
+	* src/gstsphinxsink.c: (gst_sphinx_sink_render):
+	* src/voice-control.c: (on_sink_message),
+	(setup_voice_control_widget),
+	(voice_control_applet_create_pipeline), (main):
+	
+	Real command execution like terminal or browser.
+
+2007-06-03  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
 	* Makefile.am:
 	* configure.ac:
 	* lang/Makefile.am:
