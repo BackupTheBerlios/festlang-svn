@@ -1,6 +1,19 @@
-2007-05-22  Raphael Nunes da Motta  <raphael@arthemis>
+2007-06-03  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
-	reviewed by: <delete if not using a buddy>
+	* Makefile.am:
+	* configure.ac:
+	* lang/Makefile.am:
+	* lang/desktop-control.dict:
+	* lang/desktop-control.fsg:
+	* src/gstsphinxsink.c: (gst_sphinx_sink_class_init),
+	(gst_sphinx_sink_start), (gst_sphinx_sink_render):
+	* src/gstsphinxsink.h:
+	* src/voice-control.c: (control_start), (control_stop),
+	(on_sink_calibration), (on_sink_listening), (on_sink_ready),
+	(set_tooltip), (setup_voice_control_widget),
+	(voice_control_applet_create_pipeline):
+
+2007-05-22  Raphael Nunes da Motta  <raphael@arthemis>
 
 	* configure.ac:
 	* src/action.c: (do_action):

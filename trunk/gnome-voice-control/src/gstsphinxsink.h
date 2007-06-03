@@ -81,6 +81,11 @@ struct _GstSphinxSink {
 
 struct _GstSphinxSinkClass {
   GstBaseSinkClass parent_class;
+
+  void (*calibration)     (GstElement *element);
+  void (*ready)           (GstElement *element);
+  void (*listening)       (GstElement *element);
+  void (*message)         (GstElement *element, gchar *message);
 };
 
 GType gst_sphinx_sink_get_type (void);

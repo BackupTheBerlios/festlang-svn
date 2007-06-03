@@ -26,34 +26,32 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#  include <config.h>
+#include <config.h>
 #endif
 
 #include "gstsphinxsink.h"
 
 #include <locale.h>
+#include <string.h>
 
 static char *sphinx_command = 
-"-live TRUE -ctloffset 0 "
-"-ctlcount 100000000 "
+"-live TRUE "
 "-langwt 6.5 "
 "-fwdflatlw 8.5 -rescorelw 9.5 -ugwt 0.5 -fillpen 1e-10 -silpen 0.005 "
 "-inspen 0.65 -top 1 -topsenfrm 3 -topsenthresh -70000 -beam 2e-06 "
 "-npbeam 2e-06 -lpbeam 2e-05 -lponlybeam 0.0005 -nwbeam 0.0005 -fwdflat FALSE "
 "-fwdflatbeam 1e-08 -fwdflatnwbeam 0.0003 -bestpath TRUE "
 "-8bsen TRUE "
-"-cepdir " SPHINX2_PREFIX "/share/sphinx2/model/lm/turtle/ctl "
-"-datadir " SPHINX2_PREFIX "/share/sphinx2/model/lm/turtle/ctl "
-"-kbdumpdir " SPHINX2_PREFIX "/share/sphinx2 "
-"-dictfn " SPHINX2_PREFIX "/share/sphinx2/model/lm/turtle/turtle.dic "
+"-backtrace FALSE "
+"-sendumpfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/sendump "
 "-ndictfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/noisedict "
-"-lmfn " SPHINX2_PREFIX "/share/sphinx2/model/lm/turtle/turtle.lm "
 "-phnfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/phone "
 "-mapfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/map "
 "-hmmdir " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k "
 "-hmmdirlist " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k "
-"-sendumpfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/sendump "
-"-cbdir " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k ";
+"-cbdir " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k "
+"-fsgfn " GNOMEDATADIR "/gnome-voice-control/desktop-control.fsg "
+"-dictfn " GNOMEDATADIR "/gnome-voice-control/desktop-control.dict ";
 
 static void
 gst_sphinx_decoder_init (void)
@@ -93,7 +91,10 @@ GST_ELEMENT_DETAILS ("Sphinx Sink",
 /* SphinxSink signals and args */
 enum
 {
-  DECODED_SIGNAL,
+  SIGNAL_CALIBRATION,
+  SIGNAL_LISTENING,
+  SIGNAL_READY,
+  SIGNAL_MESSAGE,
   LAST_SIGNAL
 };
 
@@ -159,6 +160,26 @@ gst_sphinx_sink_class_init (GstSphinxSinkClass * klass)
   gstbase_sink_class->start = GST_DEBUG_FUNCPTR (gst_sphinx_sink_start);
   gstbase_sink_class->stop = GST_DEBUG_FUNCPTR (gst_sphinx_sink_stop);
   gstbase_sink_class->render = GST_DEBUG_FUNCPTR (gst_sphinx_sink_render);
+
+  gst_sphinx_sink_signals[SIGNAL_CALIBRATION] =
+      g_signal_new ("calibration", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
+      G_STRUCT_OFFSET (GstSphinxSinkClass, calibration), NULL, NULL,
+      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
+
+  gst_sphinx_sink_signals[SIGNAL_LISTENING] =
+      g_signal_new ("listening", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
+      G_STRUCT_OFFSET (GstSphinxSinkClass, listening), NULL, NULL,
+      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
+
+  gst_sphinx_sink_signals[SIGNAL_READY] =
+      g_signal_new ("ready", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
+      G_STRUCT_OFFSET (GstSphinxSinkClass, calibration), NULL, NULL,
+      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
+
+  gst_sphinx_sink_signals[SIGNAL_MESSAGE] =
+      g_signal_new ("message", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
+      G_STRUCT_OFFSET (GstSphinxSinkClass, message), NULL, NULL,
+      g_cclosure_marshal_VOID__STRING, G_TYPE_NONE, 1, G_TYPE_STRING);
 }
 
 static void
@@ -229,6 +250,9 @@ gst_sphinx_sink_start (GstBaseSink * asink)
   sphinxsink->ad.calibrated = FALSE;
   sphinxsink->cont = cont_ad_init ((ad_rec_t*)&sphinxsink->ad, gst_sphinx_sink_ad_read);
   
+  g_signal_emit (sphinxsink,
+        gst_sphinx_sink_signals[SIGNAL_CALIBRATION], 0, NULL);
+  
   return TRUE;
 }
 
@@ -256,8 +280,10 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
 	
 	if (result == 0) {
 	    sphinxsink->ad.calibrated = TRUE;
-	    g_message ("Successfully calibrated");
 	    uttproc_begin_utt (NULL);
+
+	    g_signal_emit (sphinxsink,
+	        gst_sphinx_sink_signals[SIGNAL_READY], 0, NULL);
 	}
   } else {
 	int32 k;
@@ -276,15 +302,28 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
 	      uttproc_end_utt ();
    	      if (uttproc_result (&fr, &hyp, 1) < 0) {
 		      g_warning ("uttproc_result failed");
-	      } else if (sphinxsink->dump) {
-	          g_message ("%d: %s", fr, hyp);
+	      } else {
+		      if (sphinxsink->dump)
+	                 g_message ("%d: %s", fr, hyp);
+
+//		      if (hyp != NULL)
+//	 	        g_signal_emit (sphinxsink,
+//			               gst_sphinx_sink_signals[SIGNAL_MESSAGE], 
+//			               0, g_strdup(hyp));
 	      }
+
 	      sphinxsink->last_ts = 0;
 	      uttproc_begin_utt (NULL);
+
+	      g_signal_emit (sphinxsink,
+	          gst_sphinx_sink_signals[SIGNAL_READY], 0, NULL);
+
 	} else if (k != 0) {
-	     g_message ("I've got speech %d words", k);
 	     uttproc_rawdata (adbuf, k, 1);
 	     sphinxsink->last_ts = sphinxsink->cont->read_ts;
+
+	     g_signal_emit (sphinxsink,
+	          gst_sphinx_sink_signals[SIGNAL_LISTENING], 0, NULL);
 	}
   }
 

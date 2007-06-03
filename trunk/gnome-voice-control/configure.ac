@@ -11,6 +11,8 @@ AC_SUBST(GNOME_PANEL_LIBS)
 
 IT_PROG_INTLTOOL([0.35])
 
+GNOME_DOC_INIT
+
 GETTEXT_PACKAGE=gnome-voice-control
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE],["$GETTEXT_PACKAGE"],[Gettext package])
@@ -26,6 +28,8 @@ AC_OUTPUT([
 Makefile
 src/Makefile
 data/Makefile
+lang/Makefile
+help/Makefile
 po/Makefile.in
 ])
 

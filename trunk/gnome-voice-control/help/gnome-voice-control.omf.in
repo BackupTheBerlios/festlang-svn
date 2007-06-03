@@ -1,0 +1,11 @@
+<?xml version="1.0" standalone="no"?>
+<omf>
+  <resource>
+    <subject category="GNOME|Applets|Utility"/>
+    <type>
+      user's guide
+    </type>
+    <relation seriesid="6d4707ae-11a1-11dc-8b8b-cf74e6be5ca8"/>
+    <rights type="GNU FDL" license.version="1.1" holder="Nickolay V. Shmyrev"/>
+  </resource>
+</omf>

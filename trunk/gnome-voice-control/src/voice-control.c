@@ -49,10 +49,12 @@ typedef struct {
 	
 	GtkWidget*	   about_dialog;
 	GtkWidget*	   frame;
+	GtkWidget*         state_label;
 	
 	GtkTooltips* 	   tooltips;
 	
 	GstElement*        pipeline;	
+	GstElement* 	   sink;
 } VoiceControlApplet;
 
 typedef struct {
@@ -105,8 +107,7 @@ control_start (BonoboUIComponent  *uic,
 	       VoiceControlApplet *voice_control,
 	       const char         *verbname)
 {
-    g_message ("Running");
-    gst_element_set_state (voice_control->pipeline, GST_STATE_PLAYING);
+	gst_element_set_state (voice_control->pipeline, GST_STATE_PLAYING);
 }
 
 static void
@@ -114,8 +115,29 @@ control_stop (BonoboUIComponent  *uic,
 	       VoiceControlApplet *voice_control,
 	       const char         *verbname)
 {
-    g_message ("Waiting");
-    gst_element_set_state (voice_control->pipeline, GST_STATE_NULL);
+        gst_element_set_state (voice_control->pipeline, GST_STATE_NULL);
+	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Idle"));
+}
+
+static void
+on_sink_calibration (GObject *sink, gpointer data)
+{
+	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Calibration"));
+}
+
+static void
+on_sink_listening (GObject *sink, gpointer data)
+{
+	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Listening"));
+}
+
+static void
+on_sink_ready (GObject *sink, gpointer data)
+{
+	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Ready"));
 }
 
 static void
@@ -180,21 +202,21 @@ set_tooltip (VoiceControlApplet *voice_control)
                 g_object_ref (voice_control->tooltips);
                 gtk_object_sink (GTK_OBJECT (voice_control->tooltips));
         }
-        gtk_tooltips_set_tip (voice_control->tooltips, GTK_WIDGET (voice_control), _("Voice Control Applet"), NULL);
+        gtk_tooltips_set_tip (voice_control->tooltips, GTK_WIDGET (voice_control), _("Idle"), NULL);
 }
 
 static void
 setup_voice_control_widget (VoiceControlApplet *voice_control)
 {
 	GtkWidget *widget = (GtkWidget *) voice_control;
-	GtkWidget *label;
 
 	voice_control->frame = gtk_frame_new (NULL);
 	gtk_frame_set_shadow_type (GTK_FRAME (voice_control->frame), GTK_SHADOW_IN);
 	gtk_container_add (GTK_CONTAINER (widget), voice_control->frame);
+	gtk_widget_set_size_request (voice_control->frame, 50, -1);
 	
-	label = gtk_label_new ("Voice control");
-	gtk_container_add (GTK_CONTAINER (voice_control->frame), label);
+	voice_control->state_label = gtk_label_new ("Idle");
+	gtk_container_add (GTK_CONTAINER (voice_control->frame), voice_control->state_label);
 
 	set_tooltip (voice_control);
 
@@ -262,11 +284,27 @@ voice_control_applet_create_pipeline (VoiceControlApplet *voice_control)
 {
       GError *error = NULL;
 
-      voice_control->pipeline = gst_parse_launch ("gconfaudiosrc ! sphinxsink", &error);
+      voice_control->pipeline = gst_parse_launch ("gconfaudiosrc ! sphinxsink name=sink", &error);
       
-      if (error != NULL)
+      if (error != NULL) {
     	    g_warning ("Can't create pipeline: %s", error->message);
-    	    
+    	    return;
+      }
+
+      voice_control->sink = gst_bin_get_by_name(GST_BIN (voice_control->pipeline),
+    						"sink");
+      if (!voice_control->sink) {
+    	    g_warning ("Pipeline has no sink");
+    	    return;
+      }
+    	
+      g_signal_connect (voice_control->sink, "calibration",
+    		        G_CALLBACK(on_sink_calibration), voice_control);
+      g_signal_connect (voice_control->sink, "listening",
+    			G_CALLBACK(on_sink_listening), voice_control);
+      g_signal_connect (voice_control->sink, "ready",
+    			G_CALLBACK(on_sink_ready), voice_control);
+    
       return;
 }
 

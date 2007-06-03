@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+  <!ENTITY legal SYSTEM "legal.xml">
+  <!ENTITY appletversion "2.12.0">
+  <!ENTITY applet "Voice Control Applet">
+]>
+
+<!-- 
+  (Do not remove this comment block.)
+  Maintained by the GNOME Documentation Project
+  http://developer.gnome.org/projects/gdp
+  Template version: 2.0 beta
+  Template last modified Feb 12, 2002
+-->
+
+<!-- =============Document Header ============================= -->
+<article id="index" lang="en">
+<!-- please do not change the id; for translations, change lang to -->
+<!-- appropriate code -->
+  <articleinfo> 
+    <title>&applet; Manual</title> 
+    <abstract role="description">
+      <para>&applet; allows you to control desktop with voice.</para>
+    </abstract>
+    
+    <copyright>
+      <year>2007</year>
+      <holder>Nickolay V. Shmyrev</holder>
+    </copyright>
+    
+    <publisher role="maintainer"> 
+      <publishername> GNOME Documentation Project </publishername> 
+    </publisher> 
+  
+    &legal;
+<!-- This file  contains link to license for the documentation (GNU FDL), and 
+     other legal stuff such as "NO WARRANTY" statement. Please do not change 
+     any of this. -->
+
+    <authorgroup> 
+      <author>
+        <firstname>Nickolay V.</firstname>
+	<surname>Shmyrev</surname>
+	<affiliation>
+	  <orgname>GNOME Project</orgname>
+	</affiliation>
+      </author>
+    </authorgroup>
+
+    <revhistory>
+      <revision>
+        <revnumber>Version 0.1</revnumber>
+	<date>June 2007</date>
+	<revdescription>
+	  <para role="author">Nickolay V. Shmyrev</para>
+	</revdescription>
+      </revision>
+    </revhistory>
+                                                                                                  
+    <releaseinfo>This manual describes version &appletversion; of &applet;.
+    </releaseinfo>
+                                                                                                  
+    <legalnotice>
+      <title>Feedback</title>
+      <para>
+        To report a bug or make a suggestion regarding the &applet; applet or
+        this manual, follow the directions in the <ulink url="ghelp:gnome-feedback"
+        type="help">GNOME Feedback Page</ulink>.
+      </para>
+    </legalnotice> 
+  </articleinfo> 
+
+  <indexterm zone="index"> 
+	 <primary>Voice Control Applet</primary> 
+  </indexterm> 
+
+  <sect1 id="gnome-voice-control-introduction"> 
+    <title>Introduction</title> 
+
+    <para>
+      The <application>&applet;</application> allows you to control desktop
+      with voice. Just start the recording with applet's menu and connect
+      microphone. Then try to say some commands like:
+      <itemizedlist>
+       <listitem><para>
+    	  Page Up
+       </para></listitem>
+       <listitem><para>
+          Minimize the window
+       </para></listitem>
+      </itemizedlist>
+    </para>
+
+    <sect2 id="gnome-voice-control-introduction-add">
+      <title>To Add &applet; to a Panel</title>
+      <para>To add <application>&applet;</application> to a panel,
+      right-click on the panel, then choose <guimenuitem>Add to
+      Panel</guimenuitem>.  Select <application>&applet;</application>
+      in the <application>Add to the panel</application> dialog, then
+      click <guibutton>OK</guibutton>.</para>
+      <para>
+        The layout of the <application>&applet;</application> applet varies depending on the size and type of panel in which the applet resides.
+      </para>
+    </sect2>
+
+    <sect2 id="gnome-voice-control-getting-help">
+      <title>Getting Help</title>
+      <para>
+        If the voice control applet doesn't work for you,
+	please try to contact developers.
+      </para>
+      <para>
+        First of all, please check that sound is actually recorded
+        in your system. If no, try to adjust mixer settings.
+      </para>
+      <para>
+        The applet and SR is quite complex system in the development, so
+        please don't expect much right now.
+      </para>
+    </sect2>
+</sect1>
+
+</article> 

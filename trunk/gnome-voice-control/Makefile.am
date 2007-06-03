@@ -1,1 +1,1 @@
-SUBDIRS = data src
+SUBDIRS = help lang data src
