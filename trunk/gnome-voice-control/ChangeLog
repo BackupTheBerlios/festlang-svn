@@ -1,5 +1,12 @@
 2007-06-03  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
+	* Makefile.am:
+	* lang/Makefile.am:
+	
+	Distcheck fixes
+
+2007-06-03  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
 	* src/gstsphinxsink.c: (gst_sphinx_sink_class_init),
 	(gst_sphinx_sink_start), (gst_sphinx_sink_render):
 	* src/gstsphinxsink.h:
