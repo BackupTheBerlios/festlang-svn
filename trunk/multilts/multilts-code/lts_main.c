@@ -157,10 +157,11 @@ static void fill_feats (utterance *utt, int i, cst_lts_letter *vector)
 	vector[j] = LETTER_ZERO;
     }
 
-   for (j = -3; j < 0; j++)
+   for (j = -1; j > -4; j--)
     {
-	if (i + j >= 0)
-	    vector [j+4] = utt->letters[i+j];
+        vector [j+4] = utt->letters[i+j];
+        if (utt->letters[i+j] == LETTER_PAU)
+	    break;	
     }
     
    for (j = 1; j < 4; j++)

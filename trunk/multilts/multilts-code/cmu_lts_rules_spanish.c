@@ -38,7 +38,7 @@ const char * const cmu_lts_phone_table_spanish[33] =
     "u0",
     "u1",
     "u",
-    "k-s",
+    "k s",
     "ny",
     NULL
 };
