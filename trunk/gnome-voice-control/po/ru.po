@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-voice-control trunk\n"
-"Report-Msgid-Bugs-To: http://bugzilla.gnome.org\n"
-"POT-Creation-Date: 2007-03-05 15:31+0300\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-06-06 21:04+0400\n"
 "PO-Revision-Date: 2007-03-05 15:31+0300\n"
 "Last-Translator: Nickolay V. Shmyrev <nshmyrev@yandex.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -17,32 +17,32 @@ msgstr ""
 
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:1
 msgid "Control your desktop with voice"
-msgstr ""
+msgstr "Управляйте вашим рабочим столом с помощью голосовых команд"
 
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:2
 msgid "Factory for creating voice control applets."
-msgstr ""
+msgstr "Фабрика для создания апплетов управления голосом."
 
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:3
 msgid "VoiceControl"
-msgstr ""
+msgstr "Управление голосом"
 
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:4
 msgid "VoiceControl Applet Factory"
-msgstr ""
+msgstr "Фабрика апплета управления голосом"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:1
 msgid "_About"
-msgstr ""
+msgstr "_О программе"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:2
 msgid "_Help"
-msgstr ""
+msgstr "_Справка"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:3
 msgid "_Start Control"
-msgstr ""
+msgstr "З_апустить управление"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:4
 msgid "_Stop Control"
-msgstr ""
+msgstr "Остановить управл_ение"
