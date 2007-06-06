@@ -1,20 +1,8 @@
 2007-06-06  Raphael Nunes da Motta  <raphael@arthemis>
 
-	reviewed by: <delete if not using a buddy>
-
 	* POTFILES.skip:
 
-2007-06-06  Raphael Nunes da Motta  <raphael@arthemis>
-
-	reviewed by: <delete if not using a buddy>
-
-	* POTFILES.skip:
-
-2007-06-06  Raphael Nunes da Motta  <raphael@arthemis>
-
-	reviewed by: <delete if not using a buddy>
-
-	* POTFILES.skip:
+        Created and data/GNOME_VoiceControlApplet_Factory.server.in added
 
 2006-06-06  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
