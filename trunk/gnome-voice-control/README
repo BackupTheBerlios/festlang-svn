@@ -4,10 +4,6 @@ This package contains the gnome-voice-control
 
 How to Install:
 
-./configure --with-sphinx2
-make
-make install
-
 Dependency:
 
 sphinx2
@@ -15,5 +11,29 @@ sphinx2
 Where to download sphinx2:
 
 http://cmusphinx.org/download/nightly/sphinx2.nightly.tar.gz
+
+How to install sphinx2:
+
+./configure --prefix=/usr
+make
+make install
+
+How to install gnome-voice-control
+
+./configure --prefix=/usr --with-sphinx2=/usr
+make
+make install
+
+After all, add the VoiceControl to pannel
+
+Actions implemented:
+
+RUN TERMINAL     : open gnome-terminal
+RUN BROWSER      : open epiphany
+RUN MAIL         : open evolution
+CLOSE WINDOW
+MAXIMIZE WINDOW
+MINIMIZE WINDOW
+NEXT WINDOW
 
 Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>
