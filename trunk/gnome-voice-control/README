@@ -1,0 +1,11 @@
+Gnome-Voice-Control
+====================
+This package contains the gnome-voice-control
+
+How to Install:
+
+./configure --with-sphinx2
+make
+make install
+
+Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>
