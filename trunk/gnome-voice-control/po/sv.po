@@ -1,0 +1,92 @@
+# Swedish translation for gnome-voice-control.
+# Copyright (C) 2007 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gnome-voice-control package.
+# Daniel Nylander <po@danielnylander.se>, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-voice-control\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-06-07 14:50+0200\n"
+"PO-Revision-Date: 2007-06-07 14:53+0100\n"
+"Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
+"Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:1
+msgid "_About"
+msgstr "_Om"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:2
+msgid "_Help"
+msgstr "_Hjälp"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:3
+msgid "_Start Control"
+msgstr "_Starta styrningsfunktion"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:4
+msgid "_Stop Control"
+msgstr "_Stoppa styrningsfunktion"
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:1
+msgid "Control your desktop with voice"
+msgstr "Styr ditt skrivbord med din röst"
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:2
+msgid "Factory for creating voice control applets."
+msgstr "Fabrik för att skapa röststyrningspanelprogram."
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:3
+#: ../src/voice-control.c:214
+msgid "VoiceControl"
+msgstr "Röststyrning"
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:4
+msgid "VoiceControl Applet Factory"
+msgstr "Panelprogramsfabrik för röststyrning"
+
+#: ../src/voice-control.c:90
+#, c-format
+msgid "There was an error displaying help: %s"
+msgstr "Det inträffade ett fel vid visning av hjälp: %s"
+
+#: ../src/voice-control.c:120
+#: ../src/voice-control.c:248
+msgid "Idle"
+msgstr "Overksam"
+
+#: ../src/voice-control.c:129
+msgid "Init"
+msgstr "Initierar"
+
+#: ../src/voice-control.c:139
+msgid "Calibration"
+msgstr "Kalibrering"
+
+#: ../src/voice-control.c:149
+msgid "Listening"
+msgstr "Lyssnar"
+
+#: ../src/voice-control.c:159
+msgid "Ready"
+msgstr "Redo"
+
+#: ../src/voice-control.c:206
+msgid "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"
+msgstr "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"
+
+#: ../src/voice-control.c:207
+msgid "Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>"
+msgstr "Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>"
+
+#: ../src/voice-control.c:210
+msgid "Voice Control Applet used to manage desktop with speech"
+msgstr "Röststyrningsprogram som används för att hantera skrivbordet med rösten"
+
+#: ../src/voice-control.c:220
+msgid "translator-credits"
+msgstr "Daniel Nylander <po@danielnylander.se>"
+
