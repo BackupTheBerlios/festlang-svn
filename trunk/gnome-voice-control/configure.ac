@@ -21,7 +21,7 @@ AM_GLIB_GNU_GETTEXT
 AC_ARG_WITH(sphinx2,
 	AS_HELP_STRING([--with-sphinx2=DIRECTORY],
 			[look for Sphinx2 source files in DIRECTORY]),
-			SPHINX2_PREFIX=$withval, SPHINX2_PREFIX="/usr")
+			SPHINX2_PREFIX=$withval, SPHINX2_PREFIX="/usr/local")
 AC_SUBST(SPHINX2_PREFIX)
 
 AC_OUTPUT([
