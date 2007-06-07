@@ -1,3 +1,11 @@
+2007-06-07  Raphael Nunes da Motta  <raphael@arthemis>
+
+	* README:
+	* configure.ac:
+	* src/gstsphinxsink.c:
+
+        Instalation problems solved and readme updated
+
 2007-06-06  Raphael Nunes da Motta  <raphael@arthemis>
 
 	* README:

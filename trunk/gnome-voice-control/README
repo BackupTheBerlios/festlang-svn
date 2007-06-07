@@ -8,4 +8,12 @@ How to Install:
 make
 make install
 
+Dependency:
+
+sphinx2
+
+Where to download sphinx2:
+
+http://cmusphinx.org/download/nightly/sphinx2.nightly.tar.gz
+
 Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>

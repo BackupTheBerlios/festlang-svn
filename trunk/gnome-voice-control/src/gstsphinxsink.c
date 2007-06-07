@@ -51,8 +51,8 @@ static char *sphinx_command =
 "-hmmdir " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k "
 "-hmmdirlist " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k "
 "-cbdir " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k "
-"-fsgfn " GNOMEDATADIR "/gnome-voice-control/lang/desktop-control.fsg "
-"-dictfn " GNOMEDATADIR "/gnome-voice-control/lang/desktop-control.dict ";
+"-fsgfn " GNOMEDATADIR "/gnome-voice-control/desktop-control.fsg "
+"-dictfn " GNOMEDATADIR "/gnome-voice-control/desktop-control.dict ";
 
 static void
 gst_sphinx_decoder_init (void)
