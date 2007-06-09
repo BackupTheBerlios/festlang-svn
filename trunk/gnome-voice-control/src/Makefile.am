@@ -11,11 +11,13 @@ INCLUDES =							\
 libexec_PROGRAMS = voice_control_applet
 
 voice_control_applet_SOURCES = \
-	voice-control.c \
 	action.c \
 	action.h \
 	gstsphinxsink.c \
-	gstsphinxsink.h
+	gstsphinxsink.h \
+	spi-listener.c \
+	spi-listener.h \
+	voice-control.c 
 
 voice_control_applet_LDADD = \
 	$(GNOME_PANEL_LIBS)  \

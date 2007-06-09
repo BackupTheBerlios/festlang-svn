@@ -43,6 +43,8 @@
 
 #define N_VOICE_CONTROL_LISTENERS 4
 
+#include "spi-listener.h"
+
 typedef struct {
 	PanelApplet        applet;
 
@@ -56,6 +58,8 @@ typedef struct {
 	
 	GstElement*        pipeline;	
 	GstElement* 	   sink;
+	
+	ControlSpiListener*	   spi_listener;
 } VoiceControlApplet;
 
 typedef struct {
@@ -109,6 +113,7 @@ control_start (BonoboUIComponent  *uic,
 	       const char         *verbname)
 {
 	gst_element_set_state (voice_control->pipeline, GST_STATE_PLAYING);
+	voice_control->spi_listener = g_object_new (CONTROL_SPI_LISTENER_TYPE, NULL);
 }
 
 static void
@@ -408,18 +413,21 @@ int main (int argc, char *argv [])
 	g_thread_init (NULL);
 	gst_init (&argc, &argv);
 	gdk_threads_init ();
+
 	
 	program = gnome_program_init ("voice-control-applet", VERSION,
 				      LIBGNOMEUI_MODULE,
 				      argc, argv,
 				      GNOME_CLIENT_PARAM_SM_CONNECT, FALSE,
 				      GNOME_PARAM_NONE);
+	SPI_init ();
 	
         retval = panel_applet_factory_main ("OAFIID:GNOME_VoiceControlApplet_Factory",
 			     voice_control_applet_get_type (),
 			     voice_control_applet_factory,
 			     NULL);		
 	g_object_unref (program);
+	SPI_exit ();
 	
 	return retval;
 }

@@ -1,3 +1,19 @@
+2007-06-09  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* configure.ac:
+	* src/Makefile.am:
+	* src/spi-listener.c: (control_spi_listener_free_actions_list),
+	(control_spi_listener_dump_actions_list), (is_visible),
+	(is_actionable), (control_spi_listener_build_actions_list),
+	(control_spi_listener_process_event),
+	(control_spi_listener_window_listener_cb),
+	(control_spi_listener_showing_listener_cb),
+	(control_spi_listener_init), (control_spi_listener_class_init):
+	* src/spi-listener.h:
+	* src/voice-control.c: (control_start), (main):
+	
+	Added accessibility listener.
+
 2007-06-07  Raphael Nunes da Motta  <raphael.nunes.enc04@gmail.com>
 
 	* README:
