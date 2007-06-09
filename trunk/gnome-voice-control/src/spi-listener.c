@@ -53,19 +53,60 @@ is_visible (Accessible *accessible)
 static gboolean
 is_actionable (Accessible *accessible)
 {
-	if (Accessible_isAction (accessible)) {
+	AccessibleStateSet *states;
+	
+	if (!accessible)
+		return FALSE;
+	
+	states =  Accessible_getStateSet (accessible);
+	
+	if (!states)
+		return FALSE;
+		
+	if ((AccessibleStateSet_contains (states, SPI_STATE_SELECTABLE) ||
+	     Accessible_isAction (accessible)) &&
+	     AccessibleStateSet_contains (states, SPI_STATE_VISIBLE) &&
+	     AccessibleStateSet_contains (states, SPI_STATE_SHOWING) &&
+	     AccessibleStateSet_contains (states, SPI_STATE_SENSITIVE)) {
+	
+		AccessibleStateSet_unref (states);
 		return TRUE;
-	} else {
-	        AccessibleStateSet *states = Accessible_getStateSet (accessible);
-	        if (states && AccessibleStateSet_contains (states, SPI_STATE_SELECTABLE)) {
-			AccessibleStateSet_unref (states);
-			return TRUE;
-		}
-		if (states)
-		        AccessibleStateSet_unref (states);
 	}
 
+        AccessibleStateSet_unref (states);
+
 	return FALSE;
+}
+
+/* Leave only ASCII in uppercase */
+
+static char*
+control_spi_listener_normalize (char *name)
+{
+	int word_start;
+	char *result, *src, *dst;
+	
+	result = g_strdup (name);
+
+	src = name; 
+	dst = result; 
+	word_start = 2;
+	
+	while (*src != 0) {
+		if ((*src >= 'A' && *src <='Z') ||
+		    (*src >= 'a' && *src <='z')) {
+		        if (word_start == 1) 
+		    	    *dst++ = ' ';
+			*dst++ = toupper (*src);
+			word_start = 0;
+		} else {
+			if (word_start == 0)
+				word_start = 1;
+		}
+		src = g_utf8_next_char (src);
+	}
+	*dst = 0;
+	return result;
 }
 
 static void
@@ -80,6 +121,7 @@ control_spi_listener_build_actions_list (ControlSpiListener *listener, Accessibl
 
 	for (i = 0; i < child_count; ++i) {
 		char *name;
+		char *normalized_name;
 		
 		child = Accessible_getChildAtIndex (parent, i);
 		
@@ -87,17 +129,20 @@ control_spi_listener_build_actions_list (ControlSpiListener *listener, Accessibl
 			continue;
 		
 		name = Accessible_getName (child);
-		if (name && strlen(name) > 0 && is_actionable (child) && is_visible (child)) {
+		
+		normalized_name = control_spi_listener_normalize (name);
+		if (normalized_name && strlen(normalized_name) > 0 && is_actionable (child)) {
 		        AccessibleItem *item;	    
 
 		        item = g_new0(AccessibleItem, 1);
 		        Accessible_ref (child);
     			item->accessible = child;
-			item->name = g_strdup (name);
+			item->name = g_strdup (normalized_name);
 		
 			listener->actions = g_slist_append (listener->actions, item);
 		}
 		SPI_freeString (name);
+		g_free (normalized_name);
 		    
 		if (is_visible (child))
 			control_spi_listener_build_actions_list (listener, child);
@@ -128,6 +173,8 @@ control_spi_listener_process_event (gpointer data)
 	control_spi_listener_free_actions_list (listener);
 	control_spi_listener_build_actions_list (listener, listener->root);
 	control_spi_listener_dump_actions_list (listener);
+	
+	g_message ("Update");
 
 	return FALSE;
 }
@@ -140,7 +187,6 @@ control_spi_listener_window_listener_cb (const AccessibleEvent *event,
 	AccessibleEvent_ref (event);
 	g_queue_push_tail(listener->event_queue, (gpointer)event);
 	g_idle_add (control_spi_listener_process_event, listener);
-	g_message ("Got window event");
 }
 
 static void

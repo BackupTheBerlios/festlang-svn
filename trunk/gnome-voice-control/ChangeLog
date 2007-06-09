@@ -1,3 +1,13 @@
+2007-06-10  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* src/spi-listener.c: (is_actionable),
+	(control_spi_listener_normalize),
+	(control_spi_listener_build_actions_list),
+	(control_spi_listener_process_event),
+	(control_spi_listener_window_listener_cb):
+	
+	Normalized names
+
 2007-06-09  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* configure.ac:
