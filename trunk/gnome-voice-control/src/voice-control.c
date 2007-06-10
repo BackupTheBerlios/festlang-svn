@@ -60,6 +60,7 @@ typedef struct {
 	GstElement* 	   sink;
 	
 	ControlSpiListener*	   spi_listener;
+	gchar* last_message;
 } VoiceControlApplet;
 
 typedef struct {
@@ -112,8 +113,8 @@ control_start (BonoboUIComponent  *uic,
 	       VoiceControlApplet *voice_control,
 	       const char         *verbname)
 {
-	gst_element_set_state (voice_control->pipeline, GST_STATE_PLAYING);
 	control_spi_listener_start (voice_control->spi_listener);
+	gst_element_set_state (voice_control->pipeline, GST_STATE_PLAYING);
 }
 
 static void
@@ -166,6 +167,29 @@ on_sink_ready (GObject *sink, gpointer data)
 	gdk_threads_leave ();
 }
 
+static gboolean 
+process_action (gpointer data)
+{
+	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+	GSList *l, *nodes;
+
+	nodes = control_spi_listener_get_object_list (voice_control->spi_listener);
+
+	for (l = nodes; l; l = l->next) {
+		AccessibleItem *item = (AccessibleItem *)l->data;
+		if (g_strrstr(voice_control->last_message, item->name)) {
+			AccessibleAction *action;
+			
+			g_message ("Running action '%s' accessible %p", item->name, item->accessible);
+			
+			action = Accessible_getAction (item->accessible);
+			AccessibleAction_doAction (action, 0);
+			break;
+		}
+	}
+	return FALSE;
+}
+
 static void
 on_sink_message (GObject *sink, gchar *message, gpointer data)
 {
@@ -185,7 +209,11 @@ on_sink_message (GObject *sink, gchar *message, gpointer data)
 		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_MINIMIZE_WINDOW));
 	if (g_strrstr (message, "MAXIMIZE WINDOW"))
 		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_MAXIMIZE_WINDOW));
-		
+
+	if (voice_control->last_message)
+		g_free (voice_control->last_message);
+	voice_control->last_message = g_strdup (message);
+	g_idle_add (process_action, data);		
 	return;
 }
 

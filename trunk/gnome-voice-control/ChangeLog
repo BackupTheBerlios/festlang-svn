@@ -1,3 +1,15 @@
+2007-06-11  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* lang/desktop-control.dict:
+	* src/gstsphinxsink.c: (gst_sphinx_sink_render),
+	(gst_sphinx_construct_trans_list), (gst_sphinx_sink_set_fsg):
+	* src/gstsphinxsink.h:
+	* src/voice-control.c: (control_start), (process_action),
+	(on_sink_message):
+	
+	Ally actions work. You can just say 'Open' or 'Cancel' and
+	UI will listen to you.
+
 2007-06-10  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/gstsphinxsink.c: (gst_sphinx_sink_class_init),

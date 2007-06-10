@@ -60,6 +60,7 @@ typedef struct _GstSphinxSinkAd {
     int32 calibrated;
     int32 initialized;
     int32 calibrate_started;
+    int32 listening;
 } GstSphinxSinkAd;
 
 /**

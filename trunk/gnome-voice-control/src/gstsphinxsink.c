@@ -34,10 +34,11 @@
 #include <locale.h>
 #include <string.h>
 
+
 static char *sphinx_command = 
 "voice-control "
-"-verbose 0 "
 "-live TRUE "
+"-verbose 0 "
 "-langwt 6.5 "
 "-fwdflatlw 8.5 -rescorelw 9.5 -ugwt 0.5 -fillpen 1e-10 -silpen 0.005 "
 "-inspen 0.65 -top 1 -topsenfrm 3 -topsenthresh -70000 -beam 2e-06 "
@@ -240,8 +241,8 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
 	
 	if (result == 0) {
 	    sphinxsink->ad.calibrated = TRUE;
-	    uttproc_begin_utt (NULL);
-
+    	    sphinxsink->ad.listening = 0;
+    	    
 	    g_signal_emit (sphinxsink,
 	        gst_sphinx_sink_signals[SIGNAL_READY], 0, NULL);
 	}
@@ -270,12 +271,16 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
 	      }
 
 	      sphinxsink->last_ts = 0;
-	      uttproc_begin_utt (NULL);
-
+	      sphinxsink->ad.listening = 0;
 	      g_signal_emit (sphinxsink,
 	          gst_sphinx_sink_signals[SIGNAL_READY], 0, NULL);
 
 	} else if (k != 0) {
+	     if (sphinxsink->ad.listening == 0) {
+	    	    uttproc_begin_utt (NULL);
+	    	    sphinxsink->ad.listening = 1;
+	     }
+	
 	     uttproc_rawdata (adbuf, k, 1);
 	     sphinxsink->last_ts = sphinxsink->cont->read_ts;
 
@@ -294,19 +299,54 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
   return GST_FLOW_OK;
 }
 
+int
+gst_sphinx_construct_trans_list (GSList *words, s2_fsg_trans_t **trans_list)
+{
+	GSList *l;
+	s2_fsg_trans_t *transitions;
+	int n, i, j;
+	
+	n = g_slist_length (words);
+	
+	transitions = g_new0(s2_fsg_trans_t, 2 * n);
+	
+	for (l = words, i = 0, j = 1; l; l = l->next, i+=2, j++)
+	  {
+		transitions[i].from_state = 0;
+		transitions[i].to_state = j;
+		transitions[i].prob = 1.0 / n;
+		transitions[i].word = (gchar *)l->data;
+		transitions[i].next = transitions + i + 1;
+
+		transitions[i+1].from_state = j;
+		transitions[i+1].to_state = n + 1;
+		transitions[i+1].prob = 1.0;
+		transitions[i+1].word = NULL;
+		transitions[i+1].next = transitions + i + 2;
+	  }
+	transitions[2 * n - 1].next = NULL;
+	*trans_list = transitions;
+	
+	return n + 2;
+}
+
 void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *words)
 {		
 	s2_fsg_t fsg;
+	s2_fsg_trans_t *trans_list;
 	
-	fsg.name = "desktop-control";
-	fsg.n_state = 10;
+	if (!sink->ad.calibrated)
+		    return;
+	
+	fsg.name = "desktop-control";	
+	fsg.n_state = gst_sphinx_construct_trans_list (words, &trans_list);
 	fsg.start_state = 0;
-	fsg.final_state = 10;
-	fsg.trans_list = 0;
+	fsg.final_state = fsg.n_state - 1;
+	fsg.trans_list = trans_list;
 	
 	uttproc_del_fsg ("desktop-control");
 	
-	uttproc_load_fsg (&fsg, 1, 1, 0.009, 0.009, 1.0);
+	uttproc_load_fsg (&fsg, 1, 1, 0.009, 0.0, 1.0);
 	
 	uttproc_set_fsg ("desktop-control");
 	
