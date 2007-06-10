@@ -100,14 +100,6 @@ enum
   LAST_SIGNAL
 };
 
-#define DEFAULT_DUMP FALSE
-
-enum
-{
-  PROP_0,
-  PROP_DUMP,
-};
-
 static void
 _do_init (GType filesink_type)
 {	
@@ -117,11 +109,6 @@ _do_init (GType filesink_type)
 GST_BOILERPLATE_FULL (GstSphinxSink, gst_sphinx_sink, GstBaseSink,
     GST_TYPE_BASE_SINK,
     _do_init);
-
-static void gst_sphinx_sink_set_property (GObject * object, guint prop_id,
-    const GValue * value, GParamSpec * pspec);
-static void gst_sphinx_sink_get_property (GObject * object, guint prop_id,
-    GValue * value, GParamSpec * pspec);
 
 static gboolean gst_sphinx_sink_start(GstBaseSink * asink);
 static gboolean gst_sphinx_sink_stop (GstBaseSink * asink);
@@ -149,13 +136,6 @@ gst_sphinx_sink_class_init (GstSphinxSinkClass * klass)
   gobject_class = G_OBJECT_CLASS (klass);
   gstelement_class = GST_ELEMENT_CLASS (klass);
   gstbase_sink_class = GST_BASE_SINK_CLASS (klass);
-
-  gobject_class->set_property = GST_DEBUG_FUNCPTR (gst_sphinx_sink_set_property);
-  gobject_class->get_property = GST_DEBUG_FUNCPTR (gst_sphinx_sink_get_property);
-
-  g_object_class_install_property (gobject_class, PROP_DUMP,
-      g_param_spec_boolean ("dump", "Dump", "Dump buffer contents to stdout",
-          DEFAULT_DUMP, G_PARAM_READWRITE));
 
   gstbase_sink_class->start = GST_DEBUG_FUNCPTR (gst_sphinx_sink_start);
   gstbase_sink_class->stop = GST_DEBUG_FUNCPTR (gst_sphinx_sink_stop);
@@ -190,44 +170,7 @@ gst_sphinx_sink_class_init (GstSphinxSinkClass * klass)
 static void
 gst_sphinx_sink_init (GstSphinxSink * sphinxsink, GstSphinxSinkClass * g_class)
 {
-  sphinxsink->dump = DEFAULT_DUMP;
   GST_BASE_SINK (sphinxsink)->sync = FALSE;
-}
-
-static void
-gst_sphinx_sink_set_property (GObject * object, guint prop_id,
-    const GValue * value, GParamSpec * pspec)
-{
-  GstSphinxSink *sink;
-
-  sink = GST_SPHINX_SINK (object);
-
-  switch (prop_id) {
-    case PROP_DUMP:
-      sink->dump = g_value_get_boolean (value);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      break;
-  }
-}
-
-static void
-gst_sphinx_sink_get_property (GObject * object, guint prop_id, GValue * value,
-    GParamSpec * pspec)
-{
-  GstSphinxSink *sink;
-
-  sink = GST_SPHINX_SINK (object);
-
-  switch (prop_id) {
-    case PROP_DUMP:
-      g_value_set_boolean (value, sink->dump);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      break;
-  }
 }
 
 int32 
@@ -320,9 +263,6 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
    	      if (uttproc_result (&fr, &hyp, 1) < 0) {
 		      g_warning ("uttproc_result failed");
 	      } else {
-		      if (sphinxsink->dump)
-	                 g_message ("%d: %s", fr, hyp);
-
 		      if (hyp != NULL)
 		        g_signal_emit (sphinxsink,
 			               gst_sphinx_sink_signals[SIGNAL_MESSAGE], 
@@ -352,5 +292,24 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
 #endif
 
   return GST_FLOW_OK;
+}
+
+void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *words)
+{		
+	s2_fsg_t fsg;
+	
+	fsg.name = "desktop-control";
+	fsg.n_state = 10;
+	fsg.start_state = 0;
+	fsg.final_state = 10;
+	fsg.trans_list = 0;
+	
+	uttproc_del_fsg ("desktop-control");
+	
+	uttproc_load_fsg (&fsg, 1, 1, 0.009, 0.009, 1.0);
+	
+	uttproc_set_fsg ("desktop-control");
+	
+	g_message ("New fsg is set");
 }
 

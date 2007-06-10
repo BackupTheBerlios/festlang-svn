@@ -77,8 +77,6 @@ struct _GstSphinxSink {
   
   /* Link for callbacks */
   GstBuffer *buffer;  
-
-  gboolean		dump;
 };
 
 struct _GstSphinxSinkClass {
@@ -92,6 +90,8 @@ struct _GstSphinxSinkClass {
 };
 
 GType gst_sphinx_sink_get_type (void);
+
+void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *words);
 
 G_END_DECLS
 

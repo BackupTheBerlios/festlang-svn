@@ -34,7 +34,9 @@ struct _ControlSpiListenerClass {
 };
 
 GType control_spi_listener_get_type (void);
-GSList control_spi_listener_get_object_list (ControlSpiListener *listener);
+void control_spi_listener_start (ControlSpiListener *listener);
+void control_spi_listener_stop (ControlSpiListener *listener);
+GSList* control_spi_listener_get_object_list (ControlSpiListener *listener);
 
 G_END_DECLS
 

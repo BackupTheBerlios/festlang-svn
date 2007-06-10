@@ -113,7 +113,7 @@ control_start (BonoboUIComponent  *uic,
 	       const char         *verbname)
 {
 	gst_element_set_state (voice_control->pipeline, GST_STATE_PLAYING);
-	voice_control->spi_listener = g_object_new (CONTROL_SPI_LISTENER_TYPE, NULL);
+	control_spi_listener_start (voice_control->spi_listener);
 }
 
 static void
@@ -123,6 +123,7 @@ control_stop (BonoboUIComponent  *uic,
 {
         gst_element_set_state (voice_control->pipeline, GST_STATE_NULL);
 	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Idle"));
+	control_spi_listener_stop (voice_control->spi_listener);
 }
 
 static void
@@ -186,6 +187,32 @@ on_sink_message (GObject *sink, gchar *message, gpointer data)
 		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_MAXIMIZE_WINDOW));
 		
 	return;
+}
+
+static void
+voice_control_ui_changed (ControlSpiListener *listener, gpointer data)
+{
+	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+	GSList *l, *nodes, *commands;
+	
+	nodes = control_spi_listener_get_object_list (listener);
+	commands = NULL;
+
+	for (l = nodes; l; l = l->next) {
+		AccessibleItem *item = (AccessibleItem *)l->data;
+		commands = g_slist_append (commands, item->name);
+	}
+	commands = g_slist_append (commands, "RUN BROWSER");
+	commands = g_slist_append (commands, "RUN TERMINAL");
+	commands = g_slist_append (commands, "RUN MAIL");
+	commands = g_slist_append (commands, "CLOSE WINDOW");
+	commands = g_slist_append (commands, "NEXT WINDOW");
+	commands = g_slist_append (commands, "MINIMIZE WINDOW");
+	commands = g_slist_append (commands, "MAXIMIZE WINDOW");
+	
+	gst_sphinx_sink_set_fsg (GST_SPHINX_SINK(voice_control->sink), commands);
+
+	g_slist_free (commands);
 }
 
 static void
@@ -374,6 +401,10 @@ voice_control_applet_init (VoiceControlApplet      *voice_control)
 				PANEL_APPLET_EXPAND_MINOR);
 				
 	voice_control_applet_create_pipeline (voice_control);
+
+	voice_control->spi_listener = g_object_new (CONTROL_SPI_LISTENER_TYPE, NULL);
+	g_signal_connect (voice_control->spi_listener, "changed", 
+			  G_CALLBACK (voice_control_ui_changed), voice_control);
 }
 
 static gboolean

@@ -1,5 +1,21 @@
 2007-06-10  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
+	* src/gstsphinxsink.c: (gst_sphinx_sink_class_init),
+	(gst_sphinx_sink_init), (gst_sphinx_sink_render),
+	(gst_sphinx_sink_set_fsg):
+	* src/gstsphinxsink.h:
+	* src/spi-listener.c: (control_spi_listener_process_event),
+	(control_spi_listener_init), (control_spi_listener_class_init),
+	(control_spi_listener_start), (control_spi_listener_stop),
+	(control_spi_listener_get_object_list):
+	* src/spi-listener.h:
+	* src/voice-control.c: (control_start), (control_stop),
+	(voice_control_ui_changed), (voice_control_applet_init):
+	
+	List of UI items is bypassed to sphinx fsg.
+
+2007-06-10  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
 	* src/spi-listener.c: (is_actionable),
 	(control_spi_listener_normalize),
 	(control_spi_listener_build_actions_list),

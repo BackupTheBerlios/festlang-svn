@@ -7,6 +7,14 @@
 
 #include "spi-listener.h"
 
+enum
+{
+  SIGNAL_CHANGED,
+  LAST_SIGNAL
+};
+
+static guint control_spi_listener_signals[LAST_SIGNAL] = { 0 };
+
 static void
 control_spi_listener_free_actions_list (ControlSpiListener *listener)
 {
@@ -173,9 +181,10 @@ control_spi_listener_process_event (gpointer data)
 	control_spi_listener_free_actions_list (listener);
 	control_spi_listener_build_actions_list (listener, listener->root);
 	control_spi_listener_dump_actions_list (listener);
-	
-	g_message ("Update");
 
+        g_signal_emit (listener,
+	        control_spi_listener_signals[SIGNAL_CHANGED], 0, NULL);
+	
 	return FALSE;
 }
 
@@ -204,18 +213,40 @@ static void
 control_spi_listener_init (ControlSpiListener *listener)
 {
 	listener->event_queue = g_queue_new ();
-
         listener->window_listener = SPI_createAccessibleEventListener (control_spi_listener_window_listener_cb, listener);
-        SPI_registerGlobalEventListener (listener->window_listener, "window:activate");
-
         listener->showing_listener = SPI_createAccessibleEventListener (control_spi_listener_showing_listener_cb, listener);
-        SPI_registerGlobalEventListener (listener->showing_listener, "object:state-changed:showing");
 }
 
 static void
-control_spi_listener_class_init (ControlSpiListenerClass *listener)
+control_spi_listener_class_init (ControlSpiListenerClass *klass)
 {
+	control_spi_listener_signals[SIGNAL_CHANGED] =
+	g_signal_new ("changed", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
+	G_STRUCT_OFFSET (ControlSpiListenerClass, changed), NULL, NULL,
+	g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
+	
 	return;
 }
 
 G_DEFINE_TYPE(ControlSpiListener, control_spi_listener, G_TYPE_OBJECT);
+
+void 
+control_spi_listener_start (ControlSpiListener *listener)
+{
+        SPI_registerGlobalEventListener (listener->window_listener, "window:activate");
+        SPI_registerGlobalEventListener (listener->showing_listener, "object:state-changed:showing");
+}
+
+void 
+control_spi_listener_stop (ControlSpiListener *listener)
+{
+	SPI_deregisterGlobalEventListenerAll(listener->window_listener);
+	SPI_deregisterGlobalEventListenerAll(listener->showing_listener);
+}
+
+GSList*
+control_spi_listener_get_object_list (ControlSpiListener *listener)
+{
+	return listener->actions;
+}
+
