@@ -38,7 +38,7 @@
 static char *sphinx_command = 
 "voice-control "
 "-live TRUE "
-"-verbose 0 "
+"-verbose 1 "
 "-langwt 6.5 "
 "-fwdflatlw 8.5 -rescorelw 9.5 -ugwt 0.5 -fillpen 1e-10 -silpen 0.005 "
 "-inspen 0.65 -top 1 -topsenfrm 3 -topsenthresh -70000 -beam 2e-06 "
@@ -299,35 +299,51 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
   return GST_FLOW_OK;
 }
 
-int
-gst_sphinx_construct_trans_list (GSList *words, s2_fsg_trans_t **trans_list)
+static int
+gst_sphinx_construct_trans_list (GSList *phrases, s2_fsg_trans_t **trans_list)
 {
-	GSList *l;
+	GSList *l, *word_list;
+	gchar **words;
 	s2_fsg_trans_t *transitions;
-	int n, i, j;
+	int n_states, n_transitions, i, j;
 	
-	n = g_slist_length (words);
+	n_states = 2; /* Final and initial state */
+	word_list = NULL;
+	for (l = phrases; l; l = l->next) {
+		words = g_strsplit (l->data, " ", 0);
+		word_list = g_slist_append (word_list, words);
+		n_states += g_strv_length (words);
+	}
+	n_transitions = n_states - 2;
 	
-	transitions = g_new0(s2_fsg_trans_t, 2 * n);
+	transitions = g_new0(s2_fsg_trans_t, n_transitions);
 	
-	for (l = words, i = 0, j = 1; l; l = l->next, i+=2, j++)
-	  {
-		transitions[i].from_state = 0;
-		transitions[i].to_state = j;
-		transitions[i].prob = 1.0 / n;
-		transitions[i].word = (gchar *)l->data;
-		transitions[i].next = transitions + i + 1;
-
-		transitions[i+1].from_state = j;
-		transitions[i+1].to_state = n + 1;
-		transitions[i+1].prob = 1.0;
-		transitions[i+1].word = NULL;
-		transitions[i+1].next = transitions + i + 2;
-	  }
-	transitions[2 * n - 1].next = NULL;
+	for (i = 0, l = word_list; l; l = l->next) {
+		words = l->data;
+		for (j = 0; words[j] != NULL; j++, i++) {
+			transitions[i].from_state = 
+				(j == 0) ? 0 : i + 1;
+    			transitions[i].to_state = 
+    				(words[j+1] == NULL) ? n_states - 1 : i + 2;
+	    		transitions[i].prob = 1.0;
+			transitions[i].word = g_strdup (words[j]);
+			transitions[i].next = transitions + i + 1;
+			
+			g_message ("transition number %d from %d to %d word %s",
+				    i, 
+				    transitions[i].from_state,
+				    transitions[i].to_state,
+				    transitions[i].word);
+		}
+	}
+	transitions[n_transitions-1].next = NULL;
 	*trans_list = transitions;
 	
-	return n + 2;
+	for (l = word_list; l; l = l->next)
+		g_strfreev (l->data);
+	g_slist_free (word_list);
+	
+	return n_states;
 }
 
 void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *words)

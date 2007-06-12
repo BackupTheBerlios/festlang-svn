@@ -195,21 +195,29 @@ on_sink_message (GObject *sink, gchar *message, gpointer data)
 {
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 	
-	if (g_strrstr (message, "RUN BROWSER"))
+	if (g_strrstr (message, "RUN BROWSER")) {
 		do_action (ACTION_RUN_BROWSER);
-	if (g_strrstr (message, "RUN TERMINAL"))
+		return;
+	} else if (g_strrstr (message, "RUN TERMINAL")) {
 		do_action (ACTION_RUN_TERMINAL);
-	if (g_strrstr (message, "RUN MAIL"))
+		return;
+	} else if (g_strrstr (message, "RUN MAIL")) {
 		do_action (ACTION_RUN_MAIL);
-	if (g_strrstr (message, "CLOSE WINDOW"))
+		return;
+	} else if (g_strrstr (message, "CLOSE WINDOW")) {
 		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_CLOSE_WINDOW));
-	if (g_strrstr (message, "NEXT WINDOW"))
+		return;
+	} else if (g_strrstr (message, "NEXT WINDOW")) {
 		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_NEXT_WINDOW));
-	if (g_strrstr (message, "MINIMIZE WINDOW"))
+		return;
+	} else if (g_strrstr (message, "MINIMIZE WINDOW")) {
 		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_MINIMIZE_WINDOW));
-	if (g_strrstr (message, "MAXIMIZE WINDOW"))
+		return;
+	} else if (g_strrstr (message, "MAXIMIZE WINDOW")) {
 		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_MAXIMIZE_WINDOW));
-
+		return;
+	}
+	
 	if (voice_control->last_message)
 		g_free (voice_control->last_message);
 	voice_control->last_message = g_strdup (message);

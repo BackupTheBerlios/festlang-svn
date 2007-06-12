@@ -1,3 +1,10 @@
+2007-06-12  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* src/gstsphinxsink.c: (gst_sphinx_construct_trans_list):
+	* src/voice-control.c: (on_sink_message):
+	
+	Multiword commands are properly converted to FSG.
+
 2007-06-11  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* lang/desktop-control.dict:
