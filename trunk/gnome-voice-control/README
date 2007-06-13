@@ -18,6 +18,16 @@ How to install sphinx2:
 make
 make install
 
+Dependency:
+
+GNOME development libraries, gstreamer development package,
+libwnck development. On Debian-based systems you need the 
+following packages:
+
+gnome-devel
+libgstreamer0.10-dev
+libwnck-dev
+
 How to install gnome-voice-control
 
 ./configure --prefix=/usr --with-sphinx2=/usr

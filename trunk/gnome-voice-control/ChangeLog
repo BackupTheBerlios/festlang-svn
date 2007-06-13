@@ -1,3 +1,10 @@
+2007-06-14  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* README:
+	
+	Updated note about Debian packages. Thanks to
+	Dimitri Provoost.
+
 2007-06-12  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/gstsphinxsink.c: (gst_sphinx_construct_trans_list):
