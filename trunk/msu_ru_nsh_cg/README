@@ -1,0 +1,20 @@
+INTRODUCTION
+
+This directory contains clustergen synthesizer voice for Russian Language.
+
+INSTALLATION
+
+You need to build latest festival 1.96 and speech-tools 1.96. You
+can checkout them from festlang SVN
+
+Extract files from this archive into 
+
+festival/lib/voices/russian/msu_ru_nsh_cg
+
+Extract CMU dictionaries and default english voice as usual.
+
+USAGE
+
+Note, that you should select russian voice with (voice_msu_ru_nsh_cg)
+on start and all russian text should have koi8-r encoding.
+
