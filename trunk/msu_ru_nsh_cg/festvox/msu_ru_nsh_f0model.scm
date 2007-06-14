@@ -38,8 +38,7 @@
   "(msu_ru_nsh::select_f0model)
 Set up the F0 model for msu_ru."
 
-  (Parameter.set 'Int_Method 'General)
-  (set! int_general_params nil)
+  (Parameter.set 'Int_Target_Method 'Int_Targets_Default)
 )
 
 (define (msu_ru_nsh::reset_f0model)
