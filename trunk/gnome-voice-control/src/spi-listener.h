@@ -25,6 +25,8 @@ struct _ControlSpiListener {
     
     void *window_listener;
     void *showing_listener;
+    
+    guint idle_id;
 };
 
 struct _ControlSpiListenerClass {

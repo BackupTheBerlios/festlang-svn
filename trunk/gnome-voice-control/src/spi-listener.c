@@ -44,18 +44,34 @@ control_spi_listener_dump_actions_list (ControlSpiListener *listener)
 }
 
 static gboolean
-is_visible (Accessible *accessible)
+is_worth_searching (Accessible *accessible)
 {
-	gboolean retval = FALSE;
-	if (accessible) {
-		AccessibleStateSet *states = Accessible_getStateSet (accessible);
-		if (states && AccessibleStateSet_contains (states, SPI_STATE_VISIBLE) &&
-		    AccessibleStateSet_contains (states, SPI_STATE_SHOWING))
-			retval = TRUE;
-		if (states)
-			AccessibleStateSet_unref (states);
+	gboolean worthiness = TRUE;
+	gboolean bmenu = FALSE;
+	AccessibleStateSet* states = NULL;
+
+	switch (Accessible_getRole (accessible)) 
+	{
+		case SPI_ROLE_MENU:
+		case SPI_ROLE_MENU_BAR:
+		case SPI_ROLE_MENU_ITEM:
+		case SPI_ROLE_CHECK_MENU_ITEM:
+		case SPI_ROLE_RADIO_MENU_ITEM:
+			bmenu = TRUE;
+			break;
+		default:
+			bmenu = FALSE;
 	}
-	return retval;
+	states = Accessible_getStateSet(accessible);
+	if (states != NULL)
+	{
+		if (!bmenu && !AccessibleStateSet_contains(states, SPI_STATE_SHOWING))
+		{
+			worthiness = FALSE;
+		}
+		AccessibleStateSet_unref(states);
+	}
+	return worthiness;
 }
 
 static gboolean
@@ -117,15 +133,23 @@ control_spi_listener_normalize (char *name)
 	return result;
 }
 
+#define SEARCH_DEPTH 7
+#define SEARCH_BREADTH 18
+
 static void
-control_spi_listener_build_actions_list (ControlSpiListener *listener, Accessible *parent)
+control_spi_listener_build_actions_list (ControlSpiListener *listener, Accessible *parent, int depth)
 {
 	Accessible* child;
 	AccessibleRole role;
 	
 	int i, child_count;
 
+	if (depth > SEARCH_DEPTH)
+		return;
+
 	child_count = Accessible_getChildCount (parent);
+	
+	child_count = MIN (child_count, SEARCH_BREADTH);
 
 	for (i = 0; i < child_count; ++i) {
 		char *name;
@@ -135,8 +159,17 @@ control_spi_listener_build_actions_list (ControlSpiListener *listener, Accessibl
 		
 		if (child == parent)
 			continue;
-		
+
 		name = Accessible_getName (child);
+
+#if 1
+		{
+		        gchar *role_name;		
+			
+			role_name = Accessible_getRoleName (child);
+			g_message ("Looking at %s %s", role_name, name);
+		}
+#endif
 		
 		if (name) {
 			normalized_name = control_spi_listener_normalize (name);
@@ -154,8 +187,8 @@ control_spi_listener_build_actions_list (ControlSpiListener *listener, Accessibl
 			g_free (normalized_name);
 		}
 		    
-		if (is_visible (child))
-			control_spi_listener_build_actions_list (listener, child);
+		if (is_worth_searching (child))
+			control_spi_listener_build_actions_list (listener, child, depth+1);
 
 		Accessible_unref (child); 		
 	}
@@ -181,11 +214,13 @@ control_spi_listener_process_event (gpointer data)
 	}
 
 	control_spi_listener_free_actions_list (listener);
-	control_spi_listener_build_actions_list (listener, listener->root);
+	control_spi_listener_build_actions_list (listener, listener->root, 0);
 	control_spi_listener_dump_actions_list (listener);
 
         g_signal_emit (listener,
 	        control_spi_listener_signals[SIGNAL_CHANGED], 0, NULL);
+	        
+	listener->idle_id = 0;
 	
 	return FALSE;
 }
@@ -197,7 +232,9 @@ control_spi_listener_window_listener_cb (const AccessibleEvent *event,
 	ControlSpiListener *listener = CONTROL_SPI_LISTENER (user_data);
 	AccessibleEvent_ref (event);
 	g_queue_push_tail(listener->event_queue, (gpointer)event);
-	g_idle_add (control_spi_listener_process_event, listener);
+
+	if (!listener->idle_id)
+    		listener->idle_id = g_idle_add (control_spi_listener_process_event, listener);
 }
 
 static void
@@ -208,7 +245,9 @@ control_spi_listener_showing_listener_cb (const AccessibleEvent *event,
 	
 	AccessibleEvent_ref (event);
 	g_queue_push_tail(listener->event_queue, (gpointer)event);
-	g_idle_add (control_spi_listener_process_event, listener);
+	
+	if (!listener->idle_id)
+    		listener->idle_id = g_idle_add (control_spi_listener_process_event, listener);
 }
 
 static void
@@ -244,6 +283,9 @@ control_spi_listener_stop (ControlSpiListener *listener)
 {
 	SPI_deregisterGlobalEventListenerAll(listener->window_listener);
 	SPI_deregisterGlobalEventListenerAll(listener->showing_listener);
+	
+	if (listener->idle_id)
+		g_source_remove (listener->idle_id);
 }
 
 GSList*

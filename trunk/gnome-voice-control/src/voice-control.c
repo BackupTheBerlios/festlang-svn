@@ -441,8 +441,8 @@ voice_control_applet_init (VoiceControlApplet      *voice_control)
 	voice_control_applet_create_pipeline (voice_control);
 
 	voice_control->spi_listener = g_object_new (CONTROL_SPI_LISTENER_TYPE, NULL);
-	g_signal_connect (voice_control->spi_listener, "changed", 
-			  G_CALLBACK (voice_control_ui_changed), voice_control);
+	g_signal_connect_object (voice_control->spi_listener, "changed", 
+				 G_CALLBACK (voice_control_ui_changed), voice_control, 0);
 }
 
 static gboolean
