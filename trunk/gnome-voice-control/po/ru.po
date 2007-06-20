@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-voice-control trunk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-06 21:11+0400\n"
+"POT-Creation-Date: 2007-06-20 23:42+0400\n"
 "PO-Revision-Date: 2007-03-05 15:31+0300\n"
 "Last-Translator: Nickolay V. Shmyrev <nshmyrev@yandex.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -24,7 +24,7 @@ msgid "Factory for creating voice control applets."
 msgstr "Фабрика для создания апплетов управления голосом."
 
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:3
-#: ../src/voice-control.c:214
+#: ../src/voice-control.c:283
 msgid "VoiceControl"
 msgstr "Управление голосом"
 
@@ -48,43 +48,63 @@ msgstr "З_апустить управление"
 msgid "_Stop Control"
 msgstr "Остановить управл_ение"
 
-#: ../src/voice-control.c:90
+#: ../src/voice-control.c:96
 #, c-format
 msgid "There was an error displaying help: %s"
 msgstr "Возникла ошибка при отображении помощи: %s"
 
-#: ../src/voice-control.c:120 ../src/voice-control.c:248
+#: ../src/voice-control.c:127
 msgid "Idle"
 msgstr "Ожидание"
 
-#: ../src/voice-control.c:129
+#: ../src/voice-control.c:127
+msgid "Choose Start Control to start"
+msgstr "Выберите Запуск для начала"
+
+#: ../src/voice-control.c:137 ../src/voice-control.c:331
 msgid "Init"
 msgstr "Инициализация"
 
-#: ../src/voice-control.c:139
+#: ../src/voice-control.c:137 ../src/voice-control.c:331
+msgid "Loading acoustic and language model, wait a bit"
+msgstr "Загружается модель языка, подождите"
+
+#: ../src/voice-control.c:147
 msgid "Calibration"
 msgstr "Калибровка"
 
-#: ../src/voice-control.c:149
+#: ../src/voice-control.c:147
+msgid "Tuning up acoustic parameters"
+msgstr "Настройка параметров записи"
+
+#: ../src/voice-control.c:157
 msgid "Listening"
 msgstr "Слушаю"
 
-#: ../src/voice-control.c:159
+#: ../src/voice-control.c:157
+msgid "Processing speech"
+msgstr "Обработка речи"
+
+#: ../src/voice-control.c:167
 msgid "Ready"
 msgstr "Готов"
 
-#: ../src/voice-control.c:206
+#: ../src/voice-control.c:167
+msgid "Ready for input"
+msgstr "Ожидание ввода"
+
+#: ../src/voice-control.c:275
 msgid "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"
 msgstr "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"
 
-#: ../src/voice-control.c:207
+#: ../src/voice-control.c:276
 msgid "Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>"
 msgstr "Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>"
 
-#: ../src/voice-control.c:210
+#: ../src/voice-control.c:279
 msgid "Voice Control Applet used to manage desktop with speech"
 msgstr "Апплет управления рабочим столом с помощью голоса"
 
-#: ../src/voice-control.c:220
+#: ../src/voice-control.c:289
 msgid "translator-credits"
 msgstr "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"

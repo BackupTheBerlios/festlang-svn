@@ -69,6 +69,7 @@ typedef struct {
 
 static void  voice_control_applet_init (VoiceControlApplet      *voice_control);
 static void  voice_control_applet_class_init (VoiceControlAppletClass *klass);
+static void  voice_control_set_text (VoiceControlApplet *voice_control, gchar *message, gchar *tooltip);
 
 G_DEFINE_TYPE (VoiceControlApplet, voice_control_applet, PANEL_TYPE_APPLET)
 
@@ -123,7 +124,7 @@ control_stop (BonoboUIComponent  *uic,
 	       const char         *verbname)
 {
         gst_element_set_state (voice_control->pipeline, GST_STATE_NULL);
-	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Idle"));
+	voice_control_set_text (voice_control, _("Idle"), _("Choose Start Control to start"));
 	control_spi_listener_stop (voice_control->spi_listener);
 }
 
@@ -133,7 +134,7 @@ on_sink_initialization (GObject *sink, gpointer data)
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 
 	gdk_threads_enter ();
-	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Init"));
+	voice_control_set_text (voice_control, _("Init"), _("Loading acoustic and language model, wait a bit"));
 	gdk_threads_leave ();
 }
 
@@ -143,7 +144,7 @@ on_sink_calibration (GObject *sink, gpointer data)
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 
 	gdk_threads_enter ();
-	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Calibration"));
+	voice_control_set_text (voice_control, _("Calibration"), _("Tuning up acoustic parameters"));
 	gdk_threads_leave ();
 }
 
@@ -153,7 +154,7 @@ on_sink_listening (GObject *sink, gpointer data)
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 
 	gdk_threads_enter ();
-	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Listening"));
+	voice_control_set_text (voice_control, _("Listening"), _("Processing speech"));
 	gdk_threads_leave ();
 }
 
@@ -163,7 +164,7 @@ on_sink_ready (GObject *sink, gpointer data)
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 
 	gdk_threads_enter ();
-	gtk_label_set_text (GTK_LABEL (voice_control->state_label), _("Ready"));
+	voice_control_set_text (voice_control, _("Ready"), _("Ready for input"));
 	gdk_threads_leave ();
 }
 
@@ -306,14 +307,15 @@ display_about_dialog (BonoboUIComponent  *uic,
 }
 
 static void
-set_tooltip (VoiceControlApplet *voice_control)
+voice_control_set_text (VoiceControlApplet *voice_control, gchar *message, gchar *tooltip)
 {
+	gtk_label_set_text (GTK_LABEL (voice_control->state_label), message);
         if (!voice_control->tooltips) {
                 voice_control->tooltips = gtk_tooltips_new ();
                 g_object_ref (voice_control->tooltips);
                 gtk_object_sink (GTK_OBJECT (voice_control->tooltips));
         }
-        gtk_tooltips_set_tip (voice_control->tooltips, GTK_WIDGET (voice_control), _("Idle"), NULL);
+        gtk_tooltips_set_tip (voice_control->tooltips, GTK_WIDGET (voice_control), tooltip, NULL);
 }
 
 static void
@@ -326,10 +328,10 @@ setup_voice_control_widget (VoiceControlApplet *voice_control)
 	gtk_container_add (GTK_CONTAINER (widget), voice_control->frame);
 	gtk_widget_set_size_request (voice_control->frame, 100, -1);
 	
-	voice_control->state_label = gtk_label_new (_("Idle"));
+	voice_control->state_label = gtk_label_new ("");
 	gtk_container_add (GTK_CONTAINER (voice_control->frame), voice_control->state_label);
 
-	set_tooltip (voice_control);
+	voice_control_set_text (voice_control, _("Idle"), _("Choose Start Control to start"));
 
 	gtk_widget_show_all (widget);
 }

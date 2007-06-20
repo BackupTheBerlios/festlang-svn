@@ -1,5 +1,13 @@
 2007-06-20  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
+	* src/voice-control.c: (control_stop), (on_sink_initialization),
+	(on_sink_calibration), (on_sink_listening), (on_sink_ready),
+	(voice_control_set_text), (setup_voice_control_widget):
+	
+	Added sensible tooltips.
+
+2007-06-20  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
 	* src/gstsphinxsink.c: (gst_sphinx_decoder_init):
 	* src/voice-control.c: (setup_voice_control_widget):
 	
