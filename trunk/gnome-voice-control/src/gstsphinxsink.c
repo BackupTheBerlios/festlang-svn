@@ -62,11 +62,12 @@ gst_sphinx_decoder_init (void)
     int argc;
 
     /* FIXME: required for LM reading */
-    setlocale (LC_ALL, "C");
     
     g_shell_parse_argv (sphinx_command, &argc, &argv, NULL);
     
+    setlocale (LC_ALL, "C");
     fbs_init (argc, argv);
+    setlocale (LC_ALL, "");
     
     g_strfreev (argv);
 }

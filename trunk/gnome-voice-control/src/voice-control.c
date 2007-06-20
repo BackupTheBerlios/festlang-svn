@@ -326,7 +326,7 @@ setup_voice_control_widget (VoiceControlApplet *voice_control)
 	gtk_container_add (GTK_CONTAINER (widget), voice_control->frame);
 	gtk_widget_set_size_request (voice_control->frame, 100, -1);
 	
-	voice_control->state_label = gtk_label_new ("Idle");
+	voice_control->state_label = gtk_label_new (_("Idle"));
 	gtk_container_add (GTK_CONTAINER (voice_control->frame), voice_control->state_label);
 
 	set_tooltip (voice_control);

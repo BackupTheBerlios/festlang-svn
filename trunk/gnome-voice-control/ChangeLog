@@ -1,5 +1,12 @@
 2007-06-20  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
+	* src/gstsphinxsink.c: (gst_sphinx_decoder_init):
+	* src/voice-control.c: (setup_voice_control_widget):
+	
+	Fixes localization issues.
+
+2007-06-20  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
 	* lang/desktop-control.dict:
 	
 	Updated dictionary to allow full GEdit control.
