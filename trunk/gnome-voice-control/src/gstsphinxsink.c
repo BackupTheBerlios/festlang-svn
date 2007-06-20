@@ -38,7 +38,7 @@
 static char *sphinx_command = 
 "voice-control "
 "-live TRUE "
-"-verbose 1 "
+"-verbose 0 "
 "-langwt 6.5 "
 "-fwdflatlw 8.5 -rescorelw 9.5 -ugwt 0.5 -fillpen 1e-10 -silpen 0.005 "
 "-inspen 0.65 -top 1 -topsenfrm 3 -topsenthresh -70000 -beam 2e-06 "
