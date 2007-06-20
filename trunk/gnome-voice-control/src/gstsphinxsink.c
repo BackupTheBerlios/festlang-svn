@@ -329,12 +329,14 @@ gst_sphinx_construct_trans_list (GSList *phrases, s2_fsg_trans_t **trans_list)
 	    		transitions[i].prob = 1.0;
 			transitions[i].word = g_strdup (words[j]);
 			transitions[i].next = transitions + i + 1;
-			
+
+#if DEBUG			
 			g_message ("transition number %d from %d to %d word %s",
 				    i, 
 				    transitions[i].from_state,
 				    transitions[i].to_state,
 				    transitions[i].word);
+#endif
 		}
 	}
 	transitions[n_transitions-1].next = NULL;

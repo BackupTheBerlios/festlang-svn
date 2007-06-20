@@ -1,3 +1,9 @@
+2007-06-21  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* src/spi-listener.c: (control_spi_listener_build_actions_list):
+	
+	Fixes crash if accessible name is zero (yes, it happens sometimes).
+
 2007-06-20  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/voice-control.c: (control_stop), (on_sink_initialization),

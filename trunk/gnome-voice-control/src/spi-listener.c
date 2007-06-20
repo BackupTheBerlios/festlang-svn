@@ -138,19 +138,21 @@ control_spi_listener_build_actions_list (ControlSpiListener *listener, Accessibl
 		
 		name = Accessible_getName (child);
 		
-		normalized_name = control_spi_listener_normalize (name);
-		if (normalized_name && strlen(normalized_name) > 0 && is_actionable (child)) {
-		        AccessibleItem *item;	    
+		if (name) {
+			normalized_name = control_spi_listener_normalize (name);
+			if (normalized_name && strlen(normalized_name) > 0 && is_actionable (child)) {
+			        AccessibleItem *item;	    
 
-		        item = g_new0(AccessibleItem, 1);
-		        Accessible_ref (child);
-    			item->accessible = child;
-			item->name = g_strdup (normalized_name);
+		    		item = g_new0(AccessibleItem, 1);
+			        Accessible_ref (child);
+    				item->accessible = child;
+				item->name = g_strdup (normalized_name);
 		
-			listener->actions = g_slist_append (listener->actions, item);
+				listener->actions = g_slist_append (listener->actions, item);
+			}
+			SPI_freeString (name);
+			g_free (normalized_name);
 		}
-		SPI_freeString (name);
-		g_free (normalized_name);
 		    
 		if (is_visible (child))
 			control_spi_listener_build_actions_list (listener, child);
