@@ -39,7 +39,9 @@ control_spi_listener_dump_actions_list (ControlSpiListener *listener)
 	
 	for (l = listener->actions; l; l = l->next) {
 	    item = (AccessibleItem *)l->data;
+#if DEBUG
 	    g_message ("Object %s", item->name);
+#endif
 	}
 }
 
@@ -162,7 +164,7 @@ control_spi_listener_build_actions_list (ControlSpiListener *listener, Accessibl
 
 		name = Accessible_getName (child);
 
-#if 1
+#if DEBUG
 		{
 		        gchar *role_name;		
 			

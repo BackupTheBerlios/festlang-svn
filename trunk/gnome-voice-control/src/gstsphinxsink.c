@@ -369,6 +369,8 @@ void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *words)
 	
 	uttproc_set_fsg ("desktop-control");
 	
+#if DEBUG
 	g_message ("New fsg is set");
+#endif
 }
 
