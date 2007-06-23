@@ -1,3 +1,15 @@
+2007-06-24  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* src/gstsphinxsink.c: (gst_sphinx_sink_finalize),
+	(gst_sphinx_sink_class_init), (gst_sphinx_sink_init),
+	(gst_sphinx_sink_ad_read), (gst_sphinx_sink_calibrate_chunk),
+	(gst_sphinx_sink_process_chunk), (gst_sphinx_sink_render):
+	* src/gstsphinxsink.h:
+	
+	Pass fixed-size buffers to sphinx through GstAdapter. This
+	should solve the problem with locking on calibration. Thanks
+	a lot to Sander <avirulence@gmail.com>.
+
 2007-06-21  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/gstsphinxsink.c: (gst_sphinx_sink_set_fsg):

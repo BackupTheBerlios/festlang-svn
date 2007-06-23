@@ -26,6 +26,7 @@
 
 #include <gst/gst.h>
 #include <gst/base/gstbasesink.h>
+#include <gst/base/gstadapter.h>
 
 #include <s2types.h>
 #include <fbs.h>
@@ -73,11 +74,9 @@ struct _GstSphinxSink {
 
   cont_ad_t *cont;
   GstSphinxSinkAd ad;
-
   gint32 last_ts;
   
-  /* Link for callbacks */
-  GstBuffer *buffer;  
+  GstAdapter *adapter;  
 };
 
 struct _GstSphinxSinkClass {
