@@ -1,3 +1,11 @@
+2007-06-27  Raphael Nunes da Motta,,,  <raphael@arthemis>
+
+	* NEWS:
+	* README:
+	* configure.ac:
+
+        Data updated to generate release 0.2.0
+
 2007-06-24  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/gstsphinxsink.c: (gst_sphinx_sink_finalize),

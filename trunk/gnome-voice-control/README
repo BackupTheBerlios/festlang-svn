@@ -27,6 +27,7 @@ following packages:
 gnome-devel
 libgstreamer0.10-dev
 libwnck-dev
+libatspi-dev
 
 How to install gnome-voice-control
 
@@ -46,4 +47,26 @@ MAXIMIZE WINDOW
 MINIMIZE WINDOW
 NEXT WINDOW
 
+Functions over windows like:
+Here some action over gedit
+
+FILE 
+NEW
+OPEN
+SAVE
+PRINT
+UNDO
+PASTE
+FIND
+REPLACE
+
+In this release you can open a menu item and execute some actions in the menu like
+
+FILE .. OPEN
+VIEW .. HIGHLIGHT MODE
+HELP .. ABOUT
+
+and others.
+
+ 
 Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>
