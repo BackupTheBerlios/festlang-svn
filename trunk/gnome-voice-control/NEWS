@@ -2,4 +2,29 @@
 gnome-voice-control 0.2.0
 -------------------------
 
-Second release.
+New features added:
+
+    * Suport to control menus with voice
+
+Bugs fixed:
+
+    * Stop on calibration(Nickolay V. Shmyrev).
+
+Where to get the last release of the gnome-voice-control:
+
+    http://live.gnome.org/GnomeVoiceControl/Downloads
+
+More Information about the gnome-voice-control
+
+    http://live.gnome.org/GnomeVoiceControl
+
+Translators:
+
+    Nickolay V. Shmyrev (ru)
+    Daniel Nylander (sv)
+
+-------------------------
+gnome-voice-control 0.1.0
+-------------------------
+
+Initial release.
