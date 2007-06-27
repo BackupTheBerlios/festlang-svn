@@ -7,7 +7,7 @@ How to Install:
 Dependency:
 
 sphinx2
-
+	
 Where to download sphinx2:
 
 http://cmusphinx.org/download/nightly/sphinx2.nightly.tar.gz
@@ -35,7 +35,10 @@ How to install gnome-voice-control
 make
 make install
 
-After all, add the VoiceControl to pannel
+After all, add the VoiceControl to pannel and enable the ally support.
+
+The gnome-voice-control need the ally support enabled to function some
+features.
 
 Actions implemented:
 
@@ -68,5 +71,3 @@ HELP .. ABOUT
 
 and others.
 
- 
-Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>

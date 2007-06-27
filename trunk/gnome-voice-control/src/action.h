@@ -9,6 +9,7 @@ typedef enum {
     ACTION_NEXT_WINDOW,
     ACTION_MINIMIZE_WINDOW,
     ACTION_MAXIMIZE_WINDOW,
+    ACTION_RUN_TEXT_EDITOR
 } VoiceAction;
 
 void 

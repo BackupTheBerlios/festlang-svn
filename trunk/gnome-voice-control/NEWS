@@ -4,19 +4,12 @@ gnome-voice-control 0.2.0
 
 New features added:
 
-    * Suport to control menus with voice
+    * Open the gedit with voice comand: RUN TEXT EDITOR 
+    * Suport to control menus with voice.
 
 Bugs fixed:
 
-    * Stop on calibration(Nickolay V. Shmyrev).
-
-Where to get the last release of the gnome-voice-control:
-
-    http://live.gnome.org/GnomeVoiceControl/Downloads
-
-More Information about the gnome-voice-control
-
-    http://live.gnome.org/GnomeVoiceControl
+    * Stop on calibration.
 
 Translators:
 

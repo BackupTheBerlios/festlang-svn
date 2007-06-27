@@ -1,4 +1,14 @@
-2007-06-27  Raphael Nunes da Motta,,,  <raphael@arthemis>
+2007-06-27  Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>
+
+	* lang/desktop-control.fsg:
+	* src/action.c: (do_action):
+	* src/action.h:
+	* src/voice-control.c: (on_sink_message),
+	(voice_control_ui_changed):
+
+        Added command RUN TEXT EDITOR
+
+2007-06-27  Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>
 
 	* NEWS:
 	* README:

@@ -205,7 +205,10 @@ on_sink_message (GObject *sink, gchar *message, gpointer data)
 	} else if (g_strrstr (message, "RUN MAIL")) {
 		do_action (ACTION_RUN_MAIL);
 		return;
-	} else if (g_strrstr (message, "CLOSE WINDOW")) {
+	} else if (g_strrstr (message, "RUN TEXT EDITOR")) {
+		do_action (ACTION_RUN_TEXT_EDITOR);
+		return;
+        } else if (g_strrstr (message, "CLOSE WINDOW")) {
 		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_CLOSE_WINDOW));
 		return;
 	} else if (g_strrstr (message, "NEXT WINDOW")) {
@@ -217,7 +220,7 @@ on_sink_message (GObject *sink, gchar *message, gpointer data)
 	} else if (g_strrstr (message, "MAXIMIZE WINDOW")) {
 		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_MAXIMIZE_WINDOW));
 		return;
-	}
+	} 
 	
 	if (voice_control->last_message)
 		g_free (voice_control->last_message);
@@ -242,11 +245,13 @@ voice_control_ui_changed (ControlSpiListener *listener, gpointer data)
 	commands = g_slist_append (commands, "RUN BROWSER");
 	commands = g_slist_append (commands, "RUN TERMINAL");
 	commands = g_slist_append (commands, "RUN MAIL");
+	commands = g_slist_append (commands, "RUN TEXT EDITOR");
 	commands = g_slist_append (commands, "CLOSE WINDOW");
 	commands = g_slist_append (commands, "NEXT WINDOW");
 	commands = g_slist_append (commands, "MINIMIZE WINDOW");
 	commands = g_slist_append (commands, "MAXIMIZE WINDOW");
 	
+
 	gst_sphinx_sink_set_fsg (GST_SPHINX_SINK(voice_control->sink), commands);
 
 	g_slist_free (commands);

@@ -26,6 +26,9 @@ do_action (VoiceAction action)
 	    case ACTION_RUN_MAIL:
     		g_spawn_command_line_async ("evolution", NULL);
 		break;
+            case ACTION_RUN_TEXT_EDITOR:
+    		g_spawn_command_line_async ("gedit", NULL);
+                break;
 	    case ACTION_CLOSE_WINDOW:
 		screen = wnck_screen_get_default ();
 		if (screen)
