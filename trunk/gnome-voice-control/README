@@ -2,72 +2,68 @@ Gnome-Voice-Control
 ====================
 This package contains the gnome-voice-control
 
-How to Install:
+To install the gnome-voice-control first of all you need to 
+download and install sphinx2. The sphinx2 can be found at [1].
+  *[1] http://cmusphinx.org/download/nightly/sphinx2.nightly.tar.gz
+To install sphinx2 use the folowing commands:
+  1 - ./configure --prefix=/usr
+  2 - make
+  3 - make install ( as root )
 
-Dependency:
-
-sphinx2
-	
-Where to download sphinx2:
-
-http://cmusphinx.org/download/nightly/sphinx2.nightly.tar.gz
-
-How to install sphinx2:
-
-./configure --prefix=/usr
-make
-make install
-
-Dependency:
-
+The gnome voice control has some dependencys that are
 GNOME development libraries, gstreamer development package,
 libwnck development. On Debian-based systems you need the 
 following packages:
+  1 - gnome-devel
+  2 - libgstreamer0.10-dev
+  3 - libwnck-dev
+  4 - libatspi-dev
 
-gnome-devel
-libgstreamer0.10-dev
-libwnck-dev
-libatspi-dev
+Once sphinx2 is installed you can install the gnome voice control
+using the following commands:
+  1 - ./configure --prefix=/usr --with-sphinx2=/usr
+  2 - make
+  3 - make install ( as root )
 
-How to install gnome-voice-control
+Now the gnome-voice-control is installed, the next action is to add the
+gnome-voice-control applet to GNOME pannel. To add the gnome-voice-control
+to pannel click with the right button on the pannel, select Add to Pannel,
+in the section Micellaneous you will found a icon VoiceControl, add it.
 
-./configure --prefix=/usr --with-sphinx2=/usr
-make
-make install
+Before add the gnome-voice-control applet you need to enable the ally support 
+on you linux. To enable the Ally support go to Preferences/Acessibility/Assistive 
+technologies and check the box Enable Assistive technologies. You need to loggof 
+to have the changes made. The gnome-voice-control need the Ally support enabled 
+because some features uses the Ally suport.
 
-After all, add the VoiceControl to pannel and enable the ally support.
+To start the control on gnome-voice-control, click with the right button on 
+the VoiceControl icon and select Start Control. The system will pass by the 
+states idle -> calibrating -> ready.
+When the system is ready you can start to speech, giving the commands by voice.
 
-The gnome-voice-control need the ally support enabled to function some
-features.
+The functions to control windows that we implented are:
+  1 - RUN TERMINAL     : open gnome-terminal
+  2 - RUN BROWSER      : open epiphany
+  3 - RUN MAIL         : open evolution
+  4 - RUN TEXT EDITOR  : open gedit
+  5 - CLOSE WINDOW
+  6 - MAXIMIZE WINDOW
+  7 - MINIMIZE WINDOW
+  8 - NEXT WINDOW
 
-Actions implemented:
+In the gnome-voice-control we can control some windows menus too. Here we can
+list some action over the menu of gedit that can br made.
+To the actions function the system variable LANG need to be set LANG=C
 
-RUN TERMINAL     : open gnome-terminal
-RUN BROWSER      : open epiphany
-RUN MAIL         : open evolution
-CLOSE WINDOW
-MAXIMIZE WINDOW
-MINIMIZE WINDOW
-NEXT WINDOW
-
-Functions over windows like:
-Here some action over gedit
-
-FILE 
-NEW
-OPEN
-SAVE
-PRINT
-UNDO
-PASTE
-FIND
-REPLACE
-
-In this release you can open a menu item and execute some actions in the menu like
-
-FILE .. OPEN
-VIEW .. HIGHLIGHT MODE
-HELP .. ABOUT
+  1 - FILE .. OPEN 
+  2 - HELP .. ABOUT
+  3 - SAVE
+  4 - PRINT
+  5 - UNDO
+  6 - PASTE
+  7 - FIND
+  8 - REPLACE
+  9 - EDIT .. SELECT ALL
 
 and others.
 
