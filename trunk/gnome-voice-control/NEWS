@@ -2,14 +2,14 @@
 gnome-voice-control 0.2.0
 -------------------------
 
-New features added:
+New features and UI improvements:
 
-    * Open the gedit with voice comand: RUN TEXT EDITOR 
-    * Suport to control menus with voice.
+    * Opens gedit with the command RUN TEXT EDITOR 
+    * Controls UI with accessibilit.
 
-Bugs fixed:
+Bug fixes:
 
-    * Stop on calibration.
+    * Calibration lock is partially fixed
 
 Translators:
 
@@ -21,3 +21,4 @@ gnome-voice-control 0.1.0
 -------------------------
 
 Initial release.
+
