@@ -9,15 +9,20 @@ toolbar items activation, text navigation and many more.
 GnomeVoiceControl Requirements
 ==============================
 
-sphinx2 
+sphinx2:
 
  http://cmusphinx.org/download/nightly/sphinx2.nightly.tar.gz
 
-GStreamer development packages
+GStreamer development packages: gstreamer-devel gstreamer-plugins-base-devel
 
  http://gstreamer.freedesktop.org
 
-Gnome development packages libwnck-dev, libatspi-dev, gnome-panel-dev
+GNOME development packages: libwnck-dev, libatspi-dev, gnome-panel-dev 
+startup-notification-devel
+
+ http://gnome.org
+
+GNOME build system: libtool gnome-common intltool
 
  http://gnome.org
  
