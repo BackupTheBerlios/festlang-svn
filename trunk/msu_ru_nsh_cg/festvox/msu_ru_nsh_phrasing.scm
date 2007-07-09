@@ -39,7 +39,7 @@
 (define (token_next_punc token)
   "(token_next_punc token)
 Find next punctuation after the word"
-(if (null token) "0"
+(if (null token) "."
     (let (res (punc (item.feat token "punc")))
          (if (string-equal punc "0") (token_next_punc (item.next token))
 	     punc))))

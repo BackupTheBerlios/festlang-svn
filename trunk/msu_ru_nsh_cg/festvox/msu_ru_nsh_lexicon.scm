@@ -354,6 +354,7 @@ Return pronunciation of word not in lexicon."
             (t syls)))
     
     (list word features syls)
+;    (format stderr "%l\n" syls)
     ))
 
 (define (strconcat list)
@@ -492,7 +493,7 @@ Reduce vowels according to the stress."
 			     (item.set_name s (car r))))
 	   msu_ru::reducelist))
     
-      (format stderr "%s " (item.name s))
+    (format stderr "%s " (item.name s))
      
       ))
    (utt.relation.items utt 'Segment))
@@ -521,12 +522,14 @@ Reduce vowels according to the stress."
 
     ( # [ Þ Ô ] Ï = sh t )
     ( Ó É Î [ Ô ] Å Ú = t )
+    ( É Î [ Ô ] Å Ò × = t )
     ( É Î [ Ô ] Å Ò Æ = t )
     ( É Î [ Ô ] Å Ò Ð = t )
     ( [ Ó Û ] Å Ó Ô = sh )
     ( # [ Å Å ] # = j e j o )
     
     ( Ó Ô Ò Ï [ Ç ] Ï  # = g )
+    ( Í Í Î Ï [ Ç ] Ï  # = v )
     ( Í Î Ï [ Ç ] Ï  # = g )
     ( Ä Ï Ò Ï [ Ç ] Ï  # = g )
     ( Ë Ò Å Í Ì [ Å ] ×  = o )
