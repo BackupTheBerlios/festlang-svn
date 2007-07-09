@@ -492,11 +492,11 @@ Reduce vowels according to the stress."
 			     (item.set_name s (car r))))
 	   msu_ru::reducelist))
     
-;;    (format stderr "%s " (item.name s))
+      (format stderr "%s " (item.name s))
      
       ))
    (utt.relation.items utt 'Segment))
-;; (format stderr "\n")
+   (format stderr "\n")
 )
    
 
