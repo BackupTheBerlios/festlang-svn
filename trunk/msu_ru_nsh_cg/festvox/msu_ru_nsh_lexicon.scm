@@ -525,6 +525,8 @@ Reduce vowels according to the stress."
     ( É Î [ Ô ] Å Ò × = t )
     ( É Î [ Ô ] Å Ò Æ = t )
     ( É Î [ Ô ] Å Ò Ð = t )
+    ( Ü Ó [ Ô ] Å Ô = t )
+    
     ( [ Ó Û ] Å Ó Ô = sh )
     ( # [ Å Å ] # = j e j o )
     
