@@ -196,6 +196,7 @@ Basic lexicon should (must ?) have basic letters, symbols and punctuation."
   ( [ Y ] = Á Ê )
   ( [ Z ] = Ú )
 
+  ( e [ a ] = )
   ( [ a ] = Á )
   ( [ b ] = Â )
   ( [ c ] = Ã )
@@ -493,11 +494,11 @@ Reduce vowels according to the stress."
 			     (item.set_name s (car r))))
 	   msu_ru::reducelist))
     
-    (format stderr "%s " (item.name s))
+;;    (format stderr "%s " (item.name s))
      
       ))
    (utt.relation.items utt 'Segment))
-   (format stderr "\n")
+;;   (format stderr "\n")
 )
    
 
