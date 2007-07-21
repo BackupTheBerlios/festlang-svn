@@ -9,7 +9,7 @@ voice_control_applet_SOURCES = \
 	spi-listener.h \
 	voice-control.c 
 
-voice_control_applet_CFLAGS =					\
+INCLUDES =					\
 	-DGNOMELOCALEDIR=\"$(prefix)/$(DATADIRNAME)/locale\"	\
 	-DGNOMEDATADIR=\"$(datadir)\"				\
 	-DPOCKETSPHINX_PREFIX=\"$(POCKETSPHINX_PREFIX)\"	\
