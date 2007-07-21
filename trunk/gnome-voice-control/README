@@ -9,9 +9,9 @@ toolbar items activation, text navigation and many more.
 GnomeVoiceControl Requirements
 ==============================
 
-sphinx2:
+pocketsphinx:
 
- http://cmusphinx.org/download/nightly/sphinx2.nightly.tar.gz
+ http://cmusphinx.org/download/nightly/pocketsphinx.nightly.tar.gz
 
 GStreamer development packages: gstreamer-devel gstreamer-plugins-base-devel
 
@@ -29,12 +29,11 @@ GNOME build system: libtool gnome-common intltool
 Installation
 ============
 
-If you have sphinx2 installed in non-standard location you have
-to add configure option --with-sphinx2=<sphinx2 prefix>. The rest
-is usual configure && make && make install. Please make sure
-bonobo activation server correctly finds .server file with applet
-description. If not adjust BONOBO_ACTIVATION_PATH environment variable
-and restart session.
+If you have libraries installed in non-standard prefix, you'd probably
+need to set PKG_CONFIG_PATH environment variable. The rest is usual
+configure && make && make install. Please make sure bonobo activation
+server correctly finds .server file with applet description. If not
+adjust BONOBO_ACTIVATION_PATH environment variable and restart session.
 
 Please also note that you must have accessibility enabled and must use C
 locale since we only support English now. Go to

@@ -36,37 +36,11 @@
 
 static char *sphinx_command = 
 "voice-control "
-"-live TRUE "
-"-verbose 0 "
-"-langwt 6.5 "
-"-fwdflatlw 8.5 "
-"-rescorelw 9.5 "
-"-ugwt 0.5 "
-"-fillpen 1e-10 "
-"-silpen 0.005 "
-"-inspen 0.65 "
-"-top 1 "
-"-topsenfrm 3 "
-"-topsenthresh -70000 "
-"-beam 2e-06 "
-"-npbeam 2e-06 "
-"-lpbeam 2e-05 "
-"-lponlybeam 0.0005 "
-"-nwbeam 0.0005 "
-"-fwdflat FALSE "
-"-fwdflatbeam 1e-08 "
-"-fwdflatnwbeam 0.0003 "
-"-bestpath TRUE "
-"-8bsen TRUE "
-"-sendumpfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/sendump "
-"-ndictfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/noisedict "
-"-phnfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/phone "
-"-mapfn " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k/map "
-"-hmmdir " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k "
-"-hmmdirlist " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k "
-"-cbdir " SPHINX2_PREFIX "/share/sphinx2/model/hmm/6k "
-"-fsgfn " GNOMEDATADIR "/gnome-voice-control/desktop-control.fsg "
-"-dictfn " GNOMEDATADIR "/gnome-voice-control/desktop-control.dict ";
+"-fwdflat no "
+"-bestpath yes "
+"-hmm " POCKETSPHINX_PREFIX "/share/pocketsphinx/model/hmm/wsj0 "
+"-fsg " GNOMEDATADIR "/gnome-voice-control/desktop-control.fsg "
+"-dict " GNOMEDATADIR "/gnome-voice-control/desktop-control.dict ";
 
 static void
 gst_sphinx_decoder_init (void)

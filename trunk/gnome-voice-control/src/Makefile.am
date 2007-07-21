@@ -1,13 +1,3 @@
-INCLUDES =							\
-	-DGNOMELOCALEDIR=\"$(prefix)/$(DATADIRNAME)/locale\"	\
-	-DGNOMEDATADIR=\"$(datadir)\"				\
-	$(WARN_CFLAGS)						\
-	$(DISABLE_DEPRECATED_CFLAGS)				\
-	-I$(SPHINX2_PREFIX)/include/sphinx2			\
-	-DSPHINX2_PREFIX=\"$(SPHINX2_PREFIX)\"			\
-	$(GNOME_PANEL_CFLAGS)
-
-
 libexec_PROGRAMS = voice_control_applet
 
 voice_control_applet_SOURCES = \
@@ -19,12 +9,21 @@ voice_control_applet_SOURCES = \
 	spi-listener.h \
 	voice-control.c 
 
+voice_control_applet_CFLAGS =					\
+	-DGNOMELOCALEDIR=\"$(prefix)/$(DATADIRNAME)/locale\"	\
+	-DGNOMEDATADIR=\"$(datadir)\"				\
+	-DPOCKETSPHINX_PREFIX=\"$(POCKETSPHINX_PREFIX)\"	\
+	$(WARN_CFLAGS)						\
+	$(DISABLE_DEPRECATED_CFLAGS)				\
+	$(GNOME_PANEL_CFLAGS)					\
+	$(GST_CFLAGS)						\
+	$(POCKETSPHINX_CFLAGS)
+
 voice_control_applet_LDADD = \
 	$(GNOME_PANEL_LIBS)  \
-	-L$(SPHINX2_PREFIX)/lib \
-	-lsphinx2 \
-	-lsphinx2fe \
-	-lsphinx2ad
+	$(GST_LIBS)  \
+	$(POCKETSPHINX_LIBS)
+
 
 
 

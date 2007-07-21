@@ -28,9 +28,8 @@
 #include <gst/base/gstbasesink.h>
 #include <gst/base/gstadapter.h>
 
-#include <s2types.h>
+#include <fe.h>
 #include <fbs.h>
-#include <CM_macros.h>
 #include <ad.h>
 #include <cont_ad.h>
 

@@ -1,3 +1,13 @@
+2007-07-21  David Huggins-Daines <dhuggins@cs.cmu.edu>
+
+	* README:
+	* configure.ac:
+	* src/Makefile.am:
+	* src/gstsphinxsink.c:
+	* src/gstsphinxsink.h:
+	
+	Ported to pocketsphinx.
+
 2007-07-08  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* README:
