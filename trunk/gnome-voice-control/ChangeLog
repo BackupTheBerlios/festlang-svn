@@ -2,6 +2,16 @@
 
 	* README:
 	* configure.ac:
+	* src/voice-control.c: (on_sink_listening), (process_action),
+	(show_notification), (on_sink_message),
+	(voice_control_applet_init), (main):
+	
+	libnotify support to show recognized text.
+
+2007-07-21  David Huggins-Daines <dhuggins@cs.cmu.edu>
+
+	* README:
+	* configure.ac:
 	* src/Makefile.am:
 	* src/gstsphinxsink.c:
 	* src/gstsphinxsink.h:

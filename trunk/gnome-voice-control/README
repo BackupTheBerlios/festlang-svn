@@ -26,6 +26,10 @@ GNOME build system: libtool gnome-common intltool
 
  http://gnome.org
  
+libnotify:
+
+http://www.galago-project.org/news/index.php
+ 
 Installation
 ============
 

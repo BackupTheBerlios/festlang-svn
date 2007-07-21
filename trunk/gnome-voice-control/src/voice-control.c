@@ -30,6 +30,8 @@
 #include <gst/gstelement.h>
 #include <gst/gstplugin.h>
 
+#include <libnotify/notify.h>
+
 #include "gstsphinxsink.h"
 #include "action.h"
 
@@ -55,6 +57,7 @@ typedef struct {
 	GtkWidget*         state_label;
 	
 	GtkTooltips* 	   tooltips;
+	NotifyNotification *notif;
 	
 	GstElement*        pipeline;	
 	GstElement* 	   sink;
@@ -152,8 +155,14 @@ static void
 on_sink_listening (GObject *sink, gpointer data)
 {
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+	GError *err = NULL;
 
 	gdk_threads_enter ();
+	notify_notification_close(voice_control->notif, &err);
+	if (err) {
+		g_warning("Failed to show notifcation: %s\n", err->message);
+		g_error_free(err);
+	}
 	voice_control_set_text (voice_control, _("Listening"), _("Processing speech"));
 	gdk_threads_leave ();
 }
@@ -173,6 +182,17 @@ process_action (gpointer data)
 {
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 	GSList *l, *nodes;
+	GError *err = NULL;
+	notify_notification_update(voice_control->notif,
+				   "Speech Input",
+				   voice_control->last_message, NULL);
+	notify_notification_set_timeout(voice_control->notif,
+					NOTIFY_EXPIRES_DEFAULT);
+	notify_notification_show(voice_control->notif, &err);
+	if (err) {
+		g_warning("Failed to show notifcation: %s\n", err->message);
+		g_error_free(err);
+	}
 
 	nodes = control_spi_listener_get_object_list (voice_control->spi_listener);
 
@@ -191,11 +211,34 @@ process_action (gpointer data)
 	return FALSE;
 }
 
+static gboolean
+show_notification(gpointer data)
+{
+	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+	GError *err = NULL;
+
+	notify_notification_update(voice_control->notif,
+				   "Speech Input",
+				   voice_control->last_message, NULL);
+	notify_notification_set_timeout(voice_control->notif,
+					NOTIFY_EXPIRES_DEFAULT);
+	notify_notification_show(voice_control->notif, &err);
+	if (err) {
+		g_warning("Failed to show notifcation: %s\n", err->message);
+		g_error_free(err);
+	}
+}
+
 static void
 on_sink_message (GObject *sink, gchar *message, gpointer data)
 {
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
-	
+
+	if (voice_control->last_message)
+		g_free (voice_control->last_message);
+	voice_control->last_message = g_strdup (message);
+	g_idle_add (show_notification, voice_control);
+
 	if (g_strrstr (message, "RUN BROWSER")) {
 		do_action (ACTION_RUN_BROWSER);
 		return;
@@ -222,9 +265,6 @@ on_sink_message (GObject *sink, gchar *message, gpointer data)
 		return;
 	} 
 	
-	if (voice_control->last_message)
-		g_free (voice_control->last_message);
-	voice_control->last_message = g_strdup (message);
 	g_idle_add (process_action, data);		
 	return;
 }
@@ -448,6 +488,12 @@ voice_control_applet_init (VoiceControlApplet      *voice_control)
 	voice_control->spi_listener = g_object_new (CONTROL_SPI_LISTENER_TYPE, NULL);
 	g_signal_connect_object (voice_control->spi_listener, "changed", 
 				 G_CALLBACK (voice_control_ui_changed), voice_control, 0);
+
+	voice_control->notif = notify_notification_new("Speech Input",
+						       NULL,
+						       NULL,
+						       GTK_WIDGET(voice_control));
+
 }
 
 static gboolean
@@ -488,6 +534,9 @@ int main (int argc, char *argv [])
 	gst_init (&argc, &argv);
 	gdk_threads_init ();
 
+	if (!notify_init("voice-control-applet")) {
+		g_warning("Failed to initialize libnotify\n");
+	}
 	
 	program = gnome_program_init ("voice-control-applet", VERSION,
 				      LIBGNOMEUI_MODULE,
@@ -502,6 +551,8 @@ int main (int argc, char *argv [])
 			     NULL);		
 	g_object_unref (program);
 	SPI_exit ();
-	
+
+	notify_uninit();
+
 	return retval;
 }
