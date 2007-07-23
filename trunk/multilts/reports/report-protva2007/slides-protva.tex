@@ -32,24 +32,17 @@
 \item Идентификация
 \item Поддержка пользователей с ограниченными возможностями
 \item Телекоммуникационные системы
+\item Шоу-бизнес
 \end{itemize}
 
 \end{slide}
 
 \begin{slide}
-
-Синтез речи - Festival, MBROLA, Espeak
-
-\end{slide}
-
-\begin{slide}
-Пакеты распознавания
+Пакеты синтеза и распознавания:
 
 \begin{itemize}
-\item HTK
-\item CMU Sphinx
-\item ISIC
-\item Julius
+\item Синтез речи - Festival, MBROLA, Espeak
+\item HTK, CMU Sphinx, ISIC, Julius
 \end{itemize}
 
 \end{slide}
@@ -65,6 +58,8 @@
 \item Шаблоны понимания (Common Sense)
 \end{itemize}
 
+Для этого применяются деревья решений, случайные процессы, нейронные сети.
+
 \end{slide}
 
 \begin{slide}
@@ -72,10 +67,10 @@
 Проблема - базы данных для распознавания. Полноценные акустические базы существуют только
 для английского языка. Есть русский, французский и испанский. 
 
-Корень зла - http://www.ldc.upenn.edu/
+http://www.ldc.upenn.edu/ - лингвистические базы
 
 Важны не только акустические, но и другие базы - фонетические словари, 
-интонационно размеченные записи, смысловые базы.
+интонационно размеченные записи, смысловые базы, корпуса свободных текстов.
 
 Создание базы - очень дорогостоящий и трудоёмкий процесс. Например, разметка
 минуты речи специалистом занимает около получаса.
@@ -83,13 +78,22 @@
 \end{slide}
 
 \begin{slide}
-http://www.espgame.org/
 
-Luis Von Ahn. Human Computation (Google Tech Talks)
+Преимущества открытых баз данных
 
+\begin{itemize}
+\item создавать синтезаторы и системы распознавания
+\item сопоставлять различные методы создания речевых систем
+\item изучать особенности языка
+\item свободные базы обладают ещё одним преимуществом -- их можно модифицировать и пополнять
+\end{itemize}
+\end{slide}
+
+\begin{slide}
+Luis Von Ahn. Human Computation (Google Tech Talks) http://www.espgame.org
 \begin{figure}
 \begin{center}
-\includegraphics[width=.9\textwidth]{./images/esp.eps}
+\includegraphics[width=.8\textwidth]{./images/esp.eps}
 \end{center}
 \end{figure}
 
@@ -121,7 +125,7 @@ http://voxforge.org
 
 
 \begin{slide}
-gnome-voice-control. Google SOC
+gnome-voice-control. Проект в рамках Google SOC
 
 \begin{itemize}
 \item Управление рабочим столом
@@ -129,6 +133,18 @@ gnome-voice-control. Google SOC
 \item Диктовка
 \item Поддержка нескольких языков
 \end{itemize}
+
+\end{slide}
+
+\begin{slide}
+Русский язык
+ 
+Мужской и женский голоса для festival http://festlang.berlios.de/russian.html
+
+База для распознавания - 10 дикторов (нужно 200). Точность распознавания
+на тестовых данных -- 80\% точность слов, 50\% точность предложений.
+
+http://www.dev.voxforge.org/projects/Russian
 
 \end{slide}
 
