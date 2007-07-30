@@ -4,7 +4,7 @@
 
 #include "cst_lts.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 /*************************************************************************
  *
@@ -38,12 +38,12 @@ typedef struct utterance
 {
     char text[256];
     char letters[256];
-    char phones[256];
+    int  phones[256];
+
+    const cst_cart_node const * cmu_cart_nodes;
+    const int *offsets;
+    const char* const *cmu_values;
     
-    const char * const * phone_table;
-    const char * const * letter_table;
-    const cst_lts_addr * letter_index;
-    const cst_lts_model * model;
 } utterance;
 
 int get_letter_index (utterance *utt, int i)
@@ -55,16 +55,9 @@ int get_letter_index (utterance *utt, int i)
     strncpy (buf, utt->text + i, utf8_length (utt->text + i));
     buf [utf8_length (utt->text + i)] = 0;
 
-    for (j = 0; utt->letter_table[j] != NULL; j++)
-      {
-    	    if (strcmp (utt->letter_table [j], buf) == 0) 
-    	      {
-    	    	    result = j;
-    	    	    break;
-    	      }
-      }
+    result = utt->text[i];
 #if DEBUG
-     printf ("Letter is %s index is %d\n", buf, result);
+    printf ("Letter is %s index is %d\n", buf, result);
 #endif
      return result;
 }
@@ -102,53 +95,43 @@ void utterance_parse (utterance *utt)
 
 /***************************************************************************/
 
-static void cst_lts_get_state(cst_lts_rule *state,
-			      const cst_lts_model *model,
-			      unsigned short n,
-			      int rule_size)
+static unsigned short apply_model(char *vals,
+			 	 unsigned short start, 
+				 const cst_cart_node* model)
 {
-    memmove(state,&model[n*rule_size],rule_size);
-}
+    cst_cart_node state;
 
-static cst_lts_phone apply_model(cst_lts_letter *vals,
-			 	 cst_lts_addr start, 
-				 const cst_lts_model* model)
-{
-    cst_lts_rule state;
-    unsigned short nstate;
-    static const int sizeof_cst_lts_rule = 6;
-
-    cst_lts_get_state(&state,model,start,sizeof_cst_lts_rule);
+    state = model [start];
 
 #if DEBUG
-    printf ("state is %d offset is %d check is %d\n", start, state.feat, state.val);
+    printf ("state is %d offset is %d check is %d\n", start, state.feat, state.value);
 #endif
 
     while (state.feat != CST_LTS_EOR)
     {
-	if (vals[state.feat] == state.val)
-	    nstate = state.qtrue;
+	if (vals[state.feat] == state.value)
+	    start = state.no_index;
 	else
-	    nstate = state.qfalse;
+	    start++;
 
-        cst_lts_get_state(&state,model,nstate,sizeof_cst_lts_rule);
+        state = model [start];
 #if DEBUG
-	printf ("state is %d offset is %d check is %d\n", nstate, state.feat, state.val);
+	printf ("state is %d offset is %d check is %d\n", start, state.feat, state.value);
 #endif
     }
 
-    return (cst_lts_phone)state.val;
+    return state.value;
 }
 
-static cst_lts_addr letter_start (utterance *utt, int i)
+static unsigned short letter_start (utterance *utt, int i)
 {
     if (utt->letters[i] > LETTER_ZERO)
-        return utt->letter_index[utt->letters[i] - LETTER_ZERO - 1];
+        return utt->offsets[utt->letters[i] - LETTER_ZERO - 1];
     
     return -1;
 }
 
-static void fill_feats (utterance *utt, int i, cst_lts_letter *vector)
+static void fill_feats (utterance *utt, int i,  char*vector)
 {
    int j;
 
@@ -178,14 +161,14 @@ void utterance_lts (utterance *utt)
 {
     int i, j;
     
-    cst_lts_phone  phone;
-    cst_lts_letter feature_vector[7];
-    cst_lts_addr   letter_start_index;
+    unsigned short phone;
+    unsigned char  feature_vector[7];
+    unsigned short   letter_start_index;
     
     for (i = 0, j = 0; utt->letters[i] != 0; i++)
 	{
 	    letter_start_index = letter_start (utt, i);
-	    if (letter_start_index == (cst_lts_addr) -1) 
+	    if (letter_start_index == (unsigned short) -1) 
 	        {
 	    	    utt->phones[j] = PHONE_PAU;
 	    	    j++;
@@ -205,13 +188,10 @@ void utterance_lts (utterance *utt)
 #endif
 		    phone = apply_model(feature_vector,
 		    		        letter_start_index,
-					utt->model);	
+					utt->cmu_cart_nodes);	
 #if DEBUG	
 		    printf ("Result %d\n", phone);
 #endif
-		    if (strcmp (utt->phone_table[phone], "epsilon") == 0) {
-			    continue;	
-		    }
 		    utt->phones[j] = phone;
 	    	    j++;
 	    	}
@@ -225,9 +205,9 @@ void utterance_dump (utterance *utt)
     
     for (i = 0; utt->phones[i] != 0; i++)
      if (utt->phones[i] == PHONE_PAU)
-	printf ("# ");
+	printf ("#\n");
      else
-	printf ("%s ", utt->phone_table[utt->phones[i]]);
+	printf ("%s\n", utt->cmu_values[utt->phones[i]]);
     printf ("\n");
 } /* utterance_dump */
 
@@ -237,28 +217,9 @@ void utterance_init (utterance *utt, char *language)
     memset (utt->letters, 0, 256);
     memset (utt->phones, 0, 256);
 
-    if (language && strcmp (language, "russian") == 0)
-      {
-        utt->phone_table = cmu_lts_phone_table_russian;
-	utt->letter_table = cmu_lts_letter_table_russian;
-        utt->letter_index = cmu_lts_letter_index_russian;
-        utt->model = cmu_lts_model_russian;
-        return;
-      }
-    
-    if (language && strcmp (language, "spanish") == 0)
-      {
-        utt->phone_table = cmu_lts_phone_table_spanish;
-        utt->letter_table = cmu_lts_letter_table_spanish;
-        utt->letter_index = cmu_lts_letter_index_spanish;
-        utt->model = cmu_lts_model_spanish;
-        return;
-      }
-    
-    utt->phone_table = cmu_lts_phone_table_english;
-    utt->letter_table = cmu_lts_letter_table_english;
-    utt->letter_index = cmu_lts_letter_index_english;
-    utt->model = cmu_lts_model_english;
+    utt->cmu_cart_nodes = cmu_cart_nodes;
+    utt->offsets = offsets;
+    utt->cmu_values = cmu_values;
     
 } /* utterance_init */
 
