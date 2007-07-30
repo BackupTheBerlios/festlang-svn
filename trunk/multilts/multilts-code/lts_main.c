@@ -4,7 +4,7 @@
 
 #include "cst_lts.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 /*************************************************************************
  *
@@ -103,21 +103,20 @@ static unsigned short apply_model(char *vals,
 
     state = model [start];
 
-#if DEBUG
-    printf ("state is %d offset is %d check is %d\n", start, state.feat, state.value);
-#endif
-
     while (state.feat != CST_LTS_EOR)
     {
-	if (vals[state.feat] == state.value)
-	    start = state.no_index;
-	else
-	    start++;
 
-        state = model [start];
 #if DEBUG
 	printf ("state is %d offset is %d check is %d\n", start, state.feat, state.value);
+	printf ("Answer is %s\n", vals[state.feat] == state.value ? "yes" : "no");
 #endif
+	if (vals[state.feat] == state.value) {
+	    start++;
+	} else {
+	    start = state.no_index;
+	}
+
+        state = model [start];
     }
 
     return state.value;
