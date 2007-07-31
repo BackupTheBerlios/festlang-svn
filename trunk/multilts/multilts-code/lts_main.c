@@ -95,7 +95,7 @@ void utterance_parse (utterance *utt)
 
 /***************************************************************************/
 
-static unsigned short apply_model(char *vals,
+static unsigned short apply_model(unsigned char *vals,
 			 	 unsigned short start, 
 				 const cst_cart_node* model)
 {
@@ -107,13 +107,13 @@ static unsigned short apply_model(char *vals,
     {
 
 #if DEBUG
-	printf ("state is %d offset is %d check is %d\n", start, state.feat, state.value);
-	printf ("Answer is %s\n", vals[state.feat] == state.value ? "yes" : "no");
+	printf ("state is %d offset is %d check is %d\n", state.feat, start, state.check);
+	printf ("Answer is %s\n", vals[state.feat] == state.check ? "yes" : "no");
 #endif
-	if (vals[state.feat] == state.value) {
+	if (vals[state.feat] == state.check) {
 	    start++;
 	} else {
-	    start = state.no_index;
+	    start = state.value;
 	}
 
         state = model [start];
@@ -124,13 +124,13 @@ static unsigned short apply_model(char *vals,
 
 static unsigned short letter_start (utterance *utt, int i)
 {
-    if (utt->letters[i] > LETTER_ZERO)
-        return utt->offsets[utt->letters[i] - LETTER_ZERO - 1];
+    if (utt->letters[i] >= 'a')
+        return utt->offsets[utt->letters[i] - 'a'];
     
     return -1;
 }
 
-static void fill_feats (utterance *utt, int i,  char*vector)
+static void fill_feats (utterance *utt, int i,  unsigned char*vector)
 {
    int j;
 

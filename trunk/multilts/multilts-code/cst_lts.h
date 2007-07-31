@@ -10,8 +10,8 @@
 
 typedef struct _cst_cart_node {
     unsigned char  feat;
-    unsigned  short no_index;
-    unsigned  short value;
+    unsigned short value;
+    unsigned char  check;
 } cst_cart_node;
 
 
@@ -19,9 +19,9 @@ extern const cst_cart_node const cmu_cart_nodes[];
 extern const int offsets[];
 extern const char* const cmu_values[];
 
-#define LETTER_PAU 1
-#define LETTER_ZERO ('a' - 1)
-#define PHONE_PAU 100
+#define LETTER_PAU '#'
+#define LETTER_ZERO '0'
+#define PHONE_PAU 1
 
 #endif
 
