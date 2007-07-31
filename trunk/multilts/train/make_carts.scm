@@ -52,6 +52,8 @@ Coverts a CART trees to a single C file called ODIR/NAME_cart.c."
     (set! letter_table nil)
 
     (set! cart_name name)
+    (format ofdc "#include \"cst_lts.h\"\n")
+    (format ofdc "#include \"cmu_cart.h\"\n")
     (format ofdc "\n\n")
     (format ofdc "static const cst_cart_node %s_cart_nodes[] = {\n" name)
 
@@ -142,7 +144,7 @@ Dump the nodes in the tree."
       (carttoC_tree_nodes (car (cdr (cdr tree))) ofdc ofdh ofvc))
      (t  ;; a leaf node
       (format ofdc
-	      "{ 255, 0, %s },\n"
+	      "{ 255, %s, 0 },\n"
 	      (carttoC_extract_answer ofvc tree))))))
 
 (define (carttoC_extract_answer ofvc tree)
