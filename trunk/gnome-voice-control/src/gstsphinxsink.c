@@ -1,5 +1,6 @@
-/* GStreamer
- * Copyright (C)  2007 Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+/* This file is a part of GStreamer
+ *
+ * Copyright (C) 2007  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
  *
  * gstsphinxsink.c:
  *

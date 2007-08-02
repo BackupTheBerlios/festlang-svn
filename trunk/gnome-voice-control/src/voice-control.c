@@ -1,5 +1,8 @@
-/*
- * Copyright (C) 2007  Nickolay V. Shmyrev
+/* This file is a part of gnome-voice-control
+ *
+ * Copyright (C) 2007  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+ *
+ * voice-control.c:
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

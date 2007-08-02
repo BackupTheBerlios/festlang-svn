@@ -1,3 +1,15 @@
+2007-08-02  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* src/action.c:
+	* src/action.h:
+	* src/gstsphinxsink.c:
+	* src/gstsphinxsink.h:
+	* src/spi-listener.c:
+	* src/spi-listener.h:
+	* src/voice-control.c:
+	
+	Updated license information. Thanks to Saša Bodiroža <jazzva@gmail.com>
+
 2007-07-21  David Huggins-Daines <dhuggins@cs.cmu.edu>
 
 	* README:
