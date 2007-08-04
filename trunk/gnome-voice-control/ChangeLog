@@ -1,3 +1,24 @@
+2007-08-04  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* lang/desktop-control.dict:
+	* lang/desktop-control.fsg:
+	
+	Updated dictionary, thanks to David Huggins-Daines for the notice.
+	
+	* src/action.c: (do_action),
+	(voice_control_action_append_commands),
+	(voice_control_action_process_result):
+	* src/action.h:
+	* src/gstsphinxsink.c: (gst_sphinx_decoder_init),
+	(gst_sphinx_sink_class_init), (gst_sphinx_sink_render),
+	(gst_sphinx_sink_set_fsg):
+	* src/gstsphinxsink.h:
+	* src/voice-control.c: (control_start),
+	(on_sink_after_initialization), (on_sink_message),
+	(voice_control_ui_changed), (voice_control_applet_create_pipeline):
+	
+	Reworked action handling.
+
 2007-08-02  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/action.c:

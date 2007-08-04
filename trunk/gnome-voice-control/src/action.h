@@ -23,19 +23,13 @@
 #ifndef _ACTION_H_
 #define _ACTION_H_
 
-typedef enum {
-    ACTION_RUN_BROWSER,
-    ACTION_RUN_TERMINAL,
-    ACTION_RUN_MAIL,
-    ACTION_CLOSE_WINDOW,
-    ACTION_NEXT_WINDOW,
-    ACTION_MINIMIZE_WINDOW,
-    ACTION_MAXIMIZE_WINDOW,
-    ACTION_RUN_TEXT_EDITOR
-} VoiceAction;
+#include <glib.h>
 
-void 
-do_action (VoiceAction action);
+GSList*
+voice_control_action_append_commands (GSList *commands);
+
+gboolean
+voice_control_action_process_result (char *command);
 
 #endif /* _ACTION_H_ */
 

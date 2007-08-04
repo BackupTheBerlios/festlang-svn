@@ -82,6 +82,7 @@ struct _GstSphinxSinkClass {
   GstBaseSinkClass parent_class;
 
   void (*initialization)  (GstElement *element);
+  void (*after_initialization)  (GstElement *element);
   void (*calibration)     (GstElement *element);
   void (*ready)           (GstElement *element);
   void (*listening)       (GstElement *element);

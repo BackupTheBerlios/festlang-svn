@@ -120,8 +120,9 @@ control_start (BonoboUIComponent  *uic,
 	       VoiceControlApplet *voice_control,
 	       const char         *verbname)
 {
-	control_spi_listener_start (voice_control->spi_listener);
 	gst_element_set_state (voice_control->pipeline, GST_STATE_PLAYING);
+
+	control_spi_listener_start (voice_control->spi_listener);
 }
 
 static void
@@ -142,6 +143,18 @@ on_sink_initialization (GObject *sink, gpointer data)
 	gdk_threads_enter ();
 	voice_control_set_text (voice_control, _("Init"), _("Loading acoustic and language model, wait a bit"));
 	gdk_threads_leave ();
+}
+
+static void
+on_sink_after_initialization (GObject *sink, gpointer data)
+{
+	GSList *commands;
+	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+
+	commands = voice_control_action_append_commands (NULL);	
+	gst_sphinx_sink_set_fsg (GST_SPHINX_SINK(voice_control->sink), commands);
+	g_slist_free (commands);
+
 }
 
 static void
@@ -240,35 +253,14 @@ on_sink_message (GObject *sink, gchar *message, gpointer data)
 	if (voice_control->last_message)
 		g_free (voice_control->last_message);
 	voice_control->last_message = g_strdup (message);
-	g_idle_add (show_notification, voice_control);
-
-	if (g_strrstr (message, "RUN BROWSER")) {
-		do_action (ACTION_RUN_BROWSER);
-		return;
-	} else if (g_strrstr (message, "RUN TERMINAL")) {
-		do_action (ACTION_RUN_TERMINAL);
-		return;
-	} else if (g_strrstr (message, "RUN MAIL")) {
-		do_action (ACTION_RUN_MAIL);
-		return;
-	} else if (g_strrstr (message, "RUN TEXT EDITOR")) {
-		do_action (ACTION_RUN_TEXT_EDITOR);
-		return;
-        } else if (g_strrstr (message, "CLOSE WINDOW")) {
-		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_CLOSE_WINDOW));
-		return;
-	} else if (g_strrstr (message, "NEXT WINDOW")) {
-		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_NEXT_WINDOW));
-		return;
-	} else if (g_strrstr (message, "MINIMIZE WINDOW")) {
-		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_MINIMIZE_WINDOW));
-		return;
-	} else if (g_strrstr (message, "MAXIMIZE WINDOW")) {
-		g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (ACTION_MAXIMIZE_WINDOW));
-		return;
-	} 
 	
+	g_idle_add (show_notification, voice_control);
+	
+	if (voice_control_action_process_result (message))
+		return;
+
 	g_idle_add (process_action, data);		
+	
 	return;
 }
 
@@ -285,16 +277,9 @@ voice_control_ui_changed (ControlSpiListener *listener, gpointer data)
 		AccessibleItem *item = (AccessibleItem *)l->data;
 		commands = g_slist_append (commands, item->name);
 	}
-	commands = g_slist_append (commands, "RUN BROWSER");
-	commands = g_slist_append (commands, "RUN TERMINAL");
-	commands = g_slist_append (commands, "RUN MAIL");
-	commands = g_slist_append (commands, "RUN TEXT EDITOR");
-	commands = g_slist_append (commands, "CLOSE WINDOW");
-	commands = g_slist_append (commands, "NEXT WINDOW");
-	commands = g_slist_append (commands, "MINIMIZE WINDOW");
-	commands = g_slist_append (commands, "MAXIMIZE WINDOW");
 	
-
+	commands = voice_control_action_append_commands (commands);
+	
 	gst_sphinx_sink_set_fsg (GST_SPHINX_SINK(voice_control->sink), commands);
 
 	g_slist_free (commands);
@@ -461,6 +446,8 @@ voice_control_applet_create_pipeline (VoiceControlApplet *voice_control)
     	
       g_signal_connect (voice_control->sink, "initialization",
     		        G_CALLBACK(on_sink_initialization), voice_control);
+      g_signal_connect (voice_control->sink, "after_initialization",
+    		        G_CALLBACK(on_sink_after_initialization), voice_control);
       g_signal_connect (voice_control->sink, "calibration",
     		        G_CALLBACK(on_sink_calibration), voice_control);
       g_signal_connect (voice_control->sink, "listening",

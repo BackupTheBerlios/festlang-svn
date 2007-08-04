@@ -49,14 +49,12 @@ gst_sphinx_decoder_init (void)
     char **argv;
     int argc;
 
-    /* FIXME: required for LM reading */
-    
     g_shell_parse_argv (sphinx_command, &argc, &argv, NULL);
-    
+
     setlocale (LC_ALL, "C");
-    fbs_init (argc, argv);
+    fbs_init (argc, argv);    
     setlocale (LC_ALL, "");
-    
+
     g_strfreev (argv);
 }
 
@@ -83,6 +81,7 @@ GST_ELEMENT_DETAILS ("Sphinx Sink",
 enum
 {
   SIGNAL_INITIALIZATION,
+  SIGNAL_AFTER_INITIALIZATION,
   SIGNAL_CALIBRATION,
   SIGNAL_LISTENING,
   SIGNAL_READY,
@@ -148,6 +147,11 @@ gst_sphinx_sink_class_init (GstSphinxSinkClass * klass)
   gst_sphinx_sink_signals[SIGNAL_INITIALIZATION] =
       g_signal_new ("initialization", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
       G_STRUCT_OFFSET (GstSphinxSinkClass, initialization), NULL, NULL,
+      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
+
+  gst_sphinx_sink_signals[SIGNAL_AFTER_INITIALIZATION] =
+      g_signal_new ("after_initialization", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
+      G_STRUCT_OFFSET (GstSphinxSinkClass, after_initialization), NULL, NULL,
       g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
 
   gst_sphinx_sink_signals[SIGNAL_CALIBRATION] =
@@ -293,6 +297,8 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
           g_signal_emit (sphinxsink,
 	        gst_sphinx_sink_signals[SIGNAL_INITIALIZATION], 0, NULL);
 	  gst_sphinx_decoder_init ();
+          g_signal_emit (sphinxsink,
+	        gst_sphinx_sink_signals[SIGNAL_AFTER_INITIALIZATION], 0, NULL);
 	  sphinxsink->ad.initialized = TRUE;
   }
 
@@ -364,9 +370,6 @@ void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *words)
 {		
 	s2_fsg_t fsg;
 	s2_fsg_trans_t *trans_list;
-	
-	if (!sink->ad.calibrated)
-		    return;
 	
 	fsg.name = "desktop-control";	
 	fsg.n_state = gst_sphinx_construct_trans_list (words, &trans_list);

@@ -30,6 +30,42 @@
 #include <libwnck/window.h>
 #include <gdk/gdk.h>
 
+typedef enum {
+    ACTION_RUN_BROWSER,
+    ACTION_RUN_TERMINAL,
+    ACTION_RUN_TEXT_EDITOR,
+    ACTION_RUN_MAIL,
+    ACTION_CLOSE_WINDOW,
+    ACTION_NEXT_WINDOW,
+    ACTION_MINIMIZE_WINDOW,
+    ACTION_MAXIMIZE_WINDOW,
+    ACTION_CLICK,
+    ACTION_RIGHT_CLICK,
+    ACTION_MAIN_MENU
+} VoiceAction;
+
+typedef struct _VoiceActionCommand {
+    char *command;
+    VoiceAction action;
+} VoiceActionCommand;
+
+static VoiceActionCommand commands[] = 
+{
+ {"RUN MAIL", ACTION_RUN_MAIL},
+ {"RUN BROWSER", ACTION_RUN_BROWSER},
+ {"RUN TEXT EDITOR", ACTION_RUN_TEXT_EDITOR},
+ {"RUN TERMINAL", ACTION_RUN_TERMINAL},
+ {"CLOSE WINDOW", ACTION_CLOSE_WINDOW},
+ {"NEXT WINDOW", ACTION_NEXT_WINDOW},
+ {"MINIMIZE WINDOW", ACTION_MINIMIZE_WINDOW},
+ {"MAXIMIZE WINDOW", ACTION_MAXIMIZE_WINDOW},
+ {"SWITCH WINDOW", ACTION_NEXT_WINDOW},
+ {"CLICK", ACTION_CLICK},
+ {"RIGHT CLICK", ACTION_RIGHT_CLICK},
+ {"MAIN MENU", ACTION_MAIN_MENU},
+ {NULL, 0},
+};
+
 void 
 do_action (VoiceAction action)
 {
@@ -87,8 +123,41 @@ do_action (VoiceAction action)
 		  }
 		break;
 	    default:
+		g_warning ("Not implemented yet");
 		break;
 	}
 
 	return;
 }
+
+GSList*
+voice_control_action_append_commands (GSList *list)
+{
+	int i;
+	
+	for (i = 0; commands[i].command != NULL; i++) {
+		list = g_slist_append (list, commands[i].command);
+	}
+	return list;
+}
+
+gboolean
+voice_control_action_process_result (char *message)
+{
+	int i;
+	int result = FALSE;
+	
+	for (i = 0; commands[i].command != NULL; i++) {
+		if (g_strrstr (message, commands[i].command)) {
+			if (commands[i].action <= ACTION_RUN_MAIL) {
+				do_action (commands[i].action);
+			} else {
+				g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (commands[i].action));
+			}
+			result = TRUE;
+			break;
+		}
+	}
+	return result;
+}
+
