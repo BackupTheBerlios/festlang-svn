@@ -1,3 +1,9 @@
+2007-08-08  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* src/action.c:
+	
+	Added a list of unimplemented actions.
+
 2007-08-07  Marius Andreiana <marius.andreiana@gmail.com>
 
 	* src/action.c: (do_action), (voice_control_action_process_result):
