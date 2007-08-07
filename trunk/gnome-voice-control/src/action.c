@@ -29,6 +29,10 @@
 #include <libwnck/screen.h>
 #include <libwnck/window.h>
 #include <gdk/gdk.h>
+#include <gdk/gdkkeysyms.h>
+#include <gdk/gdkx.h>
+#include <cspi/spi.h>
+#include <libspi/keymasks.h>
 
 typedef enum {
     ACTION_RUN_BROWSER,
@@ -37,6 +41,7 @@ typedef enum {
     ACTION_RUN_MAIL,
     ACTION_CLOSE_WINDOW,
     ACTION_NEXT_WINDOW,
+    ACTION_PREVIOUS_WINDOW,
     ACTION_MINIMIZE_WINDOW,
     ACTION_MAXIMIZE_WINDOW,
     ACTION_CLICK,
@@ -49,6 +54,14 @@ typedef struct _VoiceActionCommand {
     VoiceAction action;
 } VoiceActionCommand;
 
+/* We collect a list of words and related actions here. Of course it's just
+ * an early beginning and some actions are missing for sure. Submit us a 
+ * request if you want a new one. We really don't want to have a customizable
+ * list because we target AI database which will simply understand you.
+ */
+
+/* RIGHT CLICK needs to be before CLICK, as we search for this inside message */
+
 static VoiceActionCommand commands[] = 
 {
  {"RUN MAIL", ACTION_RUN_MAIL},
@@ -57,77 +70,127 @@ static VoiceActionCommand commands[] =
  {"RUN TERMINAL", ACTION_RUN_TERMINAL},
  {"CLOSE WINDOW", ACTION_CLOSE_WINDOW},
  {"NEXT WINDOW", ACTION_NEXT_WINDOW},
+ {"PREVIOUS WINDOW", ACTION_PREVIOUS_WINDOW},
  {"MINIMIZE WINDOW", ACTION_MINIMIZE_WINDOW},
  {"MAXIMIZE WINDOW", ACTION_MAXIMIZE_WINDOW},
  {"SWITCH WINDOW", ACTION_NEXT_WINDOW},
- {"CLICK", ACTION_CLICK},
  {"RIGHT CLICK", ACTION_RIGHT_CLICK},
+ {"CLICK", ACTION_CLICK},
  {"MAIN MENU", ACTION_MAIN_MENU},
  {NULL, 0},
 };
 
-void 
+gboolean 
 do_action (VoiceAction action)
 {
 	WnckWindow *window;
 	WnckScreen *screen;
 	GList *windows;
+	KeyCode keycode;
+	int x, y;
 	
-        switch(action){
-    	    case ACTION_RUN_BROWSER:
-    		g_spawn_command_line_async ("epiphany", NULL);
-    		break;
+	switch(action) {
+
+	    case ACTION_RUN_BROWSER:
+		    g_spawn_command_line_async ("epiphany", NULL);
+		    break;
+
 	    case ACTION_RUN_TERMINAL:
-    		g_spawn_command_line_async ("gnome-terminal", NULL);
-		break;
+		    g_spawn_command_line_async ("gnome-terminal", NULL);
+		    break;
+
+	    case ACTION_RUN_TEXT_EDITOR:
+    		    g_spawn_command_line_async ("gedit", NULL);
+		    break;
+
 	    case ACTION_RUN_MAIL:
-    		g_spawn_command_line_async ("evolution", NULL);
-		break;
-            case ACTION_RUN_TEXT_EDITOR:
-    		g_spawn_command_line_async ("gedit", NULL);
-                break;
+		    g_spawn_command_line_async ("evolution", NULL);
+	    	    break;
+	    
 	    case ACTION_CLOSE_WINDOW:
-		screen = wnck_screen_get_default ();
-		if (screen)
-		  {
-    	        	window = wnck_screen_get_active_window (screen);
-		        if (window)
-				wnck_window_close (window, GDK_CURRENT_TIME);
-		  }
-		break;
+	    	    screen = wnck_screen_get_default ();
+		    if (screen) {
+			    window = wnck_screen_get_active_window (screen);
+			    if (window)
+				    wnck_window_close (window, GDK_CURRENT_TIME);
+		    }
+		    break;
+    
 	    case ACTION_MINIMIZE_WINDOW:
-		screen = wnck_screen_get_default ();
-		if (screen)
-		  {
-    	        	window = wnck_screen_get_active_window (screen);
-		        if (window)
-				wnck_window_minimize (window);
-		  }
-		break;
+		    screen = wnck_screen_get_default ();
+		    if (screen) {
+    	    		    window = wnck_screen_get_active_window (screen);
+		    	    if (window)
+				    wnck_window_minimize (window);
+		    }
+		    break;
+
 	    case ACTION_MAXIMIZE_WINDOW:
-		screen = wnck_screen_get_default ();
-		if (screen)
-		  {
-    	        	window = wnck_screen_get_active_window (screen);
-		        if (window)
-				wnck_window_maximize (window);
-		  }
-		break;
+		    screen = wnck_screen_get_default ();
+		    if (screen) {
+    	    	    window = wnck_screen_get_active_window (screen);
+		    	    if (window)
+				    wnck_window_maximize (window);
+		    }
+		    break;
+
 	    case ACTION_NEXT_WINDOW:
-		screen = wnck_screen_get_default ();
-		if (screen)
-		  {
-			windows = wnck_screen_get_windows_stacked (screen);
-			if (windows && windows->next)
-			    wnck_window_activate (WNCK_WINDOW (windows->next->data), GDK_CURRENT_TIME);
-		  }
-		break;
+		    screen = wnck_screen_get_default ();
+		    if (screen) {
+
+			    windows = wnck_screen_get_windows_stacked (screen);
+			    if (windows && windows->next)
+				    wnck_window_activate (WNCK_WINDOW (windows->next->data), GDK_CURRENT_TIME);
+		    }
+	    case ACTION_PREVIOUS_WINDOW:
+		    screen = wnck_screen_get_default ();
+		    if (screen) {
+			    window =  wnck_screen_get_previously_active_window (screen);
+			    if (window)
+					wnck_window_activate (window, GDK_CURRENT_TIME);
+		    }
+		    break;
+
+	    /*
+	     * should work exactly as one would have pressed mouse button 
+	     * (on a window which doesn't have focus, on a gimp canvas etc.)
+	     */
+	    case ACTION_CLICK:
+    		    gdk_display_get_pointer(gdk_display_get_default (), NULL, &x, &y, NULL);
+		    if (!SPI_generateMouseEvent (x, y, "b1c")) {
+	    		    g_warning ("Couldn't execute ACTION_CLICK");
+		    }
+#if DEBUG
+		    g_message("Executed ACTION_CLICK at (%d, %d)", x, y);
+#endif	    
+		    break;
+	    case ACTION_RIGHT_CLICK:
+    		    gdk_display_get_pointer(gdk_display_get_default (), NULL, &x, &y, NULL);
+		    if (!SPI_generateMouseEvent (x, y, "b2c")) {
+	    		    g_warning ("Couldn't execute ACTION_RIGHT_CLICK");
+		    }
+#if DEBUG
+		    g_message("Executed ACTION_RIGHT_CLICK at (%d, %d)", x, y);
+#endif	    
+		    break;
+		    
+	    case ACTION_MAIN_MENU:
+/*
+ * FIXME: hardcoded <Alt>F1; read curreny keybinding with gconf 
+ * from /apps/metacity/global_keybindings/panel_main_menu
+ */
+		    keycode = XKeysymToKeycode(GDK_DISPLAY(), (KeySym) GDK_Alt_L);
+		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_PRESS);
+		    SPI_generateKeyboardEvent (GDK_F1, NULL, SPI_KEY_SYM);
+		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_RELEASE);
+		    break;
+
 	    default:
-		g_warning ("Not implemented yet");
-		break;
+		    g_warning ("Not implemented yet");
+		    break;
 	}
 
-	return;
+	return FALSE;
 }
 
 GSList*
@@ -149,11 +212,10 @@ voice_control_action_process_result (char *message)
 	
 	for (i = 0; commands[i].command != NULL; i++) {
 		if (g_strrstr (message, commands[i].command)) {
-			if (commands[i].action <= ACTION_RUN_MAIL) {
-				do_action (commands[i].action);
-			} else {
-				g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (commands[i].action));
-			}
+#if DEBUG
+			g_message ("Found command '%s' in message '%s'\n", commands[i].command, message);
+#endif
+			g_idle_add ((GSourceFunc)do_action, GINT_TO_POINTER (commands[i].action));
 			result = TRUE;
 			break;
 		}

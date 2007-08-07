@@ -245,6 +245,17 @@ show_notification(gpointer data)
 	}
 }
 
+/**  
+ * Handle messages
+ *
+ * Checks a pre-defined list of global actions if still not found 
+ * searches in items available for the current window
+ * 
+ * @param *sink gst sink
+ * @param *message current message
+ * @param data voice_control instance
+ * @return void  
+ */
 static void
 on_sink_message (GObject *sink, gchar *message, gpointer data)
 {
