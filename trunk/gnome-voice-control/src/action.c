@@ -39,15 +39,17 @@ typedef enum {
     ACTION_RUN_TERMINAL,
     ACTION_RUN_TEXT_EDITOR,
     ACTION_RUN_MAIL,
+
     ACTION_CLOSE_WINDOW,
     ACTION_NEXT_WINDOW,
     ACTION_PREVIOUS_WINDOW,
     ACTION_MINIMIZE_WINDOW,
     ACTION_MAXIMIZE_WINDOW,
+    
     ACTION_CLICK,
     ACTION_RIGHT_CLICK,
-    ACTION_MAIN_MENU,
-    /* FIXME: the rest is not implemented */
+    ACTION_PAGE_UP,
+    ACTION_PAGE_DOWN,
     ACTION_UP,
     ACTION_DOWN,
     ACTION_LEFT,
@@ -58,9 +60,13 @@ typedef enum {
     ACTION_INSERT,
     ACTION_HOME,
     ACTION_END,
-    ACTION_PAGE_DOWN,
-    ACTION_PAGE_UP,
     ACTION_ENTER,
+    ACTION_COPY,
+    ACTION_CUT,
+    ACTION_PASTE,
+
+    ACTION_MAIN_MENU,
+    /* FIXME: the rest is not implemented */
     ACTION_SWITCH_LAYOUT,
     ACTION_MOUSE_LEFT,
     ACTION_MOUSE_RIGHT,
@@ -70,9 +76,6 @@ typedef enum {
     ACTION_HOME_FOLDER,
     ACTION_SEARCH,
     ACTION_SHOW_DESKTOP,
-    ACTION_COPY,
-    ACTION_PASTE,
-    ACTION_CUT,
     ACTION_LOCK_DESKTOP,
 } VoiceAction;
 
@@ -103,6 +106,24 @@ static VoiceActionCommand commands[] =
  {"SWITCH WINDOW", ACTION_NEXT_WINDOW},
  {"RIGHT CLICK", ACTION_RIGHT_CLICK},
  {"CLICK", ACTION_CLICK},
+
+ {"PAGE UP", ACTION_PAGE_UP},
+ {"PAGE DOWN", ACTION_PAGE_DOWN}, 
+ {"UP", ACTION_UP},
+ {"DOWN", ACTION_DOWN},
+ {"LEFT", ACTION_LEFT},
+ {"RIGHT", ACTION_RIGHT},
+ {"ESCAPE", ACTION_ESCAPE},
+ {"BACKSPACE", ACTION_BACKSPACE},
+ {"DELETE", ACTION_DELETE},
+ {"INSERT", ACTION_INSERT},
+ {"HOME", ACTION_HOME},
+ {"END", ACTION_END},
+ {"ENTER", ACTION_ENTER},
+ {"COPY", ACTION_COPY},
+ {"CUT", ACTION_CUT},
+ {"PASTE", ACTION_PASTE},
+
  {"MAIN MENU", ACTION_MAIN_MENU},
  {NULL, 0},
 };
@@ -191,6 +212,7 @@ do_action (VoiceAction action)
 		    g_message("Executed ACTION_CLICK at (%d, %d)", x, y);
 #endif	    
 		    break;
+		    
 	    case ACTION_RIGHT_CLICK:
     		    gdk_display_get_pointer(gdk_display_get_default (), NULL, &x, &y, NULL);
 		    if (!SPI_generateMouseEvent (x, y, "b2c")) {
@@ -200,7 +222,81 @@ do_action (VoiceAction action)
 		    g_message("Executed ACTION_RIGHT_CLICK at (%d, %d)", x, y);
 #endif	    
 		    break;
-		    
+
+    		    
+	    case ACTION_PAGE_UP:
+		    SPI_generateKeyboardEvent (GDK_Page_Up, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_PAGE_DOWN:
+		    SPI_generateKeyboardEvent (GDK_Page_Down, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_UP:
+		    SPI_generateKeyboardEvent (GDK_Up, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_DOWN:
+		    SPI_generateKeyboardEvent (GDK_Down, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_LEFT:
+		    SPI_generateKeyboardEvent (GDK_Left, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_RIGHT:
+		    SPI_generateKeyboardEvent (GDK_Right, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_ESCAPE:
+		    SPI_generateKeyboardEvent (GDK_Escape, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_BACKSPACE:
+		    SPI_generateKeyboardEvent (GDK_BackSpace, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_DELETE:
+		    SPI_generateKeyboardEvent (GDK_Delete, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_INSERT:
+		    SPI_generateKeyboardEvent (GDK_Insert, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_HOME:
+		    SPI_generateKeyboardEvent (GDK_Home, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_END:
+		    SPI_generateKeyboardEvent (GDK_End, NULL, SPI_KEY_SYM);
+		    break;
+
+	    case ACTION_ENTER:
+		    SPI_generateKeyboardEvent (GDK_KP_Enter, NULL, SPI_KEY_SYM);
+		    break;
+    
+	    case ACTION_COPY:
+		    keycode = XKeysymToKeycode(GDK_DISPLAY(), (KeySym) GDK_Control_L);
+		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_PRESS);
+		    SPI_generateKeyboardEvent (GDK_C, NULL, SPI_KEY_SYM);
+		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_RELEASE);
+		    break;
+    		    
+	    case ACTION_CUT:
+		    keycode = XKeysymToKeycode(GDK_DISPLAY(), (KeySym) GDK_Control_L);
+		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_PRESS);
+		    SPI_generateKeyboardEvent (GDK_X, NULL, SPI_KEY_SYM);
+		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_RELEASE);
+		    break;
+
+	    case ACTION_PASTE:
+		    keycode = XKeysymToKeycode(GDK_DISPLAY(), (KeySym) GDK_Control_L);
+		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_PRESS);
+		    SPI_generateKeyboardEvent (GDK_V, NULL, SPI_KEY_SYM);
+		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_RELEASE);
+		    break;
+
 	    case ACTION_MAIN_MENU:
 /*
  * FIXME: hardcoded <Alt>F1; read curreny keybinding with gconf 

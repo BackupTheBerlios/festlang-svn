@@ -85,6 +85,7 @@ AXIS                 AE K S AH S
 AZERBAIJANI          AA Z ER B AY JH AA N IY
 AZERBAIJANI(2)       AE Z ER B AY JH AA N IY
 BACKGROUND           B AE K G R AW N D
+BACKSPACE            B AE K S P EY S
 BACKUP               B AE K AH P
 BACKWARDS            B AE K W ER D Z
 BALTIC               B AO L T IH K
@@ -308,7 +309,8 @@ ENABLE(2)            IH N EY B AH L
 ENCODED              EH N K OW D IH D
 ENCODE               EH N K OW D
 ENCODING             EH N K OW D IH NG
-ENGLISH              IH NG G L IH SH
+END                  EH N D
+ENGLISH              IY NG L IH SH
 ENGLISH(2)           IH NG L IH SH
 ENOUGH               IH N AH F
 ENOUGH(2)            IY N AH F
@@ -321,7 +323,7 @@ ENUMERATE            IH N UW M ER EY T
 EPSILON              EH P S AH L AA N
 ERROR                EH R ER
 ERRORS               EH R ER Z
-ESPERANTO            EH S P ER AE N T OW
+ESCAPE               IH S K EY P
 ESTONIAN             EH S T OW N IY AH N
 ETC                  EH T S EH T ER AH
 ETCETERA             EH T S EH T ER AH
@@ -426,7 +428,7 @@ HIDE                 HH AY D
 HIGHLIGHT            HH AY L AY T
 HIGHLIGHTING         HH AY L AY T IH NG
 HINDI                HH IH N D IY
-HORIZONTAL           HH AO R AH Z AA N T AH L
+HOME                 HH OW M
 HORIZONTALLY         HH AO R IH Z AA N T AH L IY
 HORIZONTALLY(2)      HH AO R IH Z AO N AH L IY
 HOST                 HH OW S T

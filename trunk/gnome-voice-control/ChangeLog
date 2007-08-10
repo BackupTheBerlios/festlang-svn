@@ -1,3 +1,10 @@
+2007-08-10  Marius Andreiana <marius.andreiana@gmail.com>
+
+	* lang/desktop-control.dict:
+	* src/action.c: (do_action):
+	
+	Keyboard actions implemented
+
 2007-08-08  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/action.c:
