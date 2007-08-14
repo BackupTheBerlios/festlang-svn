@@ -1,3 +1,9 @@
+2007-08-24  David Huggins-Daines <dhuggins@cs.cmu.edu>
+
+	* src/gstsphinxsink.c:
+	
+	Require new wsj1 model.
+
 2007-08-10  Marius Andreiana <marius.andreiana@gmail.com>
 
 	* lang/desktop-control.dict:

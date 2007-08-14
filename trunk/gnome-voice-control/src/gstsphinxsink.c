@@ -39,7 +39,7 @@ static char *sphinx_command =
 "voice-control "
 "-fwdflat no "
 "-bestpath yes "
-"-hmm " POCKETSPHINX_PREFIX "/share/pocketsphinx/model/hmm/wsj0 "
+"-hmm " POCKETSPHINX_PREFIX "/share/pocketsphinx/model/hmm/wsj1 "
 "-fsg " GNOMEDATADIR "/gnome-voice-control/desktop-control.fsg "
 "-dict " GNOMEDATADIR "/gnome-voice-control/desktop-control.dict ";
 
