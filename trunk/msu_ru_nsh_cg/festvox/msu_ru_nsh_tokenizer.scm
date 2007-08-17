@@ -42,33 +42,33 @@ Specific token to word rules for the voice msu_ru_nsh.  Returns a list
 of words that expand given token with name."
   (cond
    ((string-matches name "[0-9]*")
-    (if (string-equal (item.feat token "n.name") "года")
+    (if (string-equal (item.feat token "n.name") "пЁп╬п╢п╟")
     (msu_ru::number token name "year")
     (if 
 	(or 
-	    (string-equal (item.feat token "n.name") "января")
-	    (string-equal (item.feat token "n.name") "февраля")
-	    (string-equal (item.feat token "n.name") "марта")
-	    (string-equal (item.feat token "n.name") "апреля")
-	    (string-equal (item.feat token "n.name") "мая")
-	    (string-equal (item.feat token "n.name") "июня")
-	    (string-equal (item.feat token "n.name") "июля")
-	    (string-equal (item.feat token "n.name") "августа")
-	    (string-equal (item.feat token "n.name") "сентября")
-	    (string-equal (item.feat token "n.name") "октября")
-	    (string-equal (item.feat token "n.name") "ноября")
-	    (string-equal (item.feat token "n.name") "декабря"))
+	    (string-equal (item.feat token "n.name") "я▐п╫п╡п╟я─я▐")
+	    (string-equal (item.feat token "n.name") "я└п╣п╡я─п╟п╩я▐")
+	    (string-equal (item.feat token "n.name") "п╪п╟я─я┌п╟")
+	    (string-equal (item.feat token "n.name") "п╟п©я─п╣п╩я▐")
+	    (string-equal (item.feat token "n.name") "п╪п╟я▐")
+	    (string-equal (item.feat token "n.name") "п╦я▌п╫я▐")
+	    (string-equal (item.feat token "n.name") "п╦я▌п╩я▐")
+	    (string-equal (item.feat token "n.name") "п╟п╡пЁя┐я│я┌п╟")
+	    (string-equal (item.feat token "n.name") "я│п╣п╫я┌я▐п╠я─я▐")
+	    (string-equal (item.feat token "n.name") "п╬п╨я┌я▐п╠я─я▐")
+	    (string-equal (item.feat token "n.name") "п╫п╬я▐п╠я─я▐")
+	    (string-equal (item.feat token "n.name") "п╢п╣п╨п╟п╠я─я▐"))
         (msu_ru::number token name "day")
         (msu_ru::number token name nil))))
    ((string-matches name "1/2")
-    (list "половина"))
+    (list "п©п╬п╩п╬п╡п╦п╫п╟"))
    (t ;; when no specific rules apply do the general ones
     (list name))))
 
 (define (msu_ru::number token name flag)
   "(msu_ru::number token name flag) reads number"
   (if (string-matches name "0")
-      (list "ноль")
+      (list "п╫п╬п╩я▄")
       (russian_number_from_digits (symbolexplode name) flag)))
 
 (define (msu_ru::just_zeros digits)
@@ -93,53 +93,53 @@ saying the number."
      ((equal? l 1);; single digit
       (if (string-equal flag "year")
           (cond 
-	   ((string-equal (car digits) "0") (list "ого"))
-           ((string-equal (car digits) "1") (list "первого"))
-	   ((string-equal (car digits) "2") (list "второго"))
-           ((string-equal (car digits) "3") (list "третьего"))
-	   ((string-equal (car digits) "4") (list "четвёртого"))
-           ((string-equal (car digits) "5") (list "пятого"))
-	   ((string-equal (car digits) "6") (list "шестого"))
-	   ((string-equal (car digits) "7") (list "седьмого"))
-           ((string-equal (car digits) "8") (list "восьмого"))
-	   ((string-equal (car digits) "9") (list "девятого"))
+	   ((string-equal (car digits) "0") (list "п╬пЁп╬"))
+           ((string-equal (car digits) "1") (list "п©п╣я─п╡п╬пЁп╬"))
+	   ((string-equal (car digits) "2") (list "п╡я┌п╬я─п╬пЁп╬"))
+           ((string-equal (car digits) "3") (list "я┌я─п╣я┌я▄п╣пЁп╬"))
+	   ((string-equal (car digits) "4") (list "я┤п╣я┌п╡я▒я─я┌п╬пЁп╬"))
+           ((string-equal (car digits) "5") (list "п©я▐я┌п╬пЁп╬"))
+	   ((string-equal (car digits) "6") (list "я┬п╣я│я┌п╬пЁп╬"))
+	   ((string-equal (car digits) "7") (list "я│п╣п╢я▄п╪п╬пЁп╬"))
+           ((string-equal (car digits) "8") (list "п╡п╬я│я▄п╪п╬пЁп╬"))
+	   ((string-equal (car digits) "9") (list "п╢п╣п╡я▐я┌п╬пЁп╬"))
 	   (t nil))
 	  (if (string-equal flag "day")
           (cond 
-	   ((string-equal (car digits) "0") (list "ое"))
-           ((string-equal (car digits) "1") (list "первое"))
-	   ((string-equal (car digits) "2") (list "второе"))
-           ((string-equal (car digits) "3") (list "третье"))
-	   ((string-equal (car digits) "4") (list "четвёртое"))
-           ((string-equal (car digits) "5") (list "пятое"))
-	   ((string-equal (car digits) "6") (list "шестое"))
-	   ((string-equal (car digits) "7") (list "седьмое"))
-           ((string-equal (car digits) "8") (list "восьмое"))
-	   ((string-equal (car digits) "9") (list "девятое"))
+	   ((string-equal (car digits) "0") (list "п╬п╣"))
+           ((string-equal (car digits) "1") (list "п©п╣я─п╡п╬п╣"))
+	   ((string-equal (car digits) "2") (list "п╡я┌п╬я─п╬п╣"))
+           ((string-equal (car digits) "3") (list "я┌я─п╣я┌я▄п╣"))
+	   ((string-equal (car digits) "4") (list "я┤п╣я┌п╡я▒я─я┌п╬п╣"))
+           ((string-equal (car digits) "5") (list "п©я▐я┌п╬п╣"))
+	   ((string-equal (car digits) "6") (list "я┬п╣я│я┌п╬п╣"))
+	   ((string-equal (car digits) "7") (list "я│п╣п╢я▄п╪п╬п╣"))
+           ((string-equal (car digits) "8") (list "п╡п╬я│я▄п╪п╬п╣"))
+	   ((string-equal (car digits) "9") (list "п╢п╣п╡я▐я┌п╬п╣"))
 	   (t nil))
 	  (if (string-equal flag "thousand")
 	   (cond 
-           ((string-equal (car digits) "1") (list "одна"))
-	   ((string-equal (car digits) "2") (list "две"))
-           ((string-equal (car digits) "3") (list "три"))
-	   ((string-equal (car digits) "4") (list "четыре"))
-           ((string-equal (car digits) "5") (list "пять"))
-	   ((string-equal (car digits) "6") (list "шесть"))
-	   ((string-equal (car digits) "7") (list "седь"))
-           ((string-equal (car digits) "8") (list "восемь"))
-	   ((string-equal (car digits) "9") (list "девять"))
+           ((string-equal (car digits) "1") (list "п╬п╢п╫п╟"))
+	   ((string-equal (car digits) "2") (list "п╢п╡п╣"))
+           ((string-equal (car digits) "3") (list "я┌я─п╦"))
+	   ((string-equal (car digits) "4") (list "я┤п╣я┌я▀я─п╣"))
+           ((string-equal (car digits) "5") (list "п©я▐я┌я▄"))
+	   ((string-equal (car digits) "6") (list "я┬п╣я│я┌я▄"))
+	   ((string-equal (car digits) "7") (list "я│п╣п╢я▄"))
+           ((string-equal (car digits) "8") (list "п╡п╬я│п╣п╪я▄"))
+	   ((string-equal (car digits) "9") (list "п╢п╣п╡я▐я┌я▄"))
 	   (t nil))	  
           (cond 
-	   ((string-equal (car digits) "0") (list "ноль"))
-           ((string-equal (car digits) "1") (list "один"))
-	   ((string-equal (car digits) "2") (list "два"))
-           ((string-equal (car digits) "3") (list "три"))
-	   ((string-equal (car digits) "4") (list "четыре"))
-           ((string-equal (car digits) "5") (list "пять"))
-	   ((string-equal (car digits) "6") (list "шесть"))
-	   ((string-equal (car digits) "7") (list "семь"))
-           ((string-equal (car digits) "8") (list "восемь"))
-	   ((string-equal (car digits) "9") (list "девять"))
+	   ((string-equal (car digits) "0") (list "п╫п╬п╩я▄"))
+           ((string-equal (car digits) "1") (list "п╬п╢п╦п╫"))
+	   ((string-equal (car digits) "2") (list "п╢п╡п╟"))
+           ((string-equal (car digits) "3") (list "я┌я─п╦"))
+	   ((string-equal (car digits) "4") (list "я┤п╣я┌я▀я─п╣"))
+           ((string-equal (car digits) "5") (list "п©я▐я┌я▄"))
+	   ((string-equal (car digits) "6") (list "я┬п╣я│я┌я▄"))
+	   ((string-equal (car digits) "7") (list "я│п╣п╪я▄"))
+           ((string-equal (car digits) "8") (list "п╡п╬я│п╣п╪я▄"))
+	   ((string-equal (car digits) "9") (list "п╢п╣п╡я▐я┌я▄"))
 	   (t nil))))))
      ((equal? l 2);; less than 100
       (cond
@@ -148,57 +148,57 @@ saying the number."
      
        ((string-equal (car digits) "1");; 1x
 	(cond
-	 ((string-equal (car (cdr digits)) "0") (list "десять"))
-	 ((string-equal (car (cdr digits)) "1") (list "одиннадцать"))
-	 ((string-equal (car (cdr digits)) "2") (list "двенадцать"))
-	 ((string-equal (car (cdr digits)) "3") (list "тринадцать"))
-	 ((string-equal (car (cdr digits)) "4") (list "четырнадцать"))
-	 ((string-equal (car (cdr digits)) "5") (list "пятнадцать"))
-	 ((string-equal (car (cdr digits)) "6") (list "шестнадцать"))
-	 ((string-equal (car (cdr digits)) "7") (list "семнадцать"))
-	 ((string-equal (car (cdr digits)) "8") (list "восемнадцать"))
-	 ((string-equal (car (cdr digits)) "9") (list "девятнадцать"))
+	 ((string-equal (car (cdr digits)) "0") (list "п╢п╣я│я▐я┌я▄"))
+	 ((string-equal (car (cdr digits)) "1") (list "п╬п╢п╦п╫п╫п╟п╢я├п╟я┌я▄"))
+	 ((string-equal (car (cdr digits)) "2") (list "п╢п╡п╣п╫п╟п╢я├п╟я┌я▄"))
+	 ((string-equal (car (cdr digits)) "3") (list "я┌я─п╦п╫п╟п╢я├п╟я┌я▄"))
+	 ((string-equal (car (cdr digits)) "4") (list "я┤п╣я┌я▀я─п╫п╟п╢я├п╟я┌я▄"))
+	 ((string-equal (car (cdr digits)) "5") (list "п©я▐я┌п╫п╟п╢я├п╟я┌я▄"))
+	 ((string-equal (car (cdr digits)) "6") (list "я┬п╣я│я┌п╫п╟п╢я├п╟я┌я▄"))
+	 ((string-equal (car (cdr digits)) "7") (list "я│п╣п╪п╫п╟п╢я├п╟я┌я▄"))
+	 ((string-equal (car (cdr digits)) "8") (list "п╡п╬я│п╣п╪п╫п╟п╢я├п╟я┌я▄"))
+	 ((string-equal (car (cdr digits)) "9") (list "п╢п╣п╡я▐я┌п╫п╟п╢я├п╟я┌я▄"))
 	 ))
        
        ((string-equal (car digits) "2");; 2x
 	(if (string-equal (car (cdr digits)) "0") 
-	    (list "двадцать")
-	    (cons "двадцать" (russian_number_from_digits (cdr digits) flag))))
+	    (list "п╢п╡п╟п╢я├п╟я┌я▄")
+	    (cons "п╢п╡п╟п╢я├п╟я┌я▄" (russian_number_from_digits (cdr digits) flag))))
 
        ((string-equal (car digits) "3");; 3x
 	(if (string-equal (car (cdr digits)) "0") 
-	    (list "тридцать")
-	    (cons "тридцать" (russian_number_from_digits (cdr digits) flag))))
+	    (list "я┌я─п╦п╢я├п╟я┌я▄")
+	    (cons "я┌я─п╦п╢я├п╟я┌я▄" (russian_number_from_digits (cdr digits) flag))))
 
        ((string-equal (car digits) "4");; 4x
 	(if (string-equal (car (cdr digits)) "0") 
-	    (list "сорок")
-	    (cons "сорок" (russian_number_from_digits (cdr digits) flag))))
+	    (list "я│п╬я─п╬п╨")
+	    (cons "я│п╬я─п╬п╨" (russian_number_from_digits (cdr digits) flag))))
 
        ((string-equal (car digits) "5");; 5x
 	(if (string-equal (car (cdr digits)) "0") 
-	    (list "пятьдесят")
-	    (cons "пятьдесят" (russian_number_from_digits (cdr digits) flag))))
+	    (list "п©я▐я┌я▄п╢п╣я│я▐я┌")
+	    (cons "п©я▐я┌я▄п╢п╣я│я▐я┌" (russian_number_from_digits (cdr digits) flag))))
 
        ((string-equal (car digits) "6");; 6x
 	(if (string-equal (car (cdr digits)) "0") 
-	    (list "шестьдесят")
-	    (cons "шестьдесят" (russian_number_from_digits (cdr digits) flag))))
+	    (list "я┬п╣я│я┌я▄п╢п╣я│я▐я┌")
+	    (cons "я┬п╣я│я┌я▄п╢п╣я│я▐я┌" (russian_number_from_digits (cdr digits) flag))))
 
        ((string-equal (car digits) "7");; 7x
 	(if (string-equal (car (cdr digits)) "0") 
-	    (list "семьдесят")
-	    (cons "семьдесят" (russian_number_from_digits (cdr digits) flag))))
+	    (list "я│п╣п╪я▄п╢п╣я│я▐я┌")
+	    (cons "я│п╣п╪я▄п╢п╣я│я▐я┌" (russian_number_from_digits (cdr digits) flag))))
 
        ((string-equal (car digits) "8");; 8x
 	(if (string-equal (car (cdr digits)) "0") 
-	    (list "восемьдесят")
-	    (cons "восемьдесят" (russian_number_from_digits (cdr digits) flag))))
+	    (list "п╡п╬я│п╣п╪я▄п╢п╣я│я▐я┌")
+	    (cons "п╡п╬я│п╣п╪я▄п╢п╣я│я▐я┌" (russian_number_from_digits (cdr digits) flag))))
 
        ((string-equal (car digits) "9");; 9x
 	(if (string-equal (car (cdr digits)) "0") 
-	    (list "девяносто")
-	    (cons "девяносто" (russian_number_from_digits (cdr digits) flag))))
+	    (list "п╢п╣п╡я▐п╫п╬я│я┌п╬")
+	    (cons "п╢п╣п╡я▐п╫п╬я│я┌п╬" (russian_number_from_digits (cdr digits) flag))))
 
        ))
 
@@ -206,31 +206,31 @@ saying the number."
       (cond 
      
        ((string-equal (car digits) "1");; 1xx
-	(cons "сто" (russian_number_from_digits (cdr digits) flag)))
+	(cons "я│я┌п╬" (russian_number_from_digits (cdr digits) flag)))
 
        ((string-equal (car digits) "2");; 2xx
-	(cons "двести" (russian_number_from_digits (cdr digits) flag)))
+	(cons "п╢п╡п╣я│я┌п╦" (russian_number_from_digits (cdr digits) flag)))
 
        ((string-equal (car digits) "3");; 3xx
-	(cons "триста" (russian_number_from_digits (cdr digits) flag)))
+	(cons "я┌я─п╦я│я┌п╟" (russian_number_from_digits (cdr digits) flag)))
 
        ((string-equal (car digits) "4");; 4xx
-	(cons "четыреста" (russian_number_from_digits (cdr digits) flag)))
+	(cons "я┤п╣я┌я▀я─п╣я│я┌п╟" (russian_number_from_digits (cdr digits) flag)))
 
        ((string-equal (car digits) "5");; 5xx
-	(cons "пятьсот" (russian_number_from_digits (cdr digits) flag)))
+	(cons "п©я▐я┌я▄я│п╬я┌" (russian_number_from_digits (cdr digits) flag)))
 
        ((string-equal (car digits) "6");; 6xx
-	(cons "шестьсот" (russian_number_from_digits (cdr digits) flag)))
+	(cons "я┬п╣я│я┌я▄я│п╬я┌" (russian_number_from_digits (cdr digits) flag)))
 
        ((string-equal (car digits) "7");; 7xx
-	(cons "семьсот" (russian_number_from_digits (cdr digits) flag)))
+	(cons "я│п╣п╪я▄я│п╬я┌" (russian_number_from_digits (cdr digits) flag)))
 
        ((string-equal (car digits) "8");; 8xx
-	(cons "восемьсот" (russian_number_from_digits (cdr digits) flag)))
+	(cons "п╡п╬я│п╣п╪я▄я│п╬я┌" (russian_number_from_digits (cdr digits) flag)))
 
        ((string-equal (car digits) "9");; 9xx
-	(cons "девятьсот" (russian_number_from_digits (cdr digits) flag)))
+	(cons "п╢п╣п╡я▐я┌я▄я│п╬я┌" (russian_number_from_digits (cdr digits) flag)))
 
        ))
 
@@ -244,11 +244,11 @@ saying the number."
 	(set! x (russian_number_from_digits thousands "thousand"))
 	(append
 	  (cond
-	    ((string-matches (car x) "один") (append x (list "тысяча")))
-	    ((string-matches (car x) ".*два[ ]*") (append x (list "тысячи")))
-	    ((string-matches (car x) ".*три[ ]*") (append x (list "тысячи")))
-	    ((string-matches (car x) ".*четыре[ ]*") (append x (list "тысячи")))
-	    (t (append x (list "тысяч"))))
+	    ((string-matches (car x) "п╬п╢п╦п╫") (append x (list "я┌я▀я│я▐я┤п╟")))
+	    ((string-matches (car x) ".*п╢п╡п╟[ ]*") (append x (list "я┌я▀я│я▐я┤п╦")))
+	    ((string-matches (car x) ".*я┌я─п╦[ ]*") (append x (list "я┌я▀я│я▐я┤п╦")))
+	    ((string-matches (car x) ".*я┤п╣я┌я▀я─п╣[ ]*") (append x (list "я┌я▀я│я▐я┤п╦")))
+	    (t (append x (list "я┌я▀я│я▐я┤"))))
 	 (russian_number_from_digits sub_thousands flag))))
 
      ((< l 13)
@@ -265,16 +265,16 @@ saying the number."
 	(set! x (russian_number_from_digits millions nil))
 	(append
 	  (cond
-	    ((string-matches (car x) "один") (append x (list "миллион")))
-	    ((string-matches (car x) ".*два[ ]*") (append x (list "миллиона")))
-	    ((string-matches (car x) ".*три[ ]*") (append x (list "миллиона")))
-	    ((string-matches (car x) ".*четыре[ ]*") (append x (list "миллиона")))
-	    (t (append x (list "миллионов")))
+	    ((string-matches (car x) "п╬п╢п╦п╫") (append x (list "п╪п╦п╩п╩п╦п╬п╫")))
+	    ((string-matches (car x) ".*п╢п╡п╟[ ]*") (append x (list "п╪п╦п╩п╩п╦п╬п╫п╟")))
+	    ((string-matches (car x) ".*я┌я─п╦[ ]*") (append x (list "п╪п╦п╩п╩п╦п╬п╫п╟")))
+	    ((string-matches (car x) ".*я┤п╣я┌я▀я─п╣[ ]*") (append x (list "п╪п╦п╩п╩п╦п╬п╫п╟")))
+	    (t (append x (list "п╪п╦п╩п╩п╦п╬п╫п╬п╡")))
 	  )
 	 (russian_number_from_digits sub_million flag))))
 
      (t
-      (list "ну" "очень" "большое" "число")))))
+      (list "п╫я┐" "п╬я┤п╣п╫я▄" "п╠п╬п╩я▄я┬п╬п╣" "я┤п╦я│п╩п╬")))))
   
 
 
