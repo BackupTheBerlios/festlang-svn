@@ -1,4 +1,10 @@
-2007-08-24  David Huggins-Daines <dhuggins@cs.cmu.edu>
+2007-08-18  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* configure.ac:
+	
+	Raise requirement to pocketsphinx-0.4
+
+2007-08-14  David Huggins-Daines <dhuggins@cs.cmu.edu>
 
 	* src/gstsphinxsink.c:
 	
