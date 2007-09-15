@@ -1,0 +1,92 @@
+# French translation for gnome-voice-control.
+# Copyright (C) 2007 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gnome-voice-control package.
+#
+# Olivier Blanc <olivier.blanc@laposte.net>, 2007
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-voice-control\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-06-07 14:50+0200\n"
+"PO-Revision-Date: 2007-06-07 14:53+0100\n"
+"Last-Translator: Olivier Blanc <olivier.blanc@laposte.net>\n"
+"Language-Team: French <fr@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:1
+msgid "_About"
+msgstr "_Apropos"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:2
+msgid "_Help"
+msgstr "_Aide"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:3
+msgid "_Start Control"
+msgstr "_Lancement du contrôle"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:4
+msgid "_Stop Control"
+msgstr "_Arrêt du contrôle"
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:1
+msgid "Control your desktop with voice"
+msgstr "Controlez votre bureau avec la voix"
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:2
+msgid "Factory for creating voice control applets."
+msgstr "Usine de création de l'applet de contrôle vocal."
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:3
+#: ../src/voice-control.c:214
+msgid "VoiceControl"
+msgstr "ControleVocal"
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:4
+msgid "VoiceControl Applet Factory"
+msgstr "Fabrique d'applet de ControlVocal"
+
+#: ../src/voice-control.c:90
+#, c-format
+msgid "There was an error displaying help: %s"
+msgstr "Une erreur est survenue lors de l'affichage de l'aide: %s"
+
+#: ../src/voice-control.c:120
+#: ../src/voice-control.c:248
+msgid "Idle"
+msgstr "Attente"
+
+#: ../src/voice-control.c:129
+msgid "Init"
+msgstr "Initialisation"
+
+#: ../src/voice-control.c:139
+msgid "Calibration"
+msgstr "Calibrage"
+
+#: ../src/voice-control.c:149
+msgid "Listening"
+msgstr "Ecoute"
+
+#: ../src/voice-control.c:159
+msgid "Ready"
+msgstr "Prêt"
+
+#: ../src/voice-control.c:206
+msgid "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"
+msgstr "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"
+
+#: ../src/voice-control.c:207
+msgid "Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>"
+msgstr "Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>"
+
+#: ../src/voice-control.c:210
+msgid "Voice Control Applet used to manage desktop with speech"
+msgstr "Applet de contrôle vocal utilisé pour controler le bureau avec la voix"
+
+#: ../src/voice-control.c:220
+msgid "translator-credits"
+msgstr "Olivier Blanc <olivier.blanc@laposte.net>"
+
