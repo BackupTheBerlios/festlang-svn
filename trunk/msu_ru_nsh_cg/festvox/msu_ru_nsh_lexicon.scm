@@ -70,12 +70,13 @@ Basic lexicon should (must ?) have basic letters, symbols and punctuation."
 (lex.add.entry '(":" punc nil))
 (lex.add.entry '(";" punc nil))
 (lex.add.entry '("," punc nil))
-(lex.add.entry '("-" punc nil))
+(lex.add.entry '("-" punc (((pau) 0))))
+;(lex.add.entry '("-" punc nil))
 (lex.add.entry '("\"" punc nil))
 (lex.add.entry '("`" punc nil))
 (lex.add.entry '("?" punc nil))
 (lex.add.entry '("!" punc nil))
-(lex.add.entry '("--" punc nil))
+(lex.add.entry '("--" punc (((pau) 0))))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -157,6 +158,8 @@ Basic lexicon should (must ?) have basic letters, symbols and punctuation."
   ( [ я ] = я )
 
   ( [ - ] = - )
+  ( [ "'" ] = - )
+  ( [ "+" ] = "+" )
   
   ( [ 1 ] = о д и н )
   ( [ 2 ] = д в а )
@@ -223,7 +226,6 @@ Basic lexicon should (must ?) have basic letters, symbols and punctuation."
   ( [ x ] = и к с )
   ( [ y ] = а й )
   ( [ z ] = з )
-
 ))
 
 
@@ -232,10 +234,13 @@ Basic lexicon should (must ?) have basic letters, symbols and punctuation."
 Downs case word by letter to sound rules since builtin downcase is only ascii."
   (lts.apply word 'russian_downcase))
 
+(define (is_vowel phone) 
+    (member_string phone '(a e i o u y aa ee ii oo uu yy)))
+
 (define (russian_contains_vowel phones)
   (cond
    ((null phones) nil)
-   ((member_string (car phones) '(a e i o u y))
+   ((is_vowel (car phones))
     t)
    (t (russian_contains_vowel (cdr phones)))))
 
@@ -248,19 +253,18 @@ Syllabify phones into syllables for Russian."
    (mapcar
     (lambda (syl) (list (reverse syl) 0))
     (reverse syls)))
-  ((and (member_string (car phones) '(a e i o u y))
+  ((and (is_vowel (car phones))
 	(russian_contains_vowel (cdr phones)))
    (let ((nsyls (cons (cons (car phones) (car syls)) (cdr syls)))
 	 (nphones (cdr phones)))
      (cond
       ((and (member_string (car nphones) '(l ll m mm n nn r rr))
 	    (not (member_string (car (cdr nphones)) 
-				'(a e i o y u l ll m mm n nn r rr))))
+				'(a e i o y u aa ee ii oo yy uu l ll m mm n nn r rr))))
        (set! nsyls (cons (cons (car nphones) (car nsyls)) (cdr nsyls)))
        (set! nphones (cdr nphones)))
       ((and (string-equal (car nphones) "j")
-	    (not (member_string (car (cdr nphones)) 
-				'(a e i o u y))))
+	    (not (is_vowel (car (cdr nphones)))))
        (set! nsyls (cons (cons (car nphones) (car nsyls)) (cdr nsyls)))
        (set! nphones (cdr nphones)))
        )
@@ -302,7 +306,7 @@ Add lexical stressing."
     (item.set_feat si 'lastname (car (cdr (cdddr (item.feat si 'last)))))
 		
     (set! stress (wagon_predict si tree))
-    
+        
     (item.set_feat si 'sylpos (+ 1 (item.feat si 'sylpos)))
     (item.set_feat si 'pname (car phones))	       
         
@@ -313,22 +317,37 @@ Add lexical stressing."
     (item.set_feat si 'pname (car phones))	       
     (add_lex_stress_syl (cdr phones) si tree))))
 
+(define (stressed_offset phones count)
+"Offset of stressed syllable in syllables"
+    (cond 
+        ((null phones) -1000)
+	((member_string (car phones) '(aa oo uu ee yy ii))
+	  (+ count 1))    
+	((is_vowel (car phones)) (+ (stressed_offset (cdr phones) count) 1))
+	(t (stressed_offset (cdr phones) count)))
+)
+
 (define (add_lex_stress word phones tree)
   "(add_lex_stress word syls)
 Predict lexical stress by decision tree."
   (let ((utt (Utterance Text ""))
 	(si)
 	(stress))
+    
+    (if (< 0 (stressed_offset phones 0))
+	(begin
+    	    (set! stress (stressed_offset phones 0))
+	    (format stderr "offset is %l\n" stress))
+	(begin    
+    	    (utt.relation.create utt 'Letter)
+	    (set! si (utt.relation.append utt 'Letter))
 
-    (utt.relation.create utt 'Letter)
-    (set! si (utt.relation.append utt 'Letter))
+	    (item.set_feat si 'numsyls (count_syls phones))
+	    (item.set_feat si 'sylpos 1)
+	    (item.set_feat si 'pname "pau")
+	    (item.set_feat si 'last (get_last phones))
 
-    (item.set_feat si 'numsyls (count_syls phones))
-    (item.set_feat si 'sylpos 1)
-    (item.set_feat si 'pname "pau")
-    (item.set_feat si 'last (get_last phones))
-
-    (set! stress (add_lex_stress_syl phones si tree))
+	    (set! stress (add_lex_stress_syl phones si tree))))
     
 ;;  (format t "%l\n" phones)
 ;;  (format t "%l\n" stress)
@@ -357,8 +376,8 @@ Return pronunciation of word not in lexicon."
     	   (set-car! (cdr (nth (- stress 1) syls)) 1) syls)
             (t syls)))
     
+    (format stderr "Not in a dictionary %l %l\n" word syls)
     (list word features syls)
-;    (format stderr "%l\n" syls)
     ))
 
 (define (strconcat list)
@@ -400,7 +419,7 @@ Return pronunciation of word not in lexicon."
     	        (t syls)))
       (list word pos syls)
       )))
-;;   (format stderr "%l\n" result)
+   (format stderr "%l\n" result)
    result))
 
 
@@ -415,23 +434,28 @@ Reduce vowels according to the stress."
      (cond 
         ((and (member_string segment_name '(a o u i y e))
     	    (string-equal (item.feat s "R:SylStructure.parent.stress") "1"))
-    		(item.set_name s (cadr (assoc segment_name '(("a" "aa") 
+    		(if (and (string-equal segment_name "i")
+    			 (string-equal (item.feat s "p.name") "s"))
+    		(item.set_name s "yy")
+    		(item.set_name s (cadr (assoc segment_name 
+    				    '(("a" "aa") 
     				      ("o" "oo")
     				      ("y" "yy")
     				      ("i" "ii")
     				      ("e" "ee")
-    				      ("u" "uu"))))))
-
+    				      ("u" "uu")))))))
 
         ((and (member_string segment_name '(a o)) 
     	      (or (phone_is_silence (item.feat s "p.name"))
     	          (phone_is_silence (item.feat s "n.name"))
+		  (string-equal (item.feat s "p.name") "j")
     	          (string-equal (item.feat s "p.ph_vc") "+")))
     		    (item.set_name s "a"))
 
         ((and (member_string segment_name '(a o)) 
     	      (string-equal (item.feat s "R:SylStructure.parent.R:Syllable.n.stress") "1"))
-    	      (if (string-equal (item.feat s "p.ph_csoft") "+")
+    	      (if (and (string-equal (item.feat s "p.ph_csoft") "+")
+	    	       (< (item.feat s "p.syl_break" ) 0))
     		    (item.set_name s "i")
     		    (item.set_name s "a")))
 
@@ -439,13 +463,15 @@ Reduce vowels according to the stress."
     	      (or (string-equal (item.feat s "R:SylStructure.parent.R:Syllable.n.stress") "1")
     	          (phone_is_silence (item.feat s "p.name"))
     	          (phone_is_silence (item.feat s "n.name"))
-    	          (string-equal (item.feat s "p.ph_vc" "+"))))
+		  (string-equal (item.feat s "p.name") "j")
+    	          (string-equal (item.feat s "p.ph_vc") "+")))
     	       nil)
 
         ((and (string-equal segment_name "e") 
     	      (or (phone_is_silence (item.feat s "p.name"))
     	          (phone_is_silence (item.feat s "n.name"))
-    	          (string-equal (item.feat s "p.ph_vc" "+"))))
+		  (string-equal (item.feat s "p.name") "j")
+    	          (string-equal (item.feat s "p.ph_vc") "+")))
     	          (item.set_name s "e"))
 
         ((and (string-equal segment_name "e") 
@@ -459,6 +485,13 @@ Reduce vowels according to the stress."
     		    (item.set_name s "ae")
     		    (item.set_name s "ay")))
 
+        ((and (string-equal segment_name "u") 
+    	      (or (phone_is_silence (item.feat s "p.name"))
+    	          (phone_is_silence (item.feat s "n.name"))
+		  (string-equal (item.feat s "p.name") "j")
+    	          (string-equal (item.feat s "p.ph_vc") "+")))
+    	          (item.set_name s "u"))
+
         ((string-equal segment_name "u") 
     		    (item.set_name s "ur")))))
   (utt.relation.items utt 'Segment))
@@ -467,7 +500,8 @@ Reduce vowels according to the stress."
    (lambda (s)
      (let ((segment_name (item.name s)) (s1 (item.next s)))
      (if (and (string-equal "1" (item.feat s "syl_final"))
-	 (> (item.feat s "R:SylStructure.parent.syl_break") 0))
+	      (> (item.feat s "R:SylStructure.parent.syl_break") 0)
+	      (not (member_string (item.feat s "R:SylStructure.parent.parent.R:Word.pos") '(aux in wp cc))))
      
 	 (mapcar 
 	  (lambda (r)
@@ -475,6 +509,7 @@ Reduce vowels according to the stress."
 		(if (or 
 		     (member_string (item.name s1) msu_ru::sonorlist) 
 		     (phone_is_silence (item.name s1)) 
+		     (string-equal "+" (item.feat s1 "ph_vc"))
 		     (and 
 		      (or (string-equal "v" (item.name s1)) 
 			  (string-equal "vv" (item.name s1)))	
@@ -485,10 +520,14 @@ Reduce vowels according to the stress."
 	    (if (string-equal (car (cdr r)) (item.name s)) 
 		  (if 
 		     (and 
-		      (or (string-equal "v" (item.name s1)) 
-			  (string-equal "vv" (item.name s1)))
-			      (member_string (item.feat s1 "n.name") msu_ru::voicelist))
-		      (item.set_name s (car r)))))
+		       (or (string-equal "v" (item.name s1)) 
+		 	   (string-equal "vv" (item.name s1)))
+		       (member_string (item.feat s1 "n.name") msu_ru::voicelist))
+		      (item.set_name s (car r))))
+
+	    (if (and (string-equal "z" (item.name s))
+		     (member_string (item.name s1) msu_ru::voicelesslist))
+		     (item.set_name s "s")))
 	  msu_ru::reducelist)
 
 	  (mapcar 
@@ -502,11 +541,11 @@ Reduce vowels according to the stress."
 			     (item.set_name s (car r))))
 	   msu_ru::reducelist))
     
-;;    (format stderr "%s " (item.name s))
-     
+    (format stderr "%s " (item.name s))
+ 
       ))
    (utt.relation.items utt 'Segment))
-;;   (format stderr "\n")
+   (format stderr "\n")
 )
    
 
@@ -520,36 +559,73 @@ Reduce vowels according to the stress."
 	 ;;; Letter that do make previous consonant soft
             я ё ю и ь е
      )
-     (STARTSYL # ъ ь а я о ё у ю э е и)
+     (STARTSYL # ъ ь а я о ё у ю э е и ы)
    )
  (
 ;; LTS rules
 
 
-
 ;; Some exceptions
 
     ( # [ ч т ] о = sh t )
+    ( и [ ч ] н а я = sh )
+    ( о [ ч ] н и к = sh )
+    ( н е [ ч ] н о = sh )
+    ( р о [ ч ] н о = sh )
+
     ( с и н [ т ] е з = t )
     ( и н [ т ] е р в = t )
     ( и н [ т ] е р ф = t )
     ( и н [ т ] е р п = t )
     ( э с [ т ] е т = t )
+    ( а [ н ] е л я = n )
+    ( # с о [ н ] е т = n )
+    ( т у н [ н ] е л = n )
+    ( # [ б ] е к и н г = b )
+    ( # [ б ] е й к е р = b )
+    ( # м о [ д ] е с т = d )
+    ( # э к [ з ] е м = z )
+    ( # э [ н ] е й = n )
+    ( # б [ р ] е н д и # = r )
+    ( # а р т и [ л л ] е р = ll )
+    ( # ж е [ н ] щ и н = nn )
     
-    ( [ с ш ] е с т = sh )
-    ( # [ е е ] # = j e j o )
-    
-    ( с т р о [ г ] о  # = g )
-    ( м м н о [ г ] о  # = v )
-    ( м н о [ г ] о  # = g )
-    ( д о р о [ г ] о  # = g )
-    ( к р е м л [ е ] в  = o )
-     
+    ( п о л о [ г ] о # = g )
+    ( с т р о [ г ] о # = g )
+    ( # н е м н о [ г ] о = g )
+    ( # н а м н о [ г ] о = g )
+    ( # м н о [ г ] о = g )
+    ( # д о р о [ г ] о # = g )
+    ( # б о [ г ] # = h )
+
+    ( е [ г ] о д н я # = v )
     ( о [ г ] о # = v )
     ( е [ г ] о # = v )
+    ( е [ г ] о с я # = v )
+    ( е [ г ] о - н = v )
 
+    ( к р е м л [ е ] в  = o )    
+    ( # [ е е ] # = j e j o )
     ( л [ ь о ] = j o )
+    ( [ с ь о ] = ss j o )
+    ( # [ э ] к с к у р = i )
+    ( # [ э ] л е к т р = i )
     
+;; Stress, we use + sign here because the most of the usual symbols are handled as punctuation
+
+    ( [ "+" а ] = aa )
+    ( [ "+" ы ] = yy )
+    ( [ "+" о ] = oo )
+    ( [ "+" у ] = uu )
+    ( [ "+" э ] = ee )
+    ( STARTSYL [ "+" ю ] = j uu )
+    ( STARTSYL [ "+" я ] = j aa )
+    ( STARTSYL [ "+" е ] = j ee )
+    ( [ "+" е ] = ee )
+    ( [ "+" я ] = aa )
+    ( [ "+" ю ] = uu )
+    ( [ "+" и ] = ii )
+
 ;; Simple vowels
 
     ( [ а ] = a )
@@ -557,20 +633,15 @@ Reduce vowels according to the stress."
     ( [ о ] = o )
     ( [ у ] = u )
     ( [ э ] = e )
-
-;; Vovel expansion
-
     ( STARTSYL [ ю ] = j u )
     ( STARTSYL [ я ] = j a )
     ( STARTSYL [ е ] = j e )
-    ( STARTSYL [ ё ] = j o )
-
-    ( [ ё ] = o )
+    ( STARTSYL [ ё ] = j oo )
+    ( [ ё ] = oo )
     ( [ е ] = e )
     ( [ я ] = a )
     ( [ ю ] = u )
     ( [ и ] = i )
-
 
 ;; Non readable phonems
 
@@ -584,18 +655,28 @@ Reduce vowels according to the stress."
     ( [ з д ] ц = z )
     ( [ н т ] ц = n )
     ( [ н д ] ц = n )
+    ( [ н д ] ш = n )
     ( [ с т ] н = s )    
     ( [ з д ] н = z )    
     ( [ н т ] с = n )    
     ( [ н д ] с = n )    
     ( [ н г ] т = n )    
+    ( [ с ш ] е с т = sh )
+    ( [ с ч ] = sch )
+    ( [ ч ] ш = t )
+    ( [ д ] ц = )
+    ( [ т с ] я = c )
     
 ;; Work around doubled consonants 
 
+    ( # э [ м ] м = m )
+    ( [ б ] б = )
+    ( [ р ] р = )
     ( [ н ] н = )
-    ( [ с ] с = )
     ( [ м ] м = )
+    ( [ с ] с = )
     ( [ к ] к = )
+    ( [ п ] п = )
 
 ;; Basic rules
         
@@ -614,6 +695,22 @@ Reduce vowels according to the stress."
     ( [ т ] SOFTLETTERS = tt )
     ( [ ф ] SOFTLETTERS = ff )
     ( [ х ] SOFTLETTERS = hh )
+
+    ( [ б ] + SOFTLETTERS = bb )
+    ( [ в ] + SOFTLETTERS = vv )
+    ( [ г ] + SOFTLETTERS = gg )
+    ( [ д ] + SOFTLETTERS = dd )
+    ( [ з ] + SOFTLETTERS = zz )
+    ( [ к ] + SOFTLETTERS = kk )
+    ( [ л ] + SOFTLETTERS = ll )
+    ( [ м ] + SOFTLETTERS = mm )
+    ( [ н ] + SOFTLETTERS = nn )
+    ( [ п ] + SOFTLETTERS = pp )
+    ( [ р ] + SOFTLETTERS = rr )
+    ( [ с ] + SOFTLETTERS = ss )
+    ( [ т ] + SOFTLETTERS = tt )
+    ( [ ф ] + SOFTLETTERS = ff )
+    ( [ х ] + SOFTLETTERS = hh )
 
 ;; Simple consonant
 
@@ -642,6 +739,7 @@ Reduce vowels according to the stress."
     ( [ ъ ] =  )
     ( [ ь ] =  )
     ( [ - ] =  )
+    ( [ + ] =  )
   ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

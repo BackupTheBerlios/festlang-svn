@@ -170,7 +170,7 @@ SHould only be called once per session."
                 (get_param 'index_name dt_params "all")
                 "_mcep.tree")) t))
 
-;;  (if (null (assoc 'cg::trajectory msu_ru_nsh::clustergen_mcep_trees))
+;  (if (null (assoc 'cg::trajectory msu_ru_nsh::clustergen_mcep_trees))
       (set! msu_ru_nsh::clustergen_f0_trees
             (load (string-append
                    (string-append 
@@ -178,16 +178,16 @@ SHould only be called once per session."
                     (get_param 'trees_dir dt_params "trees/")
                     (get_param 'index_name dt_params "all")
                     "_f0.tree")) t))
-;;                    )
+;                    )
 
 ;;  (if (null (assoc 'cg::trajectory msu_ru_nsh::clustergen_mcep_trees))
-      (set! msu_ru_nsh::clustergen_npow_trees
-            (load (string-append
-                   (string-append 
-                    msu_ru_nsh::dir "/"
-                    (get_param 'trees_dir dt_params "trees/")
-                    (get_param 'index_name dt_params "all")
-                    "_npow.tree")) t))
+;;      (set! msu_ru_nsh::clustergen_npow_trees
+;;            (load (string-append
+;;                   (string-append 
+;;                    msu_ru_nsh::dir "/"
+;;                    (get_param 'trees_dir dt_params "trees/")
+;;                    (get_param 'index_name dt_params "all")
+;;                    "_npow.tree")) t))
 ;;                    )
                     
   (set! msu_ru_nsh::cg_loaded t))
@@ -235,7 +235,7 @@ Define voice for ru."
   ;; For CG voice there is no duration modeling at the seg level
 
   (Parameter.set 'Duration_Method 'Default)
-  (Parameter.set 'Duration_Stretch 1.1)
+  (Parameter.set 'Duration_Stretch 1.0)
   (set! duration_cart_tree_cg msu_ru_nsh::zdur_tree)
   (set! duration_ph_info_cg msu_ru_nsh::phone_durs)
 

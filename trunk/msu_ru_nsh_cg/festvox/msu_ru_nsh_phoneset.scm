@@ -130,7 +130,7 @@
 (set! msu_ru::reducelist '((b p) (bb pp) (v f) (vv ff) (zh sh) (z s) (zz ss) (g k) (gg kk) (d t) (dd tt)))
 (set! msu_ru::sonorlist '(m mm n nn l ll r rr j))
 (set! msu_ru::voicelist '(b bb zh z zz d dd g gg))
-(set! msu_ru::voicelesslist '(p pp sh s ss t tt k kk sch))
+(set! msu_ru::voicelesslist '(p pp sh s ss t tt k kk sch ch h hh))
 
 (define (is_pau i)
   (if (phone_is_silence (item.name i))

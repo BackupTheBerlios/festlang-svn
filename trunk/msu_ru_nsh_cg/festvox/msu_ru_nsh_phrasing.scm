@@ -48,11 +48,13 @@ Find next punctuation after the word"
 '
 ((lisp_token_end_punc in ("?" "." "!" ))
   ((BB))
-  ((lisp_token_end_punc in ("'" "\"" "," ";" ":" "-" "--"))
+  ((lisp_token_end_punc in (";" ":" "-" "--"))
    ((B))
-   ((n.name is 0)  ;; end of utterance
-    ((BB))
-    ((NB))))))
+   ((lisp_token_end_punc in (","))
+    ((B))
+     ((n.name is 0)  ;; end of utterance
+      ((BB))
+      ((NB)))))))
 
 (define (msu_ru_nsh::select_phrasing)
   "(msu_ru_nsh::select_phrasing)
