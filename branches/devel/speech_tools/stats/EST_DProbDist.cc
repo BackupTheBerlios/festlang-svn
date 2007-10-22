@@ -305,79 +305,55 @@ double EST_DiscreteProbDistribution::entropy() const
 }
 
 //  For iterating through members of a probability distribution
-int EST_DiscreteProbDistribution::item_start(void) const
+void EST_DiscreteProbDistribution::point_to_first(IPointer &i) const
 {
     if (type == tprob_discrete)
-	return 0;
+	i.idx = 0 ;
     else
-	return (int)scounts.list.head();
+	i.item = scounts.list.head();
+    return;
 }
 
-int EST_DiscreteProbDistribution::item_end(int idx) const
+void EST_DiscreteProbDistribution::move_pointer_forwards(IPointer &i) const
 {
     if (type == tprob_discrete)
-	return (idx >= icounts.length());
+	i.idx++;
     else
-	return ((EST_Litem *)idx == 0);
+	i.item = next(i.item);
+	return;
 }
 
-int EST_DiscreteProbDistribution::item_next(int idx) const
+bool EST_DiscreteProbDistribution::points_to_something(const IPointer &i) const
 {
     if (type == tprob_discrete)
-	return ++idx;
+	return (i.idx < icounts.length());
     else
-	return (int)next((EST_Litem *)idx);
+	return (i.item != NULL);
 }
 
-const EST_String &EST_DiscreteProbDistribution::item_name(int idx) const
-{
-    if (type == tprob_discrete)
-	return discrete->name(idx);
-    else
-	return scounts.list((EST_Litem *)idx).k;
-}
 
-void EST_DiscreteProbDistribution::item_freq(int idx,EST_String &s,double &freq) const
+const EST_String &EST_DiscreteProbDistribution::points_at(const IPointer &i) const
 {
     if (type == tprob_discrete)
     {
-	s = discrete->name(idx);
-	freq = icounts(idx);
+	return discrete->name(i.idx);
     }
-    else
-    {
-	s = scounts.list((EST_Litem *)idx).k;
-	freq = scounts.list((EST_Litem *)idx).v;
-    }
-}
 
-void EST_DiscreteProbDistribution::item_prob(int idx,EST_String &s,double &prob) const
-{
-    if (type == tprob_discrete)
-    {
-	prob = probability(idx);
-	s = discrete->name(idx);
-    }
-    else
-    {
-	s = scounts.list((EST_Litem *)idx).k;
-	prob = (double)scounts.list((EST_Litem *)idx).v/num_samples;
-    }
+    return scounts.list(i.item).k;
 }
 
 ostream & operator<<(ostream &s, const EST_DiscreteProbDistribution &pd)
 {
     // Output best with probabilities
-    int i;
+    EST_DiscreteProbDistribution::Entries i;
     double prob;
     double sum=0;
-    EST_String name;
  
     s << "(";
-    for (i=pd.item_start(); !pd.item_end(i); i=pd.item_next(i))
-    {
-	pd.item_prob(i,name,prob);
-	s << "(" << name << "=" << prob << ") ";
+    for (i.begin (pd); i != 0; i++)
+    {	
+	prob = pd.probability (*i);
+	s << "(" << *i << "=" << prob << ") ";
 	sum+=prob;
     }
     s << "best=" << pd.most_probable(&prob) << " samples=" 

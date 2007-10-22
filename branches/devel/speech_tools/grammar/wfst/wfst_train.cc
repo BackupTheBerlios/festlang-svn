@@ -314,10 +314,9 @@ static LISP find_best_split(EST_WFST &wfst,
     LISP splits,s,dd,r;
     LISP *ssplits;
     gc_protect(&splits);
-    EST_String sname;
-    int b,best_b,i;
+    int b,best_b;
     int num_pdfs;
-    double best_score, score, sfreq;
+    double best_score, score;
 
     for (dd = data[split_state_name]; dd; dd = cdr(dd))
 	pdf_all.cumulate(get_c_int(car(car(dd))));
@@ -354,6 +353,7 @@ static LISP find_best_split(EST_WFST &wfst,
 	    break;
 	else
 	{
+	    EST_DiscreteProbDistribution::Entries i;
 	    // combine a and b
 	    // Add trans to 0
 	    setcar(cdr(ssplits[0]),
@@ -362,11 +362,9 @@ static LISP find_best_split(EST_WFST &wfst,
 	    setcar(ssplits[0], flocons(best_score));
 	    // Update 0's pdf with values from best_b's
 	    b_pdf = pdf(car(cdr(cdr(ssplits[best_b]))));
-	    for (i=b_pdf->item_start(); !b_pdf->item_end(i);
-		 i = b_pdf->item_next(i))
+	    for (i.begin(*b_pdf); i != 0; i++)
 	    {
-		b_pdf->item_freq(i,sname,sfreq);
-		a_pdf->cumulate(i,sfreq);
+		a_pdf->cumulate(*i,b_pdf->frequency (*i));
 	    }
 	    ssplits[best_b] = NIL;
 	}
@@ -390,21 +388,17 @@ static double score_pdf_combine(EST_DiscreteProbDistribution &a,
     // Find score of (a+b) vs (all-(a+b))
     EST_DiscreteProbDistribution ab(a);
     EST_DiscreteProbDistribution all_but_ab(all);
-    int i;
+    EST_DiscreteProbDistribution::Entries i;
     EST_String sname;
-    double sfreq, score;
-    for (i=b.item_start(); !b.item_end(i);
-	 i = b.item_next(i))
+    double score;
+    for (i.begin (b); i!= 0; i++)
     {
-	b.item_freq(i,sname,sfreq);
-	ab.cumulate(i,sfreq);
+	ab.cumulate(*i,b.frequency(*i));
     }
     
-    for (i=ab.item_start(); !ab.item_end(i);
-	 i = ab.item_next(i))
+    for (i.begin (ab); i!=0; i++)
     {
-	ab.item_freq(i,sname,sfreq);
-	all_but_ab.cumulate(i,-1*sfreq);
+	all_but_ab.cumulate(*i,-1*ab.frequency(*i));
     }
     
     score = (ab.entropy() * ab.samples()) +
@@ -522,9 +516,7 @@ static double find_score_if_split(EST_WFST &wfst,
     EST_DiscreteProbDistribution pdf_split(&wfst.in_symbols());
     EST_DiscreteProbDistribution pdf_remain(&wfst.in_symbols());
     int in, tostate, id;
-    int i;
-    double sfreq;
-    EST_String sname;
+    EST_DiscreteProbDistribution::Entries i;
 
     ent_split = ent_remain = 32*32*32*32;
     LISP dd;
@@ -555,11 +547,9 @@ static double find_score_if_split(EST_WFST &wfst,
     for (dd = data[tostate]; dd; dd = cdr(dd))
 	pdf_remain.cumulate(get_c_int(car(car(dd))));
     // Subtract the bit thats split
-    for (i=pdf_split.item_start(); !pdf_split.item_end(i);
-	 i = pdf_split.item_next(i))
+    for (i.begin(pdf_split); i != 0; i++)
     {
-	pdf_split.item_freq(i,sname,sfreq);
-	pdf_remain.cumulate(i,-1*sfreq);
+	pdf_remain.cumulate(*i,-1*pdf_split.frequency(*i));
     }
     if (pdf_remain.samples() > 0)
 	ent_remain = pdf_remain.entropy();

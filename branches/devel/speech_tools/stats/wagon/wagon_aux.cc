@@ -900,15 +900,13 @@ ostream & operator <<(ostream &s, WImpurity &imp)
     }
     else if (imp.t == wnim_class)
     {
-	int i;
-	EST_String name;
+	EST_DiscreteProbDistribution::Entries i;
 	double prob;
 
 	s << "(";
-	for (i=imp.p.item_start(); !imp.p.item_end(i); i=imp.p.item_next(i))
+	for (i.begin (imp.p); i != 0; i++)
 	{
-	    imp.p.item_prob(i,name,prob);
-	    s << "(" << name << " " << prob << ") ";
+	    s << "(" << *i << " " << imp.p.probability (*i) << ") ";
 	}
 	s << imp.p.most_probable(&prob) << ")";
     }

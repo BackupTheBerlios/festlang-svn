@@ -190,22 +190,24 @@ enum EST_tprob_type {tprob_string, tprob_int, tprob_discrete};
     integers are too restrictive so they are actually represented as
     doubles.
 
-    Methods are provided to iterate over the values in a distribution,
-    for example
+    We provide iterator over the values in a distribution, for example
     \begin{verbatim}
-       EST_DiscreteProbistribution pdf;
-       for (int i=pdf.item_start(); i < pdf.item_end(); i=pdf.item_next(i))
+       EST_DiscreteProbDistribution pdf;
+       EST_DiscreteProbDistribution::Entries i;
+       
+       for (i.begin(pdf); i != 0; i++)
        {
-          EST_String name;
-          double prob;
-          item_prob(i,name,prob);
-          cout << name << ": prob " << prob << endl;
+          cout << *i << ": prob " << pdf.probability (*i) << endl;
        }
     \end{verbatim}
 
     @author Alan W Black (awb@cstr.ed.ac.uk): July 1996
 */
 class EST_DiscreteProbDistribution {
+
+    struct IPointer_s { int idx; EST_UItem *item; };
+    typedef struct IPointer_s IPointer;
+    
 private:
     double num_samples;	   // because frequencies don't have to be integers
     EST_tprob_type type;
@@ -215,6 +217,16 @@ private:
     EST_DVector icounts;	
     /* For unknown vocabularies: tprob_string */
     EST_StrD_KVL scounts;
+
+protected:
+
+    void point_to_first(IPointer &i) const;
+    void move_pointer_forwards(IPointer &i) const;
+    bool points_to_something(const IPointer &i) const;
+    const EST_String &points_at(const IPointer &i) const;
+
+    friend class EST_TIterator< EST_DiscreteProbDistribution, IPointer, EST_String>;
+    
 public:
     EST_DiscreteProbDistribution() : type(tprob_string), discrete(NULL), icounts(0), scounts() {init();}
     /// Create with copying from an existing distribution.
@@ -264,18 +276,6 @@ public:
     double frequency(const EST_String &s) const; 
     /// 
     double frequency(const int i) const; 
-    /// Used for iterating through members of the distribution
-    int item_start() const;
-    /// Used for iterating through members of the distribution
-    int item_next(int idx) const;
-    /// Used for iterating through members of the distribution
-    int item_end(int idx) const;
-    /// During iteration returns name given index 
-    const EST_String &item_name(int idx) const;
-    /// During iteration returns name and frequency given index  
-    void item_freq(int idx,EST_String &s,double &freq) const;
-    /// During iteration returns name and probability given index
-    void item_prob(int idx,EST_String &s,double &prob) const;
 
     /// Returns discrete vocabulary of distribution
     inline const EST_Discrete *const get_discrete() const { return discrete; };
@@ -298,8 +298,11 @@ public:
         as it will affect how probabilities are calculated.
     */
     void set_num_samples(const double c) { num_samples = c;}
+
+    friend class EST_TStructIterator<EST_DiscreteProbDistribution, IPointer, EST_String>;    
+    typedef EST_TStructIterator<EST_DiscreteProbDistribution, IPointer, EST_String> Entries;
     
-friend ostream & operator <<(ostream &s, const EST_DiscreteProbDistribution &p);
+    friend ostream & operator <<(ostream &s, const EST_DiscreteProbDistribution &p);
     EST_DiscreteProbDistribution &operator=(const EST_DiscreteProbDistribution &a);
 };    
 

@@ -306,23 +306,22 @@ void EST_BackoffNgrammarState::print_freqs(ostream &os,
     // not right - just print out, then recurse through children
     // change to use 'backoff_traverse'
     
-    int k;
+    EST_DiscreteProbDistribution::Entries k;
     double freq;
-    EST_String name;
-    for (k=p_pdf.item_start();
-	 !p_pdf.item_end(k);
-	 k = p_pdf.item_next(k))
+    for (k.begin(p_pdf);
+	 k != 0;
+	 k++)
     {
-	p_pdf.item_freq(k,name,freq);
-	EST_BackoffNgrammarState *s = ((EST_BackoffNgrammarState*)(children.lookup(name)));
+	freq = p_pdf.frequency (*k);
+	EST_BackoffNgrammarState *s = ((EST_BackoffNgrammarState*)(children.lookup(*k)));
 	if (p_level==order-1)
 	{
 	    if(freq>0)
-		os << name << " " << followers
+		os << *k << " " << followers
 		    << ": " << freq << endl;
 	}
 	else if (s!=NULL)
-	    s->print_freqs(os,order,name+" "+followers);
+	    s->print_freqs(os,order,*k+" "+followers);
 	
     }
 }
@@ -373,17 +372,13 @@ void EST_BackoffNgrammarState::zap()
 {
 
     // recursively delete this state and all its children
-    int k;
-    double freq;
+    EST_DiscreteProbDistribution::Entries k;
     EST_String name;
-    for (k=p_pdf.item_start();
-	 !p_pdf.item_end(k);
-	 k = p_pdf.item_next(k))
+    for (k.begin(p_pdf); k!=0; k++)
     {
-	p_pdf.item_freq(k,name,freq);
-	EST_BackoffNgrammarState *child = get_child(name);
+	EST_BackoffNgrammarState *child = get_child(*k);
 	if (child!=NULL) 
-	    remove_child(child,name);
+	    remove_child(child,*k);
     }
 
     children.clear();
@@ -456,14 +451,12 @@ bool EST_BackoffNgrammarState::set_backoff_weight(const EST_StrVector &words, co
 
 void EST_BackoffNgrammarState::frequency_of_frequencies(EST_DVector &ff)
 {
-    int k,max=ff.n();
+    int max=ff.n();
+    EST_DiscreteProbDistribution::Entries k;
     double freq;
-    EST_String name;
-    for (k=p_pdf.item_start();
-	 !p_pdf.item_end(k);
-	 k = p_pdf.item_next(k))
+    for (k.begin(p_pdf); k!=0; k++)
     {
-	p_pdf.item_freq(k,name,freq);
+	freq = p_pdf.frequency(*k);
 	if(freq < max)
 	    ff[(int)(freq+0.5)] += 1;
     }
@@ -1585,38 +1578,33 @@ void EST_Ngrammar::prune_backoff_representation(EST_BackoffNgrammarState *start_
     // remove any branches with zero frequency count
     
     // find children of this state with zero freq and zap them
-    int k;
+    EST_DiscreteProbDistribution::Entries k;
     double freq;
-    EST_String name;
-    for (k=start_state->pdf_const().item_start();
-	 !start_state->pdf_const().item_end(k);
-	 k = start_state->pdf_const().item_next(k))
+    for (k.begin(start_state->pdf_const()); k!=0; k++)
     {
-	start_state->pdf_const().item_freq(k,name,freq);
+	freq = start_state->pdf_const().frequency(*k);
 	if (freq < TINY_FREQ)
 	{
-	    EST_BackoffNgrammarState *child = start_state->get_child(name);
+	    EST_BackoffNgrammarState *child = start_state->get_child(*k);
 	    
 	    if (child!=NULL)
 	    {
-		//cerr << "Zapping  " << name << " : " << child->level() 
+		//cerr << "Zapping  " << *k << " : " << child->level() 
 		//<< " " << child<< endl;
-		start_state->remove_child(child,name);
+		start_state->remove_child(child,*k);
 	    }
 	}
 	
     }
     
     // then recurse through remaining children
-    for (k=start_state->pdf_const().item_start();
-	 !start_state->pdf_const().item_end(k);
-	 k = start_state->pdf_const().item_next(k))
+    for (k.begin(start_state->pdf_const());k!=0;k++)
     {
-	start_state->pdf_const().item_freq(k,name,freq);
-	EST_BackoffNgrammarState *child = start_state->get_child(name);
+	freq = start_state->pdf_const().frequency(*k);
+	EST_BackoffNgrammarState *child = start_state->get_child(*k);
 	if (child!=NULL)
 	{
-	    //cerr << "recursing to " << name << " : " << child->level() << endl;
+	    //cerr << "recursing to " << *k << " : " << child->level() << endl;
 	    //if((child!=NULL) && (child->level() == 3))
 	    //cerr << *child  << endl;
 	    prune_backoff_representation(child);
@@ -2324,20 +2312,18 @@ void EST_Ngrammar::print_freqs(ostream &os,double floor)
 	backoff_representation->print_freqs(os,p_order);
     else
     {
-	int i,j,k;
+	int i,j;
+        EST_DiscreteProbDistribution::Entries k;
 	EST_IVector window(p_order-1);
 	
 	for (i=0; i < p_num_states; i++)
 	{
 	    // print out each ngram : freq
-	    for (k=p_states[i].pdf().item_start();
-		 !p_states[i].pdf().item_end(k);
-		 k = p_states[i].pdf().item_next(k))
+	    for (k.begin(p_states[i].pdf());k!=0;k++)
 	    {
 		double freq;
-		EST_String name;
 		int ind = i;
-		p_states[i].pdf().item_freq(k,name,freq);
+		freq = p_states[i].pdf().frequency(*k);
 		if (freq == 0)
 		    freq = floor;
 		if (freq > 0)
@@ -2349,7 +2335,7 @@ void EST_Ngrammar::print_freqs(ostream &os,double floor)
 		    }
 		    for (j = 0; j < p_order-1; j++)
 			os << wordlist_index(window(j)) << " ";
-		    os << name << " : " << freq << endl;
+		    os << *k << " : " << freq << endl;
 		}
 	    }
 	}
@@ -2665,15 +2651,12 @@ EST_Ngrammar::backoff_traverse(EST_BackoffNgrammarState *start_state,
     function(start_state,params);
     
     // and recurse down the tree
-    int k;
+    EST_DiscreteProbDistribution::Entries k;
     double freq;
-    EST_String name;
-    for (k=start_state->pdf_const().item_start();
-	 !start_state->pdf_const().item_end(k);
-	 k = start_state->pdf_const().item_next(k))
+    for (k.begin(start_state->pdf_const()); k!=0;k++)
     {
-	start_state->pdf_const().item_freq(k,name,freq);
-	EST_BackoffNgrammarState *child = start_state->get_child(name);
+	freq = start_state->pdf_const().frequency(*k);
+	EST_BackoffNgrammarState *child = start_state->get_child(*k);
 	if (child!=NULL)
 	    backoff_traverse(child,function,params);
 	
@@ -2696,16 +2679,14 @@ EST_Ngrammar::backoff_traverse(EST_BackoffNgrammarState *start_state,
     {
 	// and recurse down the tree if we haven't
 	// reached the level yet
-	int k;
+
+        EST_DiscreteProbDistribution::Entries k;
 	double freq;
-	EST_String name;
 	
-	for (k=start_state->pdf_const().item_start();
-	     !start_state->pdf_const().item_end(k);
-	     k = start_state->pdf_const().item_next(k))
+	for (k.begin(start_state->pdf_const()); k!=0; k++)
 	{
-	    start_state->pdf_const().item_freq(k,name,freq);
-	    EST_BackoffNgrammarState *child = start_state->get_child(name);
+	    freq = start_state->pdf_const().frequency(*k);
+	    EST_BackoffNgrammarState *child = start_state->get_child(*k);
 	    if (child!=NULL)
 		backoff_traverse(child,function,params,level);
 	    
