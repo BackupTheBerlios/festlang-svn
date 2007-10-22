@@ -113,12 +113,12 @@ int		rl_kill;
 ECHAR		el_NIL[] = "";
 extern CONST ECHAR	*el_Input;
 STATIC ECHAR		*Line = NULL;
-STATIC CONST char	*Prompt = NULL;
+STATIC CONST ECHAR	*Prompt = NULL;
 STATIC ECHAR		*Yanked = NULL;
-STATIC char		*Screen = NULL;
+STATIC ECHAR		*Screen = NULL;
 /* STATIC char		NEWLINE[]= CRLF; */
 STATIC HISTORY		H;
-int		rl_quit;
+int			rl_quit;
 STATIC int		Repeat;
 STATIC int		End;
 STATIC int		Mark;
@@ -283,12 +283,7 @@ STATIC void TTYstring(ECHAR *p)
 	TTYshow(*p++);
 }
 
-#if 0
-/* Old one line version */
-#define TTYback()	(backspace ? TTYputs((ECHAR *)backspace) : TTYput('\b'))
-#endif
-
-STATIC int printlen(CONST char *p)
+STATIC int printlen(CONST ECHAR *p)
 {
     int len = 0;
 
