@@ -352,6 +352,27 @@ biasing is applied to the cross-correlation track as described in
 */
 void srpd(EST_Wave &sig, EST_Track &fz, EST_Features &options);
 
+/* ESPS pitch tracker 
+
+@param sig: input waveform
+@param op:  options regarding pitch tracking parameters
+@param op.min_pitch: minimum permitted F0 value
+@param op.max_pitch: maximum permitted F0 value
+@param op.pda_frame_shift: analysis frame shift
+@param op.pda_frame_length: analysis frame length
+@param op.lpf_cutoff: cut off frequency for low pass filtering
+@param op.lpf_order: order of low pass filtering (must be odd)
+@param op.decimation
+@param op.noise_floor
+@param op.min_v2uv_coef_thresh
+@param op.v2uv_coef_thresh_ratio
+@param op.v2uv_coef_thresh
+@param op.anti_doubling_thresh
+@param op.peak_tracking
+
+*/
+void esps(EST_Wave &sig, EST_Track &fz, EST_Features &options);
+
 /** Smooth selected parts of an f0 contour.  Interpolation is
 controlled by the <tt>speech</tt> track. When a point has a positive
 value in the speech track, it is a candidate for interpolation.  

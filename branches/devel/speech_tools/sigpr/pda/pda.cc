@@ -38,15 +38,16 @@
 #include "sigpr/EST_sigpr_utt.h"
 #include "sigpr/EST_filter.h"
 #include "srpd.h"
+#include "esps.h"
 #include "EST_error.h"
 #include "EST_string_aux.h"
 
-int read_next_wave_segment (EST_Wave &sig, struct Srpd_Op *paras, 
-			    SEGMENT_ *p_seg);
-
-static void srpd(EST_Wave &sig, EST_Track &fz, Srpd_Op &srpd_op, int resize);
-static struct Srpd_Op *default_srpd_op(struct Srpd_Op *srpd);
-static void parse_srpd_list(EST_Features &a_list, struct Srpd_Op *srpd);
+int 			read_next_wave_segment (EST_Wave &sig, struct Srpd_Op *paras, 
+						SEGMENT_ *p_seg);
+static void 		srpd(EST_Wave &sig, EST_Track &fz, Srpd_Op &srpd_op, int resize);
+static void 		esps(EST_Wave &sig, EST_Track &fz, Srpd_Op &srpd_op, int resize);
+static struct Srpd_Op*  default_srpd_op(struct Srpd_Op *srpd);
+static void 		parse_srpd_list(EST_Features &a_list, struct Srpd_Op *srpd);
 
 void pda(EST_Wave &sig, EST_Track &fz, EST_Features &op, EST_String method)
 {
@@ -56,15 +57,17 @@ void pda(EST_Wave &sig, EST_Track &fz, EST_Features &op, EST_String method)
 	    method = op.S("pda_method");
     }
     if (method == "")	
-	srpd(sig, fz, op);
+	esps(sig, fz, op);
     else if  (method == "srpd")
 	srpd(sig, fz, op);
+    else if  (method == "esps")
+	esps(sig, fz, op);
     else
 	EST_error("Unknown pda %s\n", (const char *)method);
 }
 
 void icda(EST_Wave &sig, EST_Track &fz, EST_Track &speech, EST_Features &op, 
-	       EST_String method)
+	  EST_String method)
 { // intonation contour detection algorithm
     EST_Track raw_fz;
     if (method == "")
@@ -95,13 +98,15 @@ void srpd(EST_Wave &sig, EST_Track &fz, EST_Features &op)
     srpd(sig, fz, srpd_op, op.I("srpd_resize", 0));
 }
 
-/*void do_srpd_fz(EST_Wave &sig, EST_Track &fz)
+void esps(EST_Wave &sig, EST_Track &fz, EST_Features &op)
 {
     Srpd_Op srpd_op;
-    default_srpd_op(&srpd_op);
-    srpd(sig, fz, srpd_op, 1);
+
+    default_srpd_op(&srpd_op); // default values
+    parse_srpd_list(op, &srpd_op); // override with options
+
+    esps(sig, fz, srpd_op, op.I("srpd_resize", 0));
 }
-*/
 
 void srpd(EST_Wave &sig, EST_Track &fz, Srpd_Op &srpd_op, int resize)
 {
@@ -160,12 +165,12 @@ void srpd(EST_Wave &sig, EST_Track &fz, Srpd_Op &srpd_op, int resize)
 	    if (held_status.v_uv != VOICED) 
 		fz.set_break(j);
 	    fz.a(j++) = held_status.pitch_freq;
-	    //    printf( "track set:  %d (of %d) to %f\n", j-1, fz.length(), held_status.pitch_freq );
+	    // printf( "track set:  %d (of %d) to %f\n", j-1, fz.length(), held_status.pitch_freq );
 	}
 	if (pda_status.v_uv != VOICED) 
 	    fz.set_break(j);
 	fz.a(j++) = pda_status.pitch_freq;
-	//printf( "track set:  %d (of %d) to %f\n", j-1, fz.length(), pda_status.pitch_freq );
+	// printf( "track set:  %d (of %d) to %f\n", j-1, fz.length(), pda_status.pitch_freq );
     }
     if (held_status.s_h == HELD) 
     {
@@ -175,6 +180,122 @@ void srpd(EST_Wave &sig, EST_Track &fz, Srpd_Op &srpd_op, int resize)
 	fz.a(j++) = held_status.pitch_freq;
     }
     end_structure_use (&segment, &cc);
+}
+
+
+#define min(x,y) ((x > y)? y : x)
+
+static void esps(EST_Wave &lx, EST_Track &fz, Srpd_Op &srpd_op, int resize)
+{
+  float *fdata;
+  int done;
+  long buff_size, actsize;
+  double sf, start_time;
+  F0_params *par, *read_f0_params();
+  float *f0p, *vuvp, *plocs, *rms_speech, *acpkp;
+  int i, vecsize;
+  int init_dp_f0(), dp_f0();
+  static int framestep = -1;
+  long sdstep = 0, total_samps;
+  int ndone = 0;
+  int count = 0;
+  int startpos = 0, endpos = -1;
+
+  par = (F0_params *) malloc(sizeof(F0_params));
+  par->cand_thresh = 0.3f;
+  par->lag_weight = 0.3f;
+  par->freq_weight = 0.02f;
+  par->trans_cost = 0.005f;
+  par->trans_amp = 0.5f;
+  par->trans_spec = 0.5f;
+  par->voice_bias = 0.0f;
+  par->double_cost = 0.35f;
+  par->min_f0 = 50;
+  par->max_f0 = 550;
+  par->frame_step = srpd_op.shift / 1000;
+  par->wind_dur = 0.0075f;
+  par->n_cands = 20;
+
+  if (resize)
+    {
+	fz.set_equal_space(true);
+	fz.resize(lx.num_samples() / par->frame_step / lx.sample_rate (), 1);
+	fz.set_channel_name("F0", 0);
+	fz.fill_time(srpd_op.shift/1000);
+    }
+
+  if (!fz.equal_space())
+	EST_error("Pitch tracking algorithm must have equal spaced track\n");
+
+  if (startpos < 0) startpos = 0;
+  if (endpos >= (lx.length() - 1) || endpos == -1)
+    endpos = lx.length() - 1;
+  if (startpos > endpos) return;
+
+  sf = (double) lx.sample_rate();
+
+  if (framestep > 0)  /* If a value was specified with -S, use it. */
+    par->frame_step = (float) (framestep / sf);
+  start_time = 0.0f;
+  if(check_f0_params(par, sf)){
+    fprintf (stderr, "invalid/inconsistent parameters -- exiting.\n");
+    return;
+  }
+
+  total_samps = endpos - startpos + 1;
+  if(total_samps < ((par->frame_step * 2.0) + par->wind_dur) * sf) {
+    fprintf (stderr, "input range too small for analysis by get_f0.\n");
+    return;
+  }
+  /* Initialize variables in get_f0.c; allocate data structures;
+   * determine length and overlap of input frames to read.
+   */
+  if (init_dp_f0(sf, par, &buff_size, &sdstep)
+      || buff_size > INT_MAX || sdstep > INT_MAX)
+  {
+    fprintf (stderr, "problem in init_dp_f0().\n");
+    return;
+  }
+
+  // fprintf(stderr, "init_dp_f0 returned buff_size %ld, sdstep %ld.\n",buff_size, sdstep);
+
+  if (buff_size > total_samps)
+    buff_size = total_samps;
+
+  actsize = min(buff_size, lx.length());
+  fdata = (float *) malloc(sizeof(float) * max(buff_size, sdstep));
+  ndone = startpos;
+
+  while (TRUE) {
+    done = (actsize < buff_size) || (total_samps == buff_size);
+    for (i = 0; i < actsize; i++) {
+	    fdata[i] = lx.a_no_check(i + ndone);
+    }
+    if (dp_f0(fdata, (int) actsize, (int) sdstep, sf, par,
+	      &f0p, &vuvp, &plocs, &rms_speech, &acpkp, &vecsize, done)) {
+        return;
+    }
+    for (i = vecsize - 1; i >= 0; i--) {
+        fz.a(count++) = f0p[i];
+    }
+
+    if (done) break;
+
+    ndone += sdstep; 
+    actsize = min(buff_size, lx.length() - ndone);
+    total_samps -= sdstep;
+
+    if (actsize > total_samps)
+      actsize = total_samps;
+  }
+
+  free((void *)fdata);
+
+  free((void *)par);
+
+  free_dp_f0();
+
+  return;
 }
 
 static struct Srpd_Op *default_srpd_op(struct Srpd_Op *srpd)
@@ -192,7 +313,6 @@ static struct Srpd_Op *default_srpd_op(struct Srpd_Op *srpd)
     srpd->make_ascii = 0;
     srpd->peak_tracking = 0;
     srpd->sample_freq = DEFAULT_SF;
-      /* p_par->Nmax and p_par->Nmin cannot be initialised */
     return(srpd);
 }
 

@@ -83,6 +83,17 @@ are then chosen.
 
 EST_Track pitchmark(EST_Wave &lx, EST_Features &op);
 
+
+/** Find pitchmarks in waveform signal. 
+
+This high level function places a pitchmark on each positive peak in
+the voiced portions of the lx signal.
+
+@param lx laryngograph waveform
+*/
+
+EST_Track epochs(EST_Wave &lx);
+
 /** Find pitchmarks in Laryngograph (lx) signal. The function is the
 same as \Ref{pitchmark} but with more explicit control over
 the parameters.

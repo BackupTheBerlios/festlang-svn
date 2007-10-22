@@ -52,11 +52,29 @@ then
    exit 1
 fi
 
+F0MIN=60
+F0MAX=200
+F0MEAN=110
+
+if [ -f etc/f0.params ]
+then
+   . etc/f0.params
+fi
+
+if [ -f etc/silence ]
+then
+SILENCE=`awk '{print $1}' etc/silence`
+else
+SILENCE=pau
+fi
+
 for i in $*
 do
   fname=`basename $i .wav`
   echo $fname F0
-  $ESTDIR/bin/pda -L -fmin 70 -fmax 240 -o f0/$fname.f0 -otype ssff $PDA_PARAMS wav/$fname.wav
+  $ESTDIR/bin/pda -L -fmin $F0_MIN -fmax $F0_MAX -o $fname.f0 -otype ssff $PDA_PARAMS wav/$fname.wav
+  $FESTVOXDIR/src/general/smooth_f0 -o f0/$fname.f0 -otype est_binary -pm_min_f0 $F0_MIN $fname.f0 -lab lab/$fname.lab -silences $SILENCE -interpolate -postsmooth -postwindow 0.025
+  rm $fname.f0
 done
 
 

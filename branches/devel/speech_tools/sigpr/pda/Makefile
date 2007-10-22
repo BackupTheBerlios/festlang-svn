@@ -35,11 +35,11 @@
 #=========================================================================#
 TOP=../..
 DIRNAME=sigpr/pda
-H = array_smoother.h srpd.h
+H = array_smoother.h srpd.h esps.h
 
 LOCAL_DEFAULT_LIBRARY = estbase
 
-CPPSRCS = pcb_smoother.cc smooth_pda.cc pda.cc srpd1.3.cc
+CPPSRCS = pcb_smoother.cc smooth_pda.cc pda.cc srpd1.3.cc esps.cc
 CSRCS =
 SRCS = $(CPPSRCS)
 OBJS = $(CPPSRCS:.cc=.o) 

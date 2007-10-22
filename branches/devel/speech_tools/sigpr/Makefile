@@ -46,7 +46,7 @@ H =
 TSRCS = EST_Window.cc
 # Some versions of gcc can't optimize this file (most can)
 NOOPTSRCS = fft.cc 
-CPPSRCS = delta.cc filter.cc \
+CPPSRCS = delta.cc filter.cc epochs.cc \
 	sigpr_frame.cc sigpr_utt.cc \
 	pitchmark.cc spectrogram.cc misc.cc $(NOOPTSRCS)
 
