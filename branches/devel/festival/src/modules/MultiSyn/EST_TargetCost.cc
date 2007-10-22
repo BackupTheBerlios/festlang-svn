@@ -422,6 +422,29 @@ float EST_TargetCost::bad_f0_cost() const
   return penalty; 
 }
 
+float EST_TargetCost::bad_f0_target_cost() const
+{
+  // by default, the last element of join cost coef vector is
+  // the f0 (i.e. fv->a_no_check( fv->n()-1 ) )
+
+  EST_Item* t = as(targ, "Segment");
+  const EST_String &phone(  cand->features().val("name").String());
+
+  EST_FVector *fv = 0;
+  float penalty = 0.0;
+
+  if( ph_is_vowel( phone )
+      || ph_is_approximant( phone )
+      || ph_is_liquid( phone )
+      || ph_is_nasal( phone ) ){
+    fv = fvector( cand->f("midcoef") );
+    if( fv->a_no_check(fv->n()-1) > 0 ) // means voiced
+      penalty += fabs(fv->a_no_check(fv->n()-1) - ffeature (t, "seg_pitch").Float()) / 50;
+  }
+
+  return penalty; 
+}
+
 
 /*
  *  DERIVED CLASS: EST_DefaultTargetCost
@@ -449,6 +472,7 @@ float EST_DefaultTargetCost::operator()(const EST_Item* targ, const EST_Item* ca
   // These are considered really bad, and will result in a score > 1.
   score += 10.0*bad_duration_cost(); // see also join cost.
   score += 10.0*bad_f0_cost();
+  score += 10.0*bad_f0_target_cost();
   score += 10.0*punctuation_cost();
 
 
