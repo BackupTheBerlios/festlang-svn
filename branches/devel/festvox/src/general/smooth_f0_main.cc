@@ -173,6 +173,7 @@ int main(int argc,char **argv)
 		(item->name() == silences) ||
 		(item->name() == "h#")  ||
 		(item->name() == "ssil")  ||
+		(item->name() == "something")  ||
 		(item->name() == "H#"))
 		spsil.a(i) = 0;
 	    else
@@ -255,6 +256,10 @@ static void interpolate(const EST_Track &c,
     if (speech.num_frames() < c.num_frames())
 	interp.resize(speech.num_frames(), interp.num_channels());
 
+    // First is unvoiced since we rely on initial silence
+    interp.a(0) = 0;
+    interp.a(0,1) = 0;
+
     for (i = 1; i < interp.num_frames()-1; i++)
     {
 	if (speech.a(i) == 1)
@@ -294,7 +299,7 @@ static void interpolate(const EST_Track &c,
 	    interp.a(i,1) = 0;
 	}
     }
-    // Last one is unvoiced, because, thats my definition
+    // Last one is unvoiced too, because smoothing relies on initial and final silence
     interp.a(i) = 0;
     interp.a(i,1) = 0;
 }
