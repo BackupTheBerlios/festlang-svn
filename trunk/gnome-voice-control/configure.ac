@@ -1,5 +1,5 @@
 AC_INIT(configure.ac)
-AM_INIT_AUTOMAKE(gnome-voice-control, 0.2)
+AM_INIT_AUTOMAKE(gnome-voice-control, 0.3)
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
