@@ -3,6 +3,8 @@
     <popup name="button3">
       <menuitem name="Start Control" verb="VoiceControlStart" _label="_Start Control"
     		    pixtype="stock" pixname="gtk-media-play"/>
+      <menuitem name="Start Keypress Control" verb="KeypressVoiceControlStart" _label="_Start Keypress Control"
+    		    pixtype="stock" pixname="gtk-media-play"/>
       <menuitem name="Stop Control" verb="VoiceControlStop" _label="_Stop Control"
     		    pixtype="stock" pixname="gtk-media-pause"/>
       <menuitem name="Clock Help Item" verb="VoiceControlHelp" _label="_Help"

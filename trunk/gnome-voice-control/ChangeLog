@@ -1,3 +1,21 @@
+2007-12-08  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* data/GNOME_VoiceControlApplet.xml:
+	* lang/desktop-control.dict:
+	* src/Makefile.am:
+	* src/action.c: (do_action):
+	* src/spi-listener.c: (control_spi_set_voice_control_pipeline),
+	(control_spi_listener_keys_listener_cb),
+	(control_spi_listener_init), (control_spi_listener_start),
+	(control_spi_listener_stop):
+	* src/spi-listener.h:
+	* src/voice-control.c: (keypress_control_start), (control_stop),
+	(on_sink_initialization), (on_sink_calibration),
+	(on_sink_listening), (on_sink_ready), (display_about_dialog),
+	(setup_voice_control_widget), (main):
+	
+	Patch for keypress and documentation from Raphael.
+
 2007-10-23  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* configure.ac:

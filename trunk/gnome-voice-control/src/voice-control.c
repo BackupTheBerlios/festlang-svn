@@ -126,11 +126,25 @@ control_start (BonoboUIComponent  *uic,
 }
 
 static void
+keypress_control_start (BonoboUIComponent  *uic,
+	       VoiceControlApplet *voice_control,
+	       const char         *verbname)
+{
+
+	control_spi_listener_start (voice_control->spi_listener);
+
+	control_spi_set_voice_control_pipeline(voice_control->pipeline);
+
+}
+
+
+static void
 control_stop (BonoboUIComponent  *uic,
 	       VoiceControlApplet *voice_control,
 	       const char         *verbname)
 {
         gst_element_set_state (voice_control->pipeline, GST_STATE_NULL);
+	gtk_image_set_from_file(GTK_IMAGE(voice_control->frame),"/home/ken-ichi/gvc-idle-icon.png");
 	voice_control_set_text (voice_control, _("Idle"), _("Choose Start Control to start"));
 	control_spi_listener_stop (voice_control->spi_listener);
 }
@@ -141,6 +155,7 @@ on_sink_initialization (GObject *sink, gpointer data)
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 
 	gdk_threads_enter ();
+	gtk_image_set_from_file(GTK_IMAGE(voice_control->frame),"/home/ken-ichi/gvc-init_calib-icon.png");	
 	voice_control_set_text (voice_control, _("Init"), _("Loading acoustic and language model, wait a bit"));
 	gdk_threads_leave ();
 }
@@ -163,6 +178,7 @@ on_sink_calibration (GObject *sink, gpointer data)
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 
 	gdk_threads_enter ();
+	gtk_image_set_from_file(GTK_IMAGE(voice_control->frame),"/home/ken-ichi/gvc-init_calib-icon.png");
 	voice_control_set_text (voice_control, _("Calibration"), _("Tuning up acoustic parameters"));
 	gdk_threads_leave ();
 }
@@ -179,6 +195,8 @@ on_sink_listening (GObject *sink, gpointer data)
 		g_warning("Failed to show notifcation: %s\n", err->message);
 		g_error_free(err);
 	}
+
+	gtk_image_set_from_file(GTK_IMAGE(voice_control->frame),"/home/ken-ichi/gvc-listening-icon.png");	
 	voice_control_set_text (voice_control, _("Listening"), _("Processing speech"));
 	gdk_threads_leave ();
 }
@@ -189,6 +207,7 @@ on_sink_ready (GObject *sink, gpointer data)
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 
 	gdk_threads_enter ();
+	gtk_image_set_from_file(GTK_IMAGE(voice_control->frame),"/home/ken-ichi/gvc-ready-icon.png");	
 	voice_control_set_text (voice_control, _("Ready"), _("Ready for input"));
 	gdk_threads_leave ();
 }
@@ -325,7 +344,7 @@ display_about_dialog (BonoboUIComponent  *uic,
 	voice_control->about_dialog = gtk_about_dialog_new ();
 	g_object_set (voice_control->about_dialog,
 		      "name", _("VoiceControl"),
-		      "version", "0.1.0",
+		      "version", "0.2.0",
 		      "copyright", "Copyright \xc2\xa9 1998-2002 Free Software Foundation, Inc.",
 		      "comments", descr,
 		      "authors", (const char **) authors,
@@ -367,13 +386,11 @@ setup_voice_control_widget (VoiceControlApplet *voice_control)
 {
 	GtkWidget *widget = (GtkWidget *) voice_control;
 
-	voice_control->frame = gtk_frame_new (NULL);
-	gtk_frame_set_shadow_type (GTK_FRAME (voice_control->frame), GTK_SHADOW_IN);
+	voice_control->frame = GTK_IMAGE(gtk_image_new_from_file("/home/ken-ichi/gvc-idle-icon.png"));
+
 	gtk_container_add (GTK_CONTAINER (widget), voice_control->frame);
-	gtk_widget_set_size_request (voice_control->frame, 100, -1);
 	
 	voice_control->state_label = gtk_label_new ("");
-	gtk_container_add (GTK_CONTAINER (voice_control->frame), voice_control->state_label);
 
 	voice_control_set_text (voice_control, _("Idle"), _("Choose Start Control to start"));
 
@@ -381,10 +398,11 @@ setup_voice_control_widget (VoiceControlApplet *voice_control)
 }
 
 static const BonoboUIVerb voice_control_menu_verbs [] = {
-	BONOBO_UI_UNSAFE_VERB ("VoiceControlStart",       control_start),
-	BONOBO_UI_UNSAFE_VERB ("VoiceControlStop",        control_stop),
-	BONOBO_UI_UNSAFE_VERB ("VoiceControlHelp",        display_help_dialog),
-	BONOBO_UI_UNSAFE_VERB ("VoiceControlAbout",       display_about_dialog),
+	BONOBO_UI_UNSAFE_VERB ("VoiceControlStart",         control_start),
+	BONOBO_UI_UNSAFE_VERB ("KeypressVoiceControlStart", keypress_control_start),
+	BONOBO_UI_UNSAFE_VERB ("VoiceControlStop",          control_stop),
+	BONOBO_UI_UNSAFE_VERB ("VoiceControlHelp",          display_help_dialog),
+	BONOBO_UI_UNSAFE_VERB ("VoiceControlAbout",         display_about_dialog),
         BONOBO_UI_VERB_END
 };
 
@@ -544,6 +562,11 @@ int main (int argc, char *argv [])
 				      argc, argv,
 				      GNOME_CLIENT_PARAM_SM_CONNECT, FALSE,
 				      GNOME_PARAM_NONE);
+
+	gtk_icon_theme_append_search_path (gtk_icon_theme_get_default (),
+						APPNAME_DATA_DIR G_DIR_SEPARATOR_S 
+						"icons");
+
 	SPI_init ();
 	
         retval = panel_applet_factory_main ("OAFIID:GNOME_VoiceControlApplet_Factory",

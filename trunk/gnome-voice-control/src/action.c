@@ -124,6 +124,12 @@ static VoiceActionCommand commands[] =
  {"CUT", ACTION_CUT},
  {"PASTE", ACTION_PASTE},
 
+ {"MOUSE LEFT", ACTION_MOUSE_LEFT},
+ {"MOUSE RIGHT", ACTION_MOUSE_RIGHT},
+ {"MOUSE DOWN", ACTION_MOUSE_DOWN},
+ {"MOUSE UP", ACTION_MOUSE_UP},
+
+
  {"MAIN MENU", ACTION_MAIN_MENU},
  {NULL, 0},
 };
@@ -292,7 +298,7 @@ do_action (VoiceAction action)
 
 	    case ACTION_PASTE:
 		    keycode = XKeysymToKeycode(GDK_DISPLAY(), (KeySym) GDK_Control_L);
-		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_PRESS);
+		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_PRESS);	
 		    SPI_generateKeyboardEvent (GDK_V, NULL, SPI_KEY_SYM);
 		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_RELEASE);
 		    break;
@@ -307,6 +313,22 @@ do_action (VoiceAction action)
 		    SPI_generateKeyboardEvent (GDK_F1, NULL, SPI_KEY_SYM);
 		    SPI_generateKeyboardEvent (keycode, NULL, SPI_KEY_RELEASE);
 		    break;
+
+	    case ACTION_MOUSE_LEFT:
+                    SPI_generateMouseEvent(-10,0,"rel");
+		    break;	
+
+	    case ACTION_MOUSE_RIGHT:
+		    SPI_generateMouseEvent(10,0,"rel");
+		    break;
+
+    	    case ACTION_MOUSE_DOWN:
+		    SPI_generateMouseEvent(0,-10,"rel");
+		    break;
+
+	    case ACTION_MOUSE_UP:
+		    SPI_generateMouseEvent(0,10,"rel");
+		    break;	
 
 	    default:
 		    g_warning ("Not implemented yet");

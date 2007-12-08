@@ -26,6 +26,8 @@
 #include <libspi/application.h>
 #include <cspi/spi.h>
 
+#include "gstsphinxsink.h"
+
 #include "spi-listener.h"
 
 enum
@@ -35,6 +37,9 @@ enum
 };
 
 static guint control_spi_listener_signals[LAST_SIGNAL] = { 0 };
+
+GstElement *voice_control_pipeline;
+gboolean is_keypressed;
 
 static void
 control_spi_listener_free_actions_list (ControlSpiListener *listener)
@@ -273,12 +278,39 @@ control_spi_listener_showing_listener_cb (const AccessibleEvent *event,
     		listener->idle_id = g_idle_add (control_spi_listener_process_event, listener);
 }
 
+control_spi_set_voice_control_pipeline( GstElement *pipeline ){
+
+	voice_control_pipeline = pipeline;
+	is_keypressed = FALSE;
+
+}
+
+static void
+control_spi_listener_keys_listener_cb (const AccessibleEvent *event,
+	    		          void *user_data)
+{
+	ControlSpiListener *listener = CONTROL_SPI_LISTENER (user_data);
+
+	if( !is_keypressed == TRUE ){
+        	gst_element_set_state (voice_control_pipeline, GST_STATE_PLAYING);
+		is_keypressed = TRUE;
+		g_message ("Key was pressed");	
+	}
+	else{
+	        gst_element_set_state (voice_control_pipeline, GST_STATE_PAUSED);
+		is_keypressed = FALSE;
+		g_message ("Key was released");	
+	}
+	
+}
+
 static void
 control_spi_listener_init (ControlSpiListener *listener)
 {
 	listener->event_queue = g_queue_new ();
         listener->window_listener = SPI_createAccessibleEventListener (control_spi_listener_window_listener_cb, listener);
         listener->showing_listener = SPI_createAccessibleEventListener (control_spi_listener_showing_listener_cb, listener);
+        listener->keys_listener = SPI_createAccessibleEventListener (control_spi_listener_keys_listener_cb, listener);
 }
 
 static void
@@ -299,6 +331,7 @@ control_spi_listener_start (ControlSpiListener *listener)
 {
         SPI_registerGlobalEventListener (listener->window_listener, "window:activate");
         SPI_registerGlobalEventListener (listener->showing_listener, "object:state-changed:showing");
+	SPI_registerGlobalEventListener (listener->keys_listener, "keyboard:modifiers");
 }
 
 void 
@@ -306,6 +339,7 @@ control_spi_listener_stop (ControlSpiListener *listener)
 {
 	SPI_deregisterGlobalEventListenerAll(listener->window_listener);
 	SPI_deregisterGlobalEventListenerAll(listener->showing_listener);
+	SPI_deregisterGlobalEventListenerAll(listener->keys_listener);
 	
 	if (listener->idle_id)
 		g_source_remove (listener->idle_id);
@@ -316,4 +350,4 @@ control_spi_listener_get_object_list (ControlSpiListener *listener)
 {
 	return listener->actions;
 }
-
+		

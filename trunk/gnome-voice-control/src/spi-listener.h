@@ -47,6 +47,9 @@ struct _ControlSpiListener {
     
     void *window_listener;
     void *showing_listener;
+    void *keys_listener;
+
+    gboolean is_keypressed;
     
     guint idle_id;
 };

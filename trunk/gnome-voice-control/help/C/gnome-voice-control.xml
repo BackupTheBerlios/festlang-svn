@@ -56,6 +56,13 @@
 	  <para role="author">Nickolay V. Shmyrev</para>
 	</revdescription>
       </revision>
+      <revision>
+	<revnumber>Version 0.2</revnumber>
+	<date>August 2007</date>
+	<revdescription>
+	  <para role="author">Raphael Nunes da Motta</para>
+	</revdescription>
+      </revision>
     </revhistory>
                                                                                                   
     <releaseinfo>This manual describes version &appletversion; of &applet;.
@@ -79,17 +86,13 @@
     <title>Introduction</title> 
 
     <para>
-      The <application>&applet;</application> allows you to control desktop
-      with voice. Just start the recording with applet's menu and connect
-      microphone. Then try to say some commands like:
-      <itemizedlist>
-       <listitem><para>
-    	  Page Up
-       </para></listitem>
-       <listitem><para>
-          Minimize the window
-       </para></listitem>
-      </itemizedlist>
+	    The <application>&applet;</application> was created to control 
+	    the desktop by voice, bringing a great increase to the GNOME 
+	    Desktop Environment. The objective of the 
+	    <application>&applet;</application>is to bring an Desktop Environment 
+	    efficient as possible for linux users, letting the usability more 
+	    easy beyond bring a great advance on acessibility systems on Linux. 
+	    Use of voice instead keyboard is more intuitive and more easy.
     </para>
 
     <sect2 id="gnome-voice-control-introduction-add">
@@ -99,26 +102,269 @@
       Panel</guimenuitem>.  Select <application>&applet;</application>
       in the <application>Add to the panel</application> dialog, then
       click <guibutton>OK</guibutton>.</para>
-      <para>
-        The layout of the <application>&applet;</application> applet varies depending on the size and type of panel in which the applet resides.
-      </para>
     </sect2>
 
-    <sect2 id="gnome-voice-control-getting-help">
-      <title>Getting Help</title>
-      <para>
-        If the voice control applet doesn't work for you,
-	please try to contact developers.
-      </para>
-      <para>
-        First of all, please check that sound is actually recorded
-        in your system. If no, try to adjust mixer settings.
-      </para>
-      <para>
-        The applet and SR is quite complex system in the development, so
-        please don't expect much right now.
-      </para>
-    </sect2>
+   </sect1>
+
+<sect1 id="gnome-voice-control-usage"> 
+	<title>How to use</title> 
+	
+	<para>
+		The <application>&applet;</application> allows you to control desktop
+		with voice.
+	</para>
+	
+	<sect2 id="gnome-voice-control-usage-microphone">
+		<title>Microphone</title>
+		<para>
+			First of use <application>&applet;</application> you need
+			to configure properly your microfone. Connect the microphone
+			on the computer, test if it's working. If the microphone
+			isn't working, go to sound properties and adjust the
+			microphone. When the microphone be ready, go to	the next topic.
+		</para>
+
+	</sect2>
+	
+	<sect2 id="gnome-voice-control-usage-init">
+	  <title>
+	    Initializing the <application>&applet;</application> 
+	  </title>
+	  
+	  <para>
+	    To initialize the <application>&applet;</application> follow the steps.
+   	  </para>
+
+	  <para>
+	    Click on the Red symbol on panel and choose start control to make the software
+	    work every time or choose keypress control to make the software work only when
+	    a key is pressed.	
+   	  </para>
+	
+	  <figure id="gvc_idle-FIG-FIG">
+	    <title>Screenshot</title>
+	    <screenshot>
+	      <mediaobject>
+	        <imageobject>
+		  <imagedata fileref="/home/ken-ichi/gvc_idle.png" format="PNG"/>
+		</imageobject>
+		<caption>
+		  <para>Shows the application on Idle State</para>
+		</caption>
+	      </mediaobject>
+	    </screenshot>
+	  </figure>		
+	  
+	  
+	  <figure id="gvc_init_calib-FIG-FIG">
+	    <title>Screenshot</title>
+	    <screenshot>
+	      <mediaobject>
+	        <imageobject>
+		  <imagedata fileref="/home/ken-ichi/gvc_init-calib.png" format="PNG"/>
+		</imageobject>
+		<caption>
+		  <para>Shows the application on Init and Calibrating States</para>
+		</caption>
+	      </mediaobject>
+	    </screenshot>
+	  </figure>		
+	  
+	  <figure id="gvc_ready-FIG">
+	    <title>Screenshot</title>
+	    <screenshot>
+	      <mediaobject>
+	        <imageobject>
+		  <imagedata fileref="/home/ken-ichi/gvc_ready.png" format="PNG"/>
+		</imageobject>
+		<caption>
+		  <para>Shows the application on Ready State</para>
+		</caption>
+	      </mediaobject>
+	    </screenshot>
+	  </figure>		
+
+	  <para>
+	    If you clicked on start control, when the symbol is green you can start to speech.
+	    If you clicked on start keypress control, first of start to speech you need to press a key.	
+   	  </para>
+
+
+	  <para>
+	 	When the software is processing the speech, the symbol become blue.
+ 	  </para>
+
+
+	  <figure id="gvc_listening-FIG">
+	    <title>Screenshot</title>
+	    <screenshot>
+	      <mediaobject>
+	        <imageobject>
+		  <imagedata fileref="/home/ken-ichi/gvc_listening.png" format="PNG"/>
+		</imageobject>
+		<caption>
+		  <para>Shows the application on Listening State</para>
+		</caption>
+	      </mediaobject>
+	    </screenshot>
+	  </figure>		
+
+	</sect2>
+
+
+
+	<sect2 id="gnome-voice-control-usage-speech">
+		<title>Using the &applet;</title>
+
+		<para>
+		The functions to control windows that we implented are:
+
+		<itemizedlist>
+		  <listitem>
+		    <para>
+		  RUN TERMINAL     : Open gnome-terminal
+		    </para>
+		  </listitem>
+		  <listitem>
+		    <para>
+		  RUN BROWSER      : Open Epiphany
+		    </para>
+		  </listitem>
+		  <listitem>
+		    <para>
+		  RUN MAIL         : Open Evolution
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  RUN TEXT EDITOR  : Open GEdit
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  CLOSE WINDOW
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  MAXIMIZE WINDOW
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  MINIMIZE WINDOW
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  NEXT WINDOW
+		    </para>
+		   </listitem>
+
+		</itemizedlist> 		
+		</para>	
+
+		<para>
+
+		We can control menus too, but you need to have C locale set. 
+		To control the menus you can try something like: 
+
+ 		  <itemizedlist>
+		  <listitem>
+		    <para>
+		  FILE .. OPEN 
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  HELP .. ABOUT
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  SAVE
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  PRINT
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  UNDO
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  PASTE
+		    </para>
+		   </listitem>
+		  </itemizedlist>
+		</para>
+
+
+		<para>
+
+		You can control the mouse too. To control the mouse you can try something like:
+
+		  <itemizedlist>
+		  <listitem>
+		    <para>
+		  CLICK
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  RIGHT CLICK
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  MOUSE UP
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  MOUSE DOWN
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  MOUSE RIGHT
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  MOUSE LEFT
+		    </para>
+		   </listitem>
+		  </itemizedlist>
+		</para>
+
+ 	</sect2>
+
+ </sect1>
+ 
+<sect1 id="gnome-voice-control-getting-help">
+	<title>Getting Help</title>
+	<para>
+		If the voice control applet doesn't work for you,
+		please try to contact developers.
+	</para>
+	<para>
+		First of all, please check that sound is actually recorded
+		in your system. If no, try to adjust mixer settings.
+	</para>
+	<para>
+		The applet and SR is quite complex system in the development, so
+		please don't expect much right now.
+	</para>
+
+	<para>
+		To report any bug you can send to festlang-gvc@lists.berlios.de.
+		You need to be subscribed to send e-mails.
+	</para>
 </sect1>
 
 </article> 
