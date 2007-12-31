@@ -74,7 +74,7 @@ do
    # may be worth modifying, see the section on Extracting pitchmarks from
    # waveforms in the document
    $ESTDIR/bin/epochs tmp$$.wav -o $fname.pm -otype est
-   $ESTDIR/bin/pitchmark tmp$$.wav -pm $fname.pm -o pm/$fname.pm -otype est -fill
+   $ESTDIR/bin/pitchmark tmp$$.wav -pm $fname.pm -o pm/$fname.pm -otype est -fill -wave_end
    rm -f $fname.pm
    rm -f tmp$$.wav
 done
