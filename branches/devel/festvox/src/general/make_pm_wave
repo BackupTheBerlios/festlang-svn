@@ -38,14 +38,6 @@
 
 LANG=C; export LANG
 
-if [ $# = 0 ]
-then
-   echo "Make pm files from waveforms"
-   echo "Usage:  bin/make_pm_wave wav/*.wav"
-   echo "This will require editing of parameters to get a good result"
-   exit 1
-fi
-
 if [ ! "$ESTDIR" ]
 then
    echo "environment variable ESTDIR is unset"
