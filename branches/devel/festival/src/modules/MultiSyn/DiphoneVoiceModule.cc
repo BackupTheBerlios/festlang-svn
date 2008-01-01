@@ -193,6 +193,12 @@ void DiphoneVoiceModule::initialise( const EST_TargetCost *tc, bool ignore_bad_t
 
   int numIgnoredPhones=0;
 
+  if(ignore_bad_tag)
+    EST_warning( "Looking for bad flags");
+  else
+    EST_warning( "Ignoring bad flags");
+
+
   for( EST_Litem *it=fileList.head(); it!=0 ; it=next(it) ){
     u = new EST_Utterance;
     CHECK_PTR(u);
@@ -227,7 +233,8 @@ void DiphoneVoiceModule::initialise( const EST_TargetCost *tc, bool ignore_bad_t
     utt_dbase->append( u );
   }
   
-  EST_warning( "Ignored %d phones with bad flag set\n", numIgnoredPhones ); 
+  if(ignore_bad_tag)
+    EST_warning( "Ignored %d phones with bad flag set\n", numIgnoredPhones ); 
 }
 
 DiphoneVoiceModule::~DiphoneVoiceModule()

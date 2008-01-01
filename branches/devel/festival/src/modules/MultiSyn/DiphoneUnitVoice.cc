@@ -132,6 +132,9 @@ DiphoneUnitVoice::DiphoneUnitVoice( const EST_StrList& basenames,
     tc_rescoring_weight( 0.0 ),
     tc_weight( 1.0 ),
     jc_weight( 1.0 ),
+    jc_f0_weight( 1.0 ),
+    jc_power_weight( 1.0 ),
+    jc_spectral_weight( 1.0 ),
     prosodic_modification( 0 ),
     wav_srate( sr ),
     jc( 0 ),
@@ -495,9 +498,9 @@ void DiphoneUnitVoice::getUnitSequence( EST_Utterance  *utt )
 
 	  cout << "Missing diphone: "<< diphone_name << endl;
 
-	  if(s1 = parent(it,"SylStructure"))
+	  if((s1 = parent(it,"SylStructure")) == NULL)
 	    w1= parent(s1,"SylStructure");
-	  if( s2 = parent(it->next(),"SylStructure"))
+	  if((s2 = parent(it->next(),"SylStructure")) == NULL)
 	    w2= parent(s2,"SylStructure");
 
 	  if( w1 && w2 && (w1 != w2) )

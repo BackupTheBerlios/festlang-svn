@@ -114,6 +114,17 @@ TCData *EST_FlatTargetCost::flatpack(EST_Item *seg) const
   else 
     (*f)[NBAD_DUR]=0;
 
+  if(seg->f_present("bad_lex"))
+    (*f)[BAD_OOL]=1;
+  else 
+    (*f)[BAD_OOL]=0;
+
+  if(seg->next()->f_present("bad_lex"))
+    (*f)[NBAD_OOL]=1;
+  else 
+    (*f)[NBAD_OOL]=0;
+
+
   (*f)[BAD_F0]=get_bad_f0(seg);
 
 
@@ -375,6 +386,16 @@ float EST_FlatTargetCost::partofspeech_cost() const
   return 0;
 }
 
+
+float EST_FlatTargetCost::out_of_lex_cost() const
+{
+  // bad_dur may at some stage be set on a target for resynthesis purposes.
+  if( c->a_no_check(BAD_OOL) != t->a_no_check(BAD_OOL) )
+    return 1.0;
+  
+  if( c->a_no_check(NBAD_OOL) != t->a_no_check(NBAD_OOL) )
+    return 1.0;
+}
 
 float EST_FlatTargetCost::bad_duration_cost() const
 {
