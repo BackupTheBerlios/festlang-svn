@@ -374,6 +374,8 @@ float EST_TargetCost::out_of_lex_cost() const
   if( cand->next()->f_present(ool_feat) 
       != targ->next()->f_present(ool_feat) )
     return 1.0;
+  
+  return 0.0;
 }
 
 float EST_TargetCost::bad_duration_cost() const
