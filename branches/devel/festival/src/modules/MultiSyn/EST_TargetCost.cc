@@ -455,7 +455,7 @@ float EST_TargetCost::bad_f0_target_cost() const
       || ph_is_nasal( phone ) ){
     fv = fvector( cand->f("midcoef") );
     if( fv->a_no_check(fv->n()-1) > 0 ) // means voiced
-      penalty += fabs(fv->a_no_check(fv->n()-1) - ffeature (t, "seg_pitch").Float()) / 50;
+      penalty += fabs(fv->a_no_check(fv->n()-1) - ffeature (t, "seg_pitch").Float());
   }
 
   return penalty; 
@@ -482,13 +482,13 @@ float EST_DefaultTargetCost::operator()(const EST_Item* targ, const EST_Item* ca
   score += add_weight(15.0)*position_in_phrase_cost();
   score += add_weight(4.0)*left_context_cost();
   score += add_weight(3.0)*right_context_cost();
+  score += add_weight(0.2)*bad_f0_target_cost();
 
   score /= weight_sum;
 
   // These are considered really bad, and will result in a score > 1.
   score += 10.0*bad_duration_cost(); // see also join cost.
   score += 10.0*bad_f0_cost();
-  score += 10.0*bad_f0_target_cost();
   score += 10.0*punctuation_cost();
   score += 10.0*out_of_lex_cost();
 
