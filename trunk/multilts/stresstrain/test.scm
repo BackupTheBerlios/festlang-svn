@@ -3,7 +3,7 @@
 (load "words.scm")
 
 
-(voice_msu_ru_nsh_cg)
+(voice_msu_ru_nsh_clunits)
 
 (Parameter.set 'Synth_Method 'None)
 
@@ -139,5 +139,6 @@ Dump dictionary with results."
   (cond
     ((null words) nil)
     (t 
+	(format t "%s" (car words))
 	(utt.synth (eval (list 'Utterance 'Text (car words))))
         (dump_dict (cdr words)))))
