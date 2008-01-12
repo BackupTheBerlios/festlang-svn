@@ -2,17 +2,18 @@
 
 grammar test;
 
+import <ufa-streets.street>;
+
 public <prompt> = ([ <greet> ] <place> | <confirm> | <time> | (<number> *));
 
 <greet> = [здравствуйте] [такси];
 
-<place> = (<street> <number> [дробь <number>] | <poi>);
+<place> = (<ufa-streets.street> <number> [дробь <number>] | <poi>);
 
 <time> = (на <single> ([<dec>] <single> | <decimals>) [можно]);
 
 <confirm> = (да | нет);
 
-<street> = [улица | проспект] (генерала горбатого | ленина | маркса | коммунистическая);
 <poi> = (вокзал | аэропорт | в центр | на набережную | к фитнесс клубу барбара);
 <number> = [<hundreds>] ([<dec>] <single> | <decimals>) [тысяч];
 <single> = (один | два | три | четыре | пять | шесть | семь | восемь | девять);
