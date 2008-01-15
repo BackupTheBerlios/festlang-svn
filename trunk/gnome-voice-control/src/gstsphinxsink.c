@@ -26,9 +26,7 @@
  * Simple sink for voice recognition
  */
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
 
 #include "gstsphinxsink.h"
 
@@ -292,6 +290,14 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
 static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * buffer)
 {
   GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
+
+#ifdef ENABLE_DEBUG_DUMP
+  FILE *dump_fd;
+  
+  dump_fd = fopen ("dump.raw", "a+");
+  fwrite (buffer->data, 1, buffer->size, dump_fd);
+  fclose (dump_fd);
+#endif
 
   if (!sphinxsink->ad.initialized) {
           g_signal_emit (sphinxsink,

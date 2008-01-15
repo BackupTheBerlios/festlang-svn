@@ -1,3 +1,13 @@
+2008-01-16  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* configure.ac:
+	* src/gstsphinxsink.c: (gst_sphinx_sink_render):
+	* src/voice-control.c: (control_stop), (on_sink_initialization),
+	(on_sink_calibration), (on_sink_listening), (on_sink_ready),
+	(setup_voice_control_widget):
+	
+	Add configure option --enable-debug to dump raw audio.
+
 2007-12-08  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* data/GNOME_VoiceControlApplet.xml:

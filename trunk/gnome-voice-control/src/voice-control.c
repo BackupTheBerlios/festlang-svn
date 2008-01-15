@@ -144,7 +144,7 @@ control_stop (BonoboUIComponent  *uic,
 	       const char         *verbname)
 {
         gst_element_set_state (voice_control->pipeline, GST_STATE_NULL);
-	gtk_image_set_from_file(GTK_IMAGE(voice_control->frame),"/home/ken-ichi/gvc-idle-icon.png");
+	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_NO, GTK_ICON_SIZE_MENU);
 	voice_control_set_text (voice_control, _("Idle"), _("Choose Start Control to start"));
 	control_spi_listener_stop (voice_control->spi_listener);
 }
@@ -155,7 +155,7 @@ on_sink_initialization (GObject *sink, gpointer data)
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 
 	gdk_threads_enter ();
-	gtk_image_set_from_file(GTK_IMAGE(voice_control->frame),"/home/ken-ichi/gvc-init_calib-icon.png");	
+	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_STOP, GTK_ICON_SIZE_MENU);
 	voice_control_set_text (voice_control, _("Init"), _("Loading acoustic and language model, wait a bit"));
 	gdk_threads_leave ();
 }
@@ -178,7 +178,7 @@ on_sink_calibration (GObject *sink, gpointer data)
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 
 	gdk_threads_enter ();
-	gtk_image_set_from_file(GTK_IMAGE(voice_control->frame),"/home/ken-ichi/gvc-init_calib-icon.png");
+	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_STOP, GTK_ICON_SIZE_MENU);
 	voice_control_set_text (voice_control, _("Calibration"), _("Tuning up acoustic parameters"));
 	gdk_threads_leave ();
 }
@@ -196,7 +196,7 @@ on_sink_listening (GObject *sink, gpointer data)
 		g_error_free(err);
 	}
 
-	gtk_image_set_from_file(GTK_IMAGE(voice_control->frame),"/home/ken-ichi/gvc-listening-icon.png");	
+	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_YES, GTK_ICON_SIZE_MENU);
 	voice_control_set_text (voice_control, _("Listening"), _("Processing speech"));
 	gdk_threads_leave ();
 }
@@ -207,7 +207,7 @@ on_sink_ready (GObject *sink, gpointer data)
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 
 	gdk_threads_enter ();
-	gtk_image_set_from_file(GTK_IMAGE(voice_control->frame),"/home/ken-ichi/gvc-ready-icon.png");	
+	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_YES, GTK_ICON_SIZE_MENU);
 	voice_control_set_text (voice_control, _("Ready"), _("Ready for input"));
 	gdk_threads_leave ();
 }
@@ -386,7 +386,7 @@ setup_voice_control_widget (VoiceControlApplet *voice_control)
 {
 	GtkWidget *widget = (GtkWidget *) voice_control;
 
-	voice_control->frame = GTK_IMAGE(gtk_image_new_from_file("/home/ken-ichi/gvc-idle-icon.png"));
+	voice_control->frame = gtk_image_new_from_stock(GTK_STOCK_NO, GTK_ICON_SIZE_MENU);
 
 	gtk_container_add (GTK_CONTAINER (widget), voice_control->frame);
 	

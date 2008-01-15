@@ -33,6 +33,12 @@ AM_GLIB_GNU_GETTEXT
 POCKETSPHINX_PREFIX=`pkg-config --variable=prefix pocketsphinx`
 AC_SUBST(POCKETSPHINX_PREFIX)
 
+AC_ARG_ENABLE(debug,
+              [AC_HELP_STRING([--enable-debug-dump], [Enable input debugging])],enable_debug="$enableval",enable_debug=no)
+if test "x$enable_debug" = "xyes"; then
+	    AC_DEFINE([ENABLE_DEBUG_DUMP], [1], [Enable debug dump.])
+fi
+
 AC_OUTPUT([
 Makefile
 src/Makefile
