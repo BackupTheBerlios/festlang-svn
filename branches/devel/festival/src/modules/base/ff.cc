@@ -575,8 +575,10 @@ static EST_Val ff_syl_startpitch(EST_Item *s)
     float pt = ffeature(s,"R:SylStructure.daughter1.R:Segment.p.R:Target.daughter1.f0");
     float tt = ffeature(s,"R:SylStructure.daughter1.R:Segment.R:Target.daughter1.f0");
 	
-    if (pt == 0)
+    if (pt < 0.1)
 	return EST_Val(tt);
+    else if (tt < 0.1)
+	return EST_Val(pt);
     else
 	return EST_Val((tt+pt)/2.0);
 }
@@ -588,9 +590,11 @@ static EST_Val ff_syl_endpitch(EST_Item *s)
 
     float nt = ffeature(s,"R:SylStructure.daughtern.R:Segment.n.R:Target.daughter1.f0");
     float tt = ffeature(s,"R:SylStructure.daughtern.R:Segment.R:Target.daughter1.f0");
-	
-    if (nt == 0)
+    
+    if (nt < 0.1)
 	return EST_Val(tt);
+    else if (tt < 0.1)
+	return EST_Val(nt);
     else
 	return EST_Val((tt+nt)/2.0);
 }
