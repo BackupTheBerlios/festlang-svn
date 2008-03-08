@@ -38,11 +38,13 @@
 ;;;    use punctuation 
 (set! cstr_pl_phrase_cart_tree
 '
-((lisp_token_end_punc in ("'" "\"" "?" "." "," ":" ";"))
-  ((B))
-  ((n.name is 0)
+((lisp_token_end_punc in ("?" "." "!" ))
+  ((BB))
+  ((lisp_token_end_punc in ("'" "\"" "," ";" ":" "-" "--"))
    ((B))
-   ((NB)))))
+   ((n.name is 0)  ;; end of utterance
+    ((BB))
+    ((NB))))))
 
 (define (cstr_pl::select_phrasing)
   "(cstr_pl::select_phrasing)
@@ -141,10 +143,10 @@ Find the item that is the vowel in syl."
 (define (tpt_f0_map_value value)
   "(tpt_f0_map_value value)
 Map F0 vlaue through means and standard deviations in int_params."
-  (let ((target_f0_mean (get_param 'target_f0_mean int_params 110))
-	(target_f0_stddev (get_param 'target_f0_stddev int_params 15))
-	(model_f0_mean (get_param 'model_f0_mean int_params 110))
-	(model_f0_stddev (get_param 'model_f0_stddev int_params 15)))
+  (let ((target_f0_mean (get_param 'target_f0_mean int_params 90))
+	(target_f0_stddev (get_param 'target_f0_stddev int_params 20))
+	(model_f0_mean (get_param 'model_f0_mean int_params 90))
+	(model_f0_stddev (get_param 'model_f0_stddev int_params 20)))
     (+ (* (/ (- value model_f0_mean) model_f0_stddev)
 	  target_f0_stddev) target_f0_mean)))
 
@@ -156,7 +158,7 @@ Add Target at pos and value related to seg."
     (if (null tseg)
 	(set! tseg (utt.relation.append utt 'Target seg)))
     (set! ntarg (item.append_daughter tseg))
-;;    (format stderr "Adding f0 segment %s value %f\n" (item.name seg) value)
+    (format stderr "Adding f0 segment %s value %f\n" (item.name seg) value)
     (item.set_feat ntarg 'f0 (tpt_f0_map_value value))
     (item.set_feat ntarg 'pos 
 		   (+ (item.feat seg "segment_start")

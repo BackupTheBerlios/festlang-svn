@@ -43,7 +43,7 @@
 		       'voice_cstr_pl_em_multisyn_configure
 		       cstr-backoff_rules
 		       cstr_data_dir
-		       (list (list cstr_base_dirs "etc/utts.data")
+		       (list (list cstr_base_dirs "etc/txt.done.data")
 			     (list cstr_base_dirs "etc/utts.pauses")))
 
 (set_backtrace t)
@@ -66,6 +66,10 @@
   (cstr_pl::select_intonation)
   (cstr_pl::select_duration)
   (cstr_pl::select_f0model)
+
+  (set! int_params
+    '((target_f0_mean 90) (target_f0_std 20)
+      (model_f0_mean 90) (model_f0_std 20)))
 
   (Param.set 'Synth_Method 'MultiSyn)
   (Param.set 'unisyn.window_symmetric 0)

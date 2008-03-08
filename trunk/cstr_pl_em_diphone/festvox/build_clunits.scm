@@ -677,45 +677,19 @@ periods is such a naive and hopless way its embarrassing."
 	(f0s f0_points)
 	targ)
     (while s
-     (if (and (not (member_string
+     (if (not (member_string
 		    (item.name s)
 		    (cadr (car (PhoneSet.description '(silences))))))
-	      (or (string-equal "1" (item.feat s "syl_initial"))
-		  (string-equal "+" (item.feat s "ph_vc"))
-		  (member_string 
-		   (item.feat s "n.name")
-		   (cadr (car (PhoneSet.description '(silences)))))))
 	 (begin
 	   (set! targ (utt.relation.append utt 'Target s))
-	   (if (string-equal "1" (item.feat s "syl_initial"))
-	       (item.relation.append_daughter
-		targ
-		'Target
-		(list
-		 "0"
-		 (list
-		  (list 'f0 (build::get_f0_at f0s (item.feat s "segment_start")))
-		  (list 'pos (item.feat s "segment_start"))))))
-	   (if (string-equal "+" (item.feat s "ph_vc"))
-	       (item.relation.append_daughter
+          (item.relation.append_daughter
 		targ
 		'Target
 		(list
 		 "0"
 		 (list
 		  (list 'f0 (build::get_f0_at f0s (item.feat s "segment_mid")))
-		  (list 'pos (item.feat s "segment_mid"))))))
-	   (if (member_string 
-		(item.feat s "n.name")
-		(cadr (car (PhoneSet.description '(silences)))))
-	       (item.relation.append_daughter
-		targ
-		'Target
-		(list
-		 "0"
-		 (list
-		  (list 'f0 (build::get_f0_at f0s (item.feat s "segment_end")))
-		  (list 'pos (item.feat s "segment_end"))))))))
+		  (list 'pos (item.feat s "segment_mid")))))))
      (set! s (item.next s))
      ))
 )

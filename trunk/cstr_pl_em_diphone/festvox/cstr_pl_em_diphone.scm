@@ -139,6 +139,10 @@ Set speaker to em in pl from cstr."
   (set! us_rel_offset 0.0)
   (set! us_gain 0.9)
 
+  (set! int_params
+    '((target_f0_mean 165) (target_f0_std 15)
+      (model_f0_mean 90) (model_f0_std 20)))
+
   (Parameter.set 'Synth_Method 'UniSyn)
   (Parameter.set 'us_sigpr 'lpc)
   (us_db_select cstr_pl_em_db_name)
