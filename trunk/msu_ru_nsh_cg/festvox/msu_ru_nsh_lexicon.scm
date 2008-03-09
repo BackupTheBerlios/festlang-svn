@@ -380,6 +380,19 @@ Return pronunciation of word not in lexicon."
     (list word features syls)
     ))
 
+(define (fix_yo phones stress) 
+    (let (newphones nil)
+    (mapcar 
+      (lambda (phone)
+       (set! newphones (cons 
+        (if (string-equal phone "e")
+    	    'o
+    	    phone) newphones)))
+    phones)
+;;    (format stderr "%l\n" (reverse newphones))
+    (reverse newphones))
+)
+
 (define (strconcat list)
     "convert list into string"
     (cond ((null list) "")
@@ -404,6 +417,7 @@ Return pronunciation of word not in lexicon."
   (let ((word (car entry))
 	(pos (car (cdr entry)))
 	(stress (car (car (cdr (cdr entry)))))
+	(fix (car (cdr (cdr (cdr entry)))))
 	syls letters downcase letters phones result)
   (set! result
   (cond 
@@ -412,6 +426,8 @@ Return pronunciation of word not in lexicon."
       (set! letters (utf8explode word));; utf8 letter based
       (set! downcase_letters (lts.apply letters 'russian_downcase))
       (set! phones (lts.apply downcase_letters 'msu_ru))
+      (if (not (null fix))
+        (set! phones (fix_yo phones stress)))
       (set! syls (russian_syllabify phones nil))
       (set! syls 
           (cond ((and (>= (length syls) stress) (> stress 0)) 
