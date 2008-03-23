@@ -1,0 +1,177 @@
+\documentclass[runningheads]{llncs}
+
+\usepackage{amssymb}
+
+\usepackage[english]{babel}
+
+\usepackage{url}
+
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip\noindent\keywordname\enspace\ignorespaces#1}
+
+\begin{document}
+
+\mainmatter
+
+\title{VoxForge Speech Corpora}
+
+\maketitle
+
+\begin{abstract}
+Voxforge.org resource was set up to collect transcribed speech in many
+languages for use with free and open source recognition engines. The
+report reviews database processing problems related to diverse speech
+sources used and the quality of the distributed acoustic models.
+\keywords{speech corpora, free software, voxforge}
+\end{abstract}
+
+With the development of modern storage and communication systems it's
+possible to collect and process huge amounts of data. Big speech
+databases are used in speech synthesis and speech recognition systems,
+allow developers to test their algorithms and estimate system
+performance. Almost every recent investigation in speech technologies
+from noise cancellation or language understanding uses carefully collected
+database for system development and evaluation. Machine learning methods
+are proved to be effective.
+
+Large amount of modern databases were collected and processed by hand, 
+but the size and the variety of databases grow. Thus the important
+issues now are automation, growing the source auditory, proper
+database postprocessing and organization. Significant efforts are spent
+to minimize the involvement of the human into  database collection and
+processing. Many algorithms require minimal preprocessing of the data,
+sometimes can even use data as is. So called unsupervised learning can
+work with raw data collected and give acceptable results. For example
+the algorithm for morpheme segmentation \cite{creutz} can break words on
+morphemes without any markup on training set. Such algorithms are
+successfully applied to image recognition. Unfortunately, it's sometimes
+impossible to avoid preprocessing stage. So the main question we discuss
+here is how to build a free speech database and use it for the speech
+recognition system.
+
+The most interesting work on this subject \cite{ahn} discusses
+human-computer interaction built as the game. Interesting combination of
+the web technologies, competitions between participants and fascinating style
+founds an effective organization of distributed calculation where
+both computers and humans are involved. Huge database of images
+is classified with tags and can be later used in training or evaluation
+of the image recognition software.
+
+Here we discuss the methods to collect a huge speech database for
+speech recognition system. This effort is called VoxForge \cite{voxforge} 
+project. We consider the problems raised and some important issues we have
+to solve.
+
+The main goal of the project is to build a large free multilingual speech
+corpora for text-independent speech recognition. Currently
+the recordings in the following languages are collected: US English, German, 
+Italian, Dutch, Russian. Several languages are also in plans but have no data yet.
+we are ready to support any language with reasonable amount of speakers.
+Most active languages like English already submitted 39 hours of data from
+more than 200 speakers. Russian data is more than 10 hours of speech from around
+200 speakers, German speakers also submitted around 10 hours of speech.
+Of course our target is much large amount of data, at least 140 - 150 hours for
+each language. Project is a live system and a new data appears every day
+so the values aren't precise.
+
+Database is distributed freely under GPL license and contains recordings
+in original format in utterances and a transcription. We also distribute
+phonetic dictionaries, data processing applications, acoustic models for
+most well-known speech recognition systems CMU Sphinx, HTK and Julius.
+Voxforge English model is the main recommended model Julius recognition
+toolkit. Databases are used in other applications, not only speech
+recognition systems. for example part of Russian data is used in the
+Russian cluster unit voice for Festival TTS \cite{russian}.  Similar
+projects are working on related domains. For example it's worth to
+mention Freesound \cite{freesound} project which collects various sound
+recordings.
+
+The main part of the database is recorded by usual contributors,
+visitors of our resource although recently many other sources of the
+speech appeared in the web. Fortunately even without additional
+stimulation for many most active languages like English there is a huge
+amount of sources we can take speech from.
+
+Visitor can submit his speech by the following ways: by telephone, by
+recording the data on local machine and uploading it to resource, by
+using Java applet embedded into the page to record speech directly with
+the web browser. The last capability is rather important for us.
+Practice shows that it's still very hard to setup recording software
+properly. Complicated combination of actions to record speech is the
+biggest barrier on the way to contribution. Web-based recording
+simplifies the process significantly.
+
+We suggest visitor a text for recording. Usually it consist of the set
+of chunks selected from a big free text corpora. Recording is checked
+against existing model and if everything is aligned properly is added to
+the database. Periodically we build acoustic models from the collected
+data.
+
+We use and search other speech sources recently the amount of them
+grows. For example we cooperate with the audio book recording project
+Librivox \cite{librivox}. Authors of the books recorded provide their
+original samples and text used. We also consider movies with subtitles
+and even official government sessions. For example recordings of the
+Missoula city council from the OpenGovernment project contain both text
+and transcription and could be used without any problems.
+
+
+Sadly it's not always easy to collect speech for some specialized
+domain. We stimulate participants with grants and prizes sometimes. For
+example, we use record mobile phone speech with the help of Voice2type
+company. Nevertheless, the problem of stimulation stays open. We
+investigate various ways to increase the amount of submissions and to
+stimulate the  contributors. For example, we develop a module that will
+reuse recorded speech for building personally adapted model for online
+recognition. By submitting  a relatively small recording user improves
+our database and gets the  model adapted to his voice. We hope this way
+we will be able to collect a large user base.
+
+Another problem is related to unification of the data collected from 
+the various sources. Not taking into account the problems with dictionaries
+or models lets consider the initial data preprocessing.
+
+First of all the format of the data is not always suitable for model
+training. Sometimes sound is encoded by lossy codec like ogg or mp3.
+The problem appears, is it possible to use such data for recognition
+system. Unfortunately it's not quite clear if mp3 sound could be used for
+recognition of usual recording. It's known that if the model is trained on mp3
+the quality of recognition degrades. But some researches state
+that it's possible to recognize mp3-encoded speech with a model trained
+on mp3 data without any significant loss in accuracy. It's still not
+clear is it possible to mix mp3 speech and original recordings in raw format.
+We can only hope that modern feature extraction technique can solve this problem.
+
+Second it's interesting to have an application to segment and check a large recording
+with a known text like an audio book. We are glad to mention some recent advances
+in this direction like the system \cite{kishore}. We hope such systems will 
+be freely available soon.
+
+Above we described a work on building completely open source recognition system
+with a free speech corpora. Of course there are many issues to solve still.
+We haven't investigated the quality of our models yet. We don't know
+how to build a prompts for recording properly. We don't know if it's possible
+to build a single model for many languages. Fortunately the field for 
+research is very large.
+
+\begin{thebibliography}{4}
+
+\bibitem{creutz} Creutz, M., Lagus, K.: Unsupervised models for morpheme segmentation 
+and morphology learning. ACM Transactions on Speech and Language Processing,
+vol. 4, issue 1, article 3, (2007)
+
+\bibitem{ahn} von Ahn, L., Dabbish, L.: Labeling images with a computer game. 
+In: Proceedings of the SIGCHI conference on Human factors in computing systems (2004)
+
+\bibitem{voxforge} VoxForge project, \url{http://voxforge.org}
+
+\bibitem{russian} Russian voice for Festival TTS, \url{http://festlang.berlios.de/russian.html}
+
+\bibitem{freesound} FreeSound project, \url{http://freesound.iua.upf.edu}
+
+\bibitem{librivox} Librivox project, \url{http://librivox.org}
+
+\bibitem{kishore} Prahallad, K., Toth, A., Black, A.: Automatic Building of Synthetic Voices from 
+Large Multi-Paragraph Speech Databases. In: Interspeech (2007)
+
+\end{thebibliography}
+\end{document}
