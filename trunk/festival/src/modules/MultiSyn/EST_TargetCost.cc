@@ -448,16 +448,22 @@ float EST_TargetCost::bad_f0_target_cost() const
 
   EST_FVector *fv = 0;
   float penalty = 0.0;
+  float f;
 
-  if( ph_is_vowel( phone )
-      || ph_is_approximant( phone )
-      || ph_is_liquid( phone )
-      || ph_is_nasal( phone ) ){
-    fv = fvector( cand->f("midcoef") );
-    if( fv->a_no_check(fv->n()-1) > 0 ) // means voiced
-      penalty += fabs(fv->a_no_check(fv->n()-1) - ffeature (t, "seg_pitch").Float());
+  fv = fvector( cand->f("midcoef") );
+  
+  f = (fv->a_no_check(fv->n()-1) - 0.5) * 40 + 124.0; // deviation and mean
+
+  if( !ph_is_silence( phone )) {
+      if (fv->a_no_check (fv->n() - 1) > 0) // means voiced
+          penalty += fabs(f - ffeature (t, "seg_pitch").Float()) / 32.1; // deviation
+      else
+          penalty += 2.0;
   }
 
+//  cerr << " bad f0 penalty " << phone << " " << cand->relation()->utt()->f.S("fileid")  << " " << penalty <<
+//  " midcoef " <<  fv->a_no_check(fv->n() -1 ) << " f " << f  << endl;
+  
   return penalty; 
 }
 
