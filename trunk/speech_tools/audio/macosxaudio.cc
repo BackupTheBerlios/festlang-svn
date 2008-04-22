@@ -44,6 +44,7 @@
 
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
+#include <AudioUnit/AUNTComponent.h>
 #include <AudioToolbox/AudioConverter.h>
 #include <AudioToolbox/DefaultAudioOutput.h>
 
@@ -127,8 +128,13 @@ int play_macosx_wave(EST_Wave &inwave, EST_Option &al)
     // onto the hardware output format.
     waveformat.mSampleRate = (Float64) inwave.sample_rate();
     waveformat.mFormatID = kAudioFormatLinearPCM;
-    waveformat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger
-        | kLinearPCMFormatFlagIsPacked | kLinearPCMFormatFlagIsBigEndian;
+    waveformat.mFormatFlags = 
+#if defined(__BIG_ENDIAN__)
+	    kLinearPCMFormatFlagIsBigEndian |   
+#endif
+	    kLinearPCMFormatFlagIsSignedInteger |
+    	    kLinearPCMFormatFlagIsPacked;
+
     waveformat.mBytesPerPacket = 2;
     waveformat.mFramesPerPacket = 1;
     waveformat.mBytesPerFrame = 2;

@@ -43,7 +43,7 @@
 
 #if defined(__APPLE__)
 /* Not sure why I need this here, but I do */
-extern "C" int isnan(double);
+extern "C" int isnan(float);
 #endif
 
 /* this isn't included from c, but just to be safe... */
@@ -101,7 +101,6 @@ extern "C" {
 /* Apple OSX */
 #if defined(__APPLE__)
 #define isnanf(X) isnan(X)
-#define isnan(X) __isnan(X)
 #endif
 
 /* FreeBSD *and other 4.4 based systems require anything, isnanf is defined */
