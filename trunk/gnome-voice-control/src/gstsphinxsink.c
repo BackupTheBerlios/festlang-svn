@@ -262,15 +262,26 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
 			    DEFAULT_SAMPLES_PER_SEC) {
 	      int32 score;
 	      const char *hyp;
+    	      char *stripped_hyp;
+    	      int i, j;
   
 	      ps_end_utt (sphinxsink->decoder);
    	      if ((hyp = ps_get_hyp (sphinxsink->decoder, &score, NULL)) == NULL) {
 		      g_warning ("uttproc_result failed");
 	      } else {
-		      if (hyp != NULL)
-		        g_signal_emit (sphinxsink,
-			               gst_sphinx_sink_signals[SIGNAL_MESSAGE], 
-			               0, hyp);
+	    	      stripped_hyp = 
+		           g_malloc (strlen (hyp));
+	    	      for (i=0, j=0; hyp[i] != 0; i++) {
+	    	    	    if (hyp[i] != '(' && hyp[i] != ')' && (hyp[i] < '0' || hyp[i] > '9')) {
+	    	    		    stripped_hyp[j++] = hyp[i];
+	    	    	    }
+	    	      }
+	    	      stripped_hyp [j] = 0;
+	    	      
+		      g_signal_emit (sphinxsink,
+		                     gst_sphinx_sink_signals[SIGNAL_MESSAGE], 
+			             0, stripped_hyp);
+		      g_free (stripped_hyp);
 	      }
 
 	      sphinxsink->last_ts = 0;
