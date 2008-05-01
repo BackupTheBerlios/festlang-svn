@@ -35,13 +35,38 @@
 
 #include <fsg_set.h>
 
-static char *sphinx_command = 
-"voice-control "
-"-fwdflat no "
-"-bestpath yes "
-"-hmm " POCKETSPHINX_PREFIX "/share/pocketsphinx/model/hmm/wsj1 "
-"-fsg " GNOMEDATADIR "/gnome-voice-control/desktop-control.fsg "
-"-dict " GNOMEDATADIR "/gnome-voice-control/desktop-control.dict ";
+
+static char*
+gst_sphinx_get_command () 
+{
+   const gchar* const * language_names = g_get_language_names ();
+   int i;
+
+   gchar *result;
+   const gchar *lang = NULL;
+   
+   for (i = 0; language_names[i] != 0; i++) {
+	gchar *path;
+	
+	path = g_strdup_printf (GNOMEDATADIR "/gnome-voice-control/desktop-control-%s.dict", language_names[i]);
+	if (g_file_test (path, G_FILE_TEST_EXISTS)) {
+	    lang = language_names[i];
+	    g_free (path);
+	    break;
+	}
+	g_free (path);
+   }
+   
+   result = g_strdup_printf ("voice-control "
+    "-fwdflat no "
+    "-bestpath yes "
+    "-hmm " POCKETSPHINX_PREFIX "/share/pocketsphinx/model/hmm/%s%s " 
+    "-fsg " GNOMEDATADIR "/gnome-voice-control/desktop-control.fsg "
+    "-dict " GNOMEDATADIR "/gnome-voice-control/desktop-control-%s.dict ", 
+    lang ? "voxforge-" : "wsj1", lang ? lang : "", lang ? lang : "en");
+
+    return result;    
+}
 
 static void
 gst_sphinx_decoder_init (GstSphinxSink *sink)
@@ -49,16 +74,18 @@ gst_sphinx_decoder_init (GstSphinxSink *sink)
     char **argv;
     int argc;
     cmd_ln_t *config;
-
+    char *sphinx_command;
+    
+    sphinx_command = gst_sphinx_get_command();
+    
     g_shell_parse_argv (sphinx_command, &argc, &argv, NULL);
 
-    setlocale (LC_ALL, "C");
     config = cmd_ln_parse_r(NULL, ps_args(), argc, argv, TRUE);
     sink->decoder = ps_init (config);    
     sink->lmath = logmath_init(1.0001, 0, 0);
-    setlocale (LC_ALL, "");
 
     g_strfreev (argv);
+    g_free (sphinx_command);
 }
 
 static GstStaticPadTemplate sinktemplate = GST_STATIC_PAD_TEMPLATE ("sink",

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-voice-control trunk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-20 23:42+0400\n"
+"POT-Creation-Date: 2008-05-01 18:53+0400\n"
 "PO-Revision-Date: 2007-03-05 15:31+0300\n"
 "Last-Translator: Nickolay V. Shmyrev <nshmyrev@yandex.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -24,7 +24,7 @@ msgid "Factory for creating voice control applets."
 msgstr "Фабрика для создания апплетов управления голосом."
 
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:3
-#: ../src/voice-control.c:283
+#: ../src/voice-control.c:346
 msgid "VoiceControl"
 msgstr "Управление голосом"
 
@@ -45,66 +45,204 @@ msgid "_Start Control"
 msgstr "З_апустить управление"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:4
+#, fuzzy
+msgid "_Start Keypress Control"
+msgstr "З_апустить управление"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:5
 msgid "_Stop Control"
 msgstr "Остановить управл_ение"
 
-#: ../src/voice-control.c:96
+#: ../src/voice-control.c:102
 #, c-format
 msgid "There was an error displaying help: %s"
 msgstr "Возникла ошибка при отображении помощи: %s"
 
-#: ../src/voice-control.c:127
+#: ../src/voice-control.c:148 ../src/voice-control.c:395
 msgid "Idle"
 msgstr "Ожидание"
 
-#: ../src/voice-control.c:127
+#: ../src/voice-control.c:148 ../src/voice-control.c:395
 msgid "Choose Start Control to start"
 msgstr "Выберите Запуск для начала"
 
-#: ../src/voice-control.c:137 ../src/voice-control.c:331
+#: ../src/voice-control.c:159
 msgid "Init"
 msgstr "Инициализация"
 
-#: ../src/voice-control.c:137 ../src/voice-control.c:331
+#: ../src/voice-control.c:159
 msgid "Loading acoustic and language model, wait a bit"
 msgstr "Загружается модель языка, подождите"
 
-#: ../src/voice-control.c:147
+#: ../src/voice-control.c:182
 msgid "Calibration"
 msgstr "Калибровка"
 
-#: ../src/voice-control.c:147
+#: ../src/voice-control.c:182
 msgid "Tuning up acoustic parameters"
 msgstr "Настройка параметров записи"
 
-#: ../src/voice-control.c:157
+#: ../src/voice-control.c:200
 msgid "Listening"
 msgstr "Слушаю"
 
-#: ../src/voice-control.c:157
+#: ../src/voice-control.c:200
 msgid "Processing speech"
 msgstr "Обработка речи"
 
-#: ../src/voice-control.c:167
+#: ../src/voice-control.c:211
 msgid "Ready"
 msgstr "Готов"
 
-#: ../src/voice-control.c:167
+#: ../src/voice-control.c:211
 msgid "Ready for input"
 msgstr "Ожидание ввода"
 
-#: ../src/voice-control.c:275
+#: ../src/voice-control.c:338
 msgid "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"
 msgstr "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"
 
-#: ../src/voice-control.c:276
+#: ../src/voice-control.c:339
 msgid "Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>"
 msgstr "Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>"
 
-#: ../src/voice-control.c:279
+#: ../src/voice-control.c:342
 msgid "Voice Control Applet used to manage desktop with speech"
 msgstr "Апплет управления рабочим столом с помощью голоса"
 
-#: ../src/voice-control.c:289
+#: ../src/voice-control.c:352
 msgid "translator-credits"
 msgstr "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"
+
+#: ../src/action.c:98
+msgid "RUN MAIL"
+msgstr "проверить почту"
+
+#: ../src/action.c:99
+msgid "RUN BROWSER"
+msgstr "забустить браузер"
+
+#: ../src/action.c:100
+msgid "RUN TEXT EDITOROS"
+msgstr "запустить текстовый редактор"
+
+#: ../src/action.c:101
+msgid "RUN TERMINAL"
+msgstr "открыть терминал"
+
+#: ../src/action.c:102
+msgid "CLOSE WINDOW"
+msgstr "закрыть окно"
+
+#: ../src/action.c:103
+msgid "NEXT WINDOW"
+msgstr "следующее окно"
+
+#: ../src/action.c:104
+msgid "PREVIOUS WINDOW"
+msgstr "предыдущее окно"
+
+#: ../src/action.c:105
+msgid "MINIMIZE WINDOW"
+msgstr "свернуть окно"
+
+#: ../src/action.c:106
+msgid "MAXIMIZE WINDOW"
+msgstr "развернуть окно"
+
+#: ../src/action.c:107
+msgid "SWITCH WINDOW"
+msgstr "переключить окно"
+
+#: ../src/action.c:108
+msgid "RIGHT CLICK"
+msgstr "правай щелчок"
+
+#: ../src/action.c:109
+msgid "CLICK"
+msgstr "щелчок"
+
+#: ../src/action.c:111
+msgid "PAGE UP"
+msgstr "страница вверх"
+
+#: ../src/action.c:112
+msgid "PAGE DOWN"
+msgstr "страница вниз"
+
+#: ../src/action.c:113
+msgid "UP"
+msgstr "вверх"
+
+#: ../src/action.c:114
+msgid "DOWN"
+msgstr "вниз"
+
+#: ../src/action.c:115
+msgid "LEFT"
+msgstr "влево"
+
+#: ../src/action.c:116
+msgid "RIGHT"
+msgstr "вправо"
+
+#: ../src/action.c:117
+msgid "ESCAPE"
+msgstr "отменить"
+
+#: ../src/action.c:118
+msgid "BACKSPACE"
+msgstr "стереть"
+
+#: ../src/action.c:119
+msgid "DELETE"
+msgstr "удалить"
+
+#: ../src/action.c:120
+msgid "INSERT"
+msgstr "вставить"
+
+#: ../src/action.c:121
+msgid "HOME"
+msgstr "в начало"
+
+#: ../src/action.c:122
+msgid "END"
+msgstr "в конец"
+
+#: ../src/action.c:123
+msgid "ENTER"
+msgstr "ввод"
+
+#: ../src/action.c:124
+msgid "COPY"
+msgstr "копировать"
+
+#: ../src/action.c:125
+msgid "CUT"
+msgstr "вырезать"
+
+#: ../src/action.c:126
+msgid "PASTE"
+msgstr "вставить"
+
+#: ../src/action.c:128
+msgid "MOUSE LEFT"
+msgstr "мышь влево"
+
+#: ../src/action.c:129
+msgid "MOUSE RIGHT"
+msgstr "мышь вправо"
+
+#: ../src/action.c:130
+msgid "MOUSE DOWN"
+msgstr "мышь вниз"
+
+#: ../src/action.c:131
+msgid "MOUSE UP"
+msgstr "мышь вверх"
+
+#: ../src/action.c:134
+msgid "MAIN MENU"
+msgstr "главное меню"
+

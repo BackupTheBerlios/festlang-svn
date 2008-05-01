@@ -1,7 +1,8 @@
 languagedir=$(datadir)/gnome-voice-control
 
 language_DATA=\
-	desktop-control.dict \
+	desktop-control-en.dict \
+	desktop-control-ru.dict \
 	desktop-control.fsg
 
 EXTRA_DIST = $(language_DATA)
