@@ -28,10 +28,12 @@
 #include <gst/base/gstbasesink.h>
 #include <gst/base/gstadapter.h>
 
-#include <fe.h>
-#include <fbs.h>
+#include <pocketsphinx.h>
+#include <sphinx_types.h>
 #include <ad.h>
 #include <cont_ad.h>
+#include <logmath.h>
+#include <fsg_model.h>
 
 G_BEGIN_DECLS
 
@@ -74,6 +76,10 @@ struct _GstSphinxSink {
   cont_ad_t *cont;
   GstSphinxSinkAd ad;
   gint32 last_ts;
+  
+  ps_decoder_t *decoder;
+  fsg_model_t *fsg;
+  logmath_t* lmath;
   
   GstAdapter *adapter;  
 };

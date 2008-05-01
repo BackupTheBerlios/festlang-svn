@@ -33,6 +33,8 @@
 #include <locale.h>
 #include <string.h>
 
+#include <fsg_set.h>
+
 static char *sphinx_command = 
 "voice-control "
 "-fwdflat no "
@@ -42,15 +44,18 @@ static char *sphinx_command =
 "-dict " GNOMEDATADIR "/gnome-voice-control/desktop-control.dict ";
 
 static void
-gst_sphinx_decoder_init (void)
+gst_sphinx_decoder_init (GstSphinxSink *sink)
 {
     char **argv;
     int argc;
+    cmd_ln_t *config;
 
     g_shell_parse_argv (sphinx_command, &argc, &argv, NULL);
 
     setlocale (LC_ALL, "C");
-    fbs_init (argc, argv);    
+    config = cmd_ln_parse_r(NULL, ps_args(), argc, argv, TRUE);
+    sink->decoder = ps_init (config);    
+    sink->lmath = logmath_init(1.0001, 0, 0);
     setlocale (LC_ALL, "");
 
     g_strfreev (argv);
@@ -255,11 +260,11 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
 	      return;
 	} else if (k == 0 && sphinxsink->cont->read_ts - sphinxsink->last_ts > 
 			    DEFAULT_SAMPLES_PER_SEC) {
-	      int32 fr;
-	      char *hyp = NULL;
+	      int32 score;
+	      const char *hyp;
   
-	      uttproc_end_utt ();
-   	      if (uttproc_result (&fr, &hyp, 1) < 0) {
+	      ps_end_utt (sphinxsink->decoder);
+   	      if ((hyp = ps_get_hyp (sphinxsink->decoder, &score, NULL)) == NULL) {
 		      g_warning ("uttproc_result failed");
 	      } else {
 		      if (hyp != NULL)
@@ -275,11 +280,11 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
 
 	} else if (k != 0) {
 	     if (sphinxsink->ad.listening == 0) {
-	    	    uttproc_begin_utt (NULL);
+	    	    ps_start_utt (sphinxsink->decoder, NULL);
 	    	    sphinxsink->ad.listening = 1;
 	     }
 	
-	     uttproc_rawdata (adbuf, k, 1);
+	     ps_process_raw (sphinxsink->decoder, adbuf, k, 0, 0);
 	     sphinxsink->last_ts = sphinxsink->cont->read_ts;
 
 	     g_signal_emit (sphinxsink,
@@ -302,7 +307,7 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
   if (!sphinxsink->ad.initialized) {
           g_signal_emit (sphinxsink,
 	        gst_sphinx_sink_signals[SIGNAL_INITIALIZATION], 0, NULL);
-	  gst_sphinx_decoder_init ();
+	  gst_sphinx_decoder_init (sphinxsink);
           g_signal_emit (sphinxsink,
 	        gst_sphinx_sink_signals[SIGNAL_AFTER_INITIALIZATION], 0, NULL);
 	  sphinxsink->ad.initialized = TRUE;
@@ -323,12 +328,12 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
   return GST_FLOW_OK;
 }
 
-static int
-gst_sphinx_construct_trans_list (GSList *phrases, s2_fsg_trans_t **trans_list)
+fsg_model_t *
+gst_sphinx_construct_fsg (GstSphinxSink *sink, GSList *phrases)
 {
+	fsg_model_t *fsg;
 	GSList *l, *word_list;
 	gchar **words;
-	s2_fsg_trans_t *transitions;
 	int n_states, n_transitions, i, j;
 	
 	n_states = 2; /* Final and initial state */
@@ -339,56 +344,39 @@ gst_sphinx_construct_trans_list (GSList *phrases, s2_fsg_trans_t **trans_list)
 		n_states += g_strv_length (words);
 	}
 	n_transitions = n_states - 2;
-	
-	transitions = g_new0(s2_fsg_trans_t, n_transitions);
+		
+	fsg = fsg_model_init ("desktop-control", sink->lmath, 10.0, n_states);
+	fsg->start_state = 0;
+	fsg->final_state = n_states - 1;
 	
 	for (i = 0, l = word_list; l; l = l->next) {
 		words = l->data;
+		int wid, from_state, to_state, next;
 		for (j = 0; words[j] != NULL; j++, i++) {
-			transitions[i].from_state = 
-				(j == 0) ? 0 : i + 1;
-    			transitions[i].to_state = 
-    				(words[j+1] == NULL) ? n_states - 1 : i + 2;
-	    		transitions[i].prob = 1.0;
-			transitions[i].word = g_strdup (words[j]);
-			transitions[i].next = transitions + i + 1;
-
-#if DEBUG			
-			g_message ("transition number %d from %d to %d word %s",
-				    i, 
-				    transitions[i].from_state,
-				    transitions[i].to_state,
-				    transitions[i].word);
-#endif
+    	    		wid = fsg_model_word_add(fsg, words[j]);
+    	    		from_state = (j == 0) ? 0 : i + 1;
+			to_state = (words[j+1] == NULL) ? n_states - 1 : i + 2;
+			fsg_model_trans_add (fsg, from_state, to_state, 0, wid);
 		}
 	}
-	transitions[n_transitions-1].next = NULL;
-	*trans_list = transitions;
-	
 	for (l = word_list; l; l = l->next)
 		g_strfreev (l->data);
 	g_slist_free (word_list);
 	
-	return n_states;
+	return fsg;
 }
 
-void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *words)
-{		
-	s2_fsg_t fsg;
-	s2_fsg_trans_t *trans_list;
-	
-	fsg.name = "desktop-control";	
-	fsg.n_state = gst_sphinx_construct_trans_list (words, &trans_list);
-	fsg.start_state = 0;
-	fsg.final_state = fsg.n_state - 1;
-	fsg.trans_list = trans_list;
-	
-	uttproc_del_fsg ("desktop-control");
-	
-	uttproc_load_fsg (&fsg, 1, 1, 0.009, 0.0, 1.0);
-	
-	uttproc_set_fsg ("desktop-control");
-	
+void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *phrases)
+{	
+	fsg_set_t *fsgs;
+
+	sink->fsg = gst_sphinx_construct_fsg (sink, phrases);
+
+        fsgs = ps_get_fsgset(sink->decoder);
+        fsg_set_remove_byname(fsgs, "desktop-control");
+        fsg_set_add(fsgs, fsg_model_name(sink->fsg), sink->fsg);
+        fsg_set_select(fsgs, fsg_model_name(sink->fsg));
+        ps_update_fsgset (sink->decoder);
 #if DEBUG
 	g_message ("New fsg is set");
 #endif
