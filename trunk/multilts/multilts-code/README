@@ -1,11 +1,11 @@
-Multiligual LTS with CART tree
+N-best LTS with CART tree
 
 ============
 Compilation
 ============
 
 	Under UNIX just type 'make'. It should be compiled with Visual Studio
-	as well, there is dsw project.
+	as well, just include all files.
 
 =======
  Usage
@@ -13,6 +13,7 @@ Compilation
 	
 	lts program just reads string by string from standard input and
 	outputs transcription to standard output. You can also point
-	the language (English is default) and file to use as input
+	the file to use as input
 	
-	lts [-l language] [file]
+	lts [file]
+

@@ -1,14 +1,17 @@
 SOURCES = \
-	lts_main.c \
-	cmu_cart.c \
-	cmu_values.c
+	lts.c \
+	values.c \
+	cart.c \
+	main.c
 
 HEADERS = \
-	cmu_cart.h \
-	cst_lts.h
+	cart.h \
+	lts.h \
+	lts_int.h
 
 lts: $(SOURCES) $(HEADERS)
 	gcc -O0 -g -o lts $(SOURCES)
 
 clean:
 	rm -rf lts
+
