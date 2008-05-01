@@ -1,5 +1,12 @@
 2008-05-01  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
+	* lang/Makefile.am:
+	* lang/desktop-control-de.dict:
+	
+	Added support for German
+
+2008-05-01  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
 	* lang/desktop-control-ru.dict: 
 	
 	Fixes for handling Russian.

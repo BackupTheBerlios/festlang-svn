@@ -238,7 +238,7 @@ msgstr "MAUS RUNTER"
 
 #: ../src/action.c:131
 msgid "MOUSE UP"
-msgstr "MAUS HOCH "
+msgstr "MAUS HOCH"
 
 #: ../src/action.c:134
 msgid "MAIN MENU"
