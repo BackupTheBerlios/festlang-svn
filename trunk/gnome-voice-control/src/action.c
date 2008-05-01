@@ -345,7 +345,7 @@ voice_control_action_append_commands (GSList *list)
 	int i;
 	
 	for (i = 0; commands[i].command != NULL; i++) {
-		list = g_slist_append (list, commands[i].command);
+		list = g_slist_append (list, _(commands[i].command));
 	}
 	return list;
 }

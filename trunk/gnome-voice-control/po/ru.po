@@ -120,7 +120,7 @@ msgstr "проверить почту"
 
 #: ../src/action.c:99
 msgid "RUN BROWSER"
-msgstr "забустить браузер"
+msgstr "запустить браузер"
 
 #: ../src/action.c:100
 msgid "RUN TEXT EDITOROS"
@@ -156,7 +156,7 @@ msgstr "переключить окно"
 
 #: ../src/action.c:108
 msgid "RIGHT CLICK"
-msgstr "правай щелчок"
+msgstr "правый щелчок"
 
 #: ../src/action.c:109
 msgid "CLICK"

@@ -80,9 +80,10 @@ gst_sphinx_decoder_init (GstSphinxSink *sink)
     
     g_shell_parse_argv (sphinx_command, &argc, &argv, NULL);
 
+    setlocale (LC_ALL, "C");
     config = cmd_ln_parse_r(NULL, ps_args(), argc, argv, TRUE);
-    sink->decoder = ps_init (config);    
-    sink->lmath = logmath_init(1.0001, 0, 0);
+    sink->decoder = ps_init (config);
+    setlocale (LC_ALL, "");
 
     g_strfreev (argv);
     g_free (sphinx_command);
@@ -296,6 +297,7 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
    	      if ((hyp = ps_get_hyp (sphinxsink->decoder, &score, NULL)) == NULL) {
 		      g_warning ("uttproc_result failed");
 	      } else {
+	    	      g_message ("Recognized hyp %s", hyp);
 	    	      stripped_hyp = 
 		           g_malloc (strlen (hyp));
 	    	      for (i=0, j=0; hyp[i] != 0; i++) {
@@ -378,12 +380,13 @@ gst_sphinx_construct_fsg (GstSphinxSink *sink, GSList *phrases)
 	word_list = NULL;
 	for (l = phrases; l; l = l->next) {
 		words = g_strsplit (l->data, " ", 0);
+		g_message ("%s", l->data);
 		word_list = g_slist_append (word_list, words);
 		n_states += g_strv_length (words);
 	}
 	n_transitions = n_states - 2;
 		
-	fsg = fsg_model_init ("desktop-control", sink->lmath, 10.0, n_states);
+	fsg = fsg_model_init ("desktop-control", ps_get_logmath (sink->decoder), 10.0, n_states);
 	fsg->start_state = 0;
 	fsg->final_state = n_states - 1;
 	

@@ -32,7 +32,6 @@
 #include <sphinx_types.h>
 #include <ad.h>
 #include <cont_ad.h>
-#include <logmath.h>
 #include <fsg_model.h>
 
 G_BEGIN_DECLS
@@ -79,7 +78,6 @@ struct _GstSphinxSink {
   
   ps_decoder_t *decoder;
   fsg_model_t *fsg;
-  logmath_t* lmath;
   
   GstAdapter *adapter;  
 };
