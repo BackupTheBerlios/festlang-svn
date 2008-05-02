@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-voice-control trunk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-01 20:31+0400\n"
+"POT-Creation-Date: 2008-05-02 21:01+0400\n"
 "PO-Revision-Date: 2008-05-01 20:31+0400\n"
-"Last-Translator: Nickolay V. Shmyrev <nshmyrev@yandex.ru>\n"
+"Last-Translator: Martin Weinelt <mweinelt@gmail.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,7 +16,7 @@ msgstr ""
 
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:1
 msgid "Control your desktop with voice"
-msgstr ""
+msgstr "Steuere deinen Desktop mit Hilfe deiner Sprache"
 
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:2
 msgid "Factory for creating voice control applets."
@@ -25,7 +25,7 @@ msgstr ""
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:3
 #: ../src/voice-control.c:346
 msgid "VoiceControl"
-msgstr ""
+msgstr "Sprachsteuerung"
 
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:4
 msgid "VoiceControl Applet Factory"
@@ -33,68 +33,68 @@ msgstr ""
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:1
 msgid "_About"
-msgstr ""
+msgstr "_Über"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:2
 msgid "_Help"
-msgstr ""
+msgstr "_Hilfe"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:3
 msgid "_Start Control"
-msgstr ""
+msgstr "_Starte Erkennung"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:4
 msgid "_Start Keypress Control"
-msgstr ""
+msgstr "Starte Erkennung (_Hotkey)"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:5
 msgid "_Stop Control"
-msgstr ""
+msgstr "_Stoppe Erkennung"
 
 #: ../src/voice-control.c:102
 #, c-format
 msgid "There was an error displaying help: %s"
-msgstr ""
+msgstr "Es gab einen Fehler beim Darstellen der Hilfe: %s"
 
 #: ../src/voice-control.c:148 ../src/voice-control.c:395
 msgid "Idle"
-msgstr ""
+msgstr "Leerlauf"
 
 #: ../src/voice-control.c:148 ../src/voice-control.c:395
 msgid "Choose Start Control to start"
-msgstr ""
+msgstr "Wähle Starte Erkennung um zu beginnen"
 
 #: ../src/voice-control.c:159
 msgid "Init"
-msgstr ""
+msgstr "Initialisierung"
 
 #: ../src/voice-control.c:159
 msgid "Loading acoustic and language model, wait a bit"
-msgstr ""
+msgstr "Lade Sprach- und Akustikmodell, bitte warten"
 
 #: ../src/voice-control.c:182
 msgid "Calibration"
-msgstr ""
+msgstr "Kalibrierung"
 
 #: ../src/voice-control.c:182
 msgid "Tuning up acoustic parameters"
-msgstr ""
+msgstr "Konfiguriere akustische Umgebungsparameter"
 
 #: ../src/voice-control.c:200
 msgid "Listening"
-msgstr ""
+msgstr "Warte"
 
 #: ../src/voice-control.c:200
 msgid "Processing speech"
-msgstr ""
+msgstr "Verarbeite Sprache"
 
 #: ../src/voice-control.c:211
 msgid "Ready"
-msgstr ""
+msgstr "Bereit"
 
 #: ../src/voice-control.c:211
 msgid "Ready for input"
-msgstr ""
+msgstr "Bereit für Eingaben"
 
 #: ../src/voice-control.c:338
 msgid "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"
@@ -106,7 +106,7 @@ msgstr ""
 
 #: ../src/voice-control.c:342
 msgid "Voice Control Applet used to manage desktop with speech"
-msgstr ""
+msgstr "Applet zur Steuerung des Desktops mit Hilfe von Spracheingaben"
 
 #: ../src/voice-control.c:352
 msgid "translator-credits"
@@ -138,7 +138,7 @@ msgstr "NÄCHSTES FENSTER"
 
 #: ../src/action.c:104
 msgid "PREVIOUS WINDOW"
-msgstr "NÄCHSTES FENSTER"
+msgstr "VORHERIGES FENSTER"
 
 #: ../src/action.c:105
 msgid "MINIMIZE WINDOW"
@@ -150,7 +150,7 @@ msgstr "MAXIMIERE FENSTER"
 
 #: ../src/action.c:107
 msgid "SWITCH WINDOW"
-msgstr "SCHALTER FENSTER"
+msgstr "WECHSLE FENSTER"
 
 #: ../src/action.c:108
 msgid "RIGHT CLICK"
@@ -190,7 +190,7 @@ msgstr "ESCAPE"
 
 #: ../src/action.c:118
 msgid "BACKSPACE"
-msgstr "LEERTASTE"
+msgstr "BACKSPACE"
 
 #: ../src/action.c:119
 msgid "DELETE"
@@ -198,15 +198,15 @@ msgstr "LÖSCHEN"
 
 #: ../src/action.c:120
 msgid "INSERT"
-msgstr "EINFÜGEN"
+msgstr "ERSETZEN"
 
 #: ../src/action.c:121
 msgid "HOME"
-msgstr "ZEILENBEGINN"
+msgstr "ZEILENANFANG"
 
 #: ../src/action.c:122
 msgid "END"
-msgstr "ENDE"
+msgstr "ZEILENENDE"
 
 #: ../src/action.c:123
 msgid "ENTER"
@@ -242,4 +242,4 @@ msgstr "MAUS HOCH"
 
 #: ../src/action.c:134
 msgid "MAIN MENU"
-msgstr "HAUPTMENU"
+msgstr "HAUPTMENÜ"
