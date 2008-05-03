@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-voice-control trunk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-01 18:53+0400\n"
+"POT-Creation-Date: 2008-05-03 10:01+0400\n"
 "PO-Revision-Date: 2007-03-05 15:31+0300\n"
 "Last-Translator: Nickolay V. Shmyrev <nshmyrev@yandex.ru>\n"
 "Language-Team: Russian <gnome-cyr@gnome.org>\n"
@@ -45,9 +45,8 @@ msgid "_Start Control"
 msgstr "З_апустить управление"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:4
-#, fuzzy
 msgid "_Start Keypress Control"
-msgstr "З_апустить управление"
+msgstr "З_апустить управление по клавише"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:5
 msgid "_Stop Control"
@@ -123,7 +122,7 @@ msgid "RUN BROWSER"
 msgstr "запустить браузер"
 
 #: ../src/action.c:100
-msgid "RUN TEXT EDITOROS"
+msgid "RUN TEXT EDITOR"
 msgstr "запустить текстовый редактор"
 
 #: ../src/action.c:101
@@ -245,4 +244,3 @@ msgstr "мышь вверх"
 #: ../src/action.c:134
 msgid "MAIN MENU"
 msgstr "главное меню"
-

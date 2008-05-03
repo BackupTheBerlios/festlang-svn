@@ -380,7 +380,6 @@ gst_sphinx_construct_fsg (GstSphinxSink *sink, GSList *phrases)
 	word_list = NULL;
 	for (l = phrases; l; l = l->next) {
 		words = g_strsplit (l->data, " ", 0);
-		g_message ("%s", l->data);
 		word_list = g_slist_append (word_list, words);
 		n_states += g_strv_length (words);
 	}
@@ -395,6 +394,7 @@ gst_sphinx_construct_fsg (GstSphinxSink *sink, GSList *phrases)
 		int wid, from_state, to_state, next;
 		for (j = 0; words[j] != NULL; j++, i++) {
     	    		wid = fsg_model_word_add(fsg, words[j]);
+			g_message ("Word %s with wid %d", words[j], wid);
     	    		from_state = (j == 0) ? 0 : i + 1;
 			to_state = (words[j+1] == NULL) ? n_states - 1 : i + 2;
 			fsg_model_trans_add (fsg, from_state, to_state, 0, wid);

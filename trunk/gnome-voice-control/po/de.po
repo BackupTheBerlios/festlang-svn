@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-voice-control trunk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-05-02 21:01+0400\n"
+"POT-Creation-Date: 2008-05-03 10:00+0400\n"
 "PO-Revision-Date: 2008-05-01 20:31+0400\n"
 "Last-Translator: Martin Weinelt <mweinelt@gmail.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
@@ -110,7 +110,7 @@ msgstr "Applet zur Steuerung des Desktops mit Hilfe von Spracheingaben"
 
 #: ../src/voice-control.c:352
 msgid "translator-credits"
-msgstr ""
+msgstr "Martin Weinelt <mweinelt@gmail.com>"
 
 #: ../src/action.c:98
 msgid "RUN MAIL"
@@ -121,7 +121,7 @@ msgid "RUN BROWSER"
 msgstr "STARTE BROWSER"
 
 #: ../src/action.c:100
-msgid "RUN TEXT EDITOROS"
+msgid "RUN TEXT EDITOR"
 msgstr "STARTE TEXTEDITOR"
 
 #: ../src/action.c:101
