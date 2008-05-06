@@ -308,7 +308,7 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
 	      } else {
 	    	      g_message ("Recognized hyp %s", hyp);
 	    	      stripped_hyp = 
-		           g_malloc (strlen (hyp));
+		           g_malloc (strlen (hyp) + 1);
 	    	      for (i=0, j=0; hyp[i] != 0; i++) {
 	    	    	    if (hyp[i] != '(' && hyp[i] != ')' && (hyp[i] < '0' || hyp[i] > '9')) {
 	    	    		    stripped_hyp[j++] = hyp[i];
