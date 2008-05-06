@@ -46,15 +46,24 @@ gst_sphinx_get_command ()
    const gchar *lang = NULL;
    
    for (i = 0; language_names[i] != 0; i++) {
-	gchar *path;
+	gchar *dict_path;
+	gchar *model_path;
 	
-	path = g_strdup_printf (GNOMEDATADIR "/gnome-voice-control/desktop-control-%s.dict", language_names[i]);
-	if (g_file_test (path, G_FILE_TEST_EXISTS)) {
+	dict_path = g_strdup_printf (GNOMEDATADIR 
+				     "/gnome-voice-control/desktop-control-%s.dict", 
+				     language_names[i]);
+	model_path = g_strdup_printf (POCKETSPHINX_PREFIX 
+				      "/share/pocketsphinx/model/hmm/voxforge-%s/mdef", 
+				      language_names[i]);
+	if (g_file_test (dict_path, G_FILE_TEST_EXISTS) &&
+	    g_file_test (model_path, G_FILE_TEST_EXISTS)) {
 	    lang = language_names[i];
-	    g_free (path);
+	    g_free (dict_path);
+	    g_free (model_path);
 	    break;
 	}
-	g_free (path);
+	g_free (dict_path);
+	g_free (model_path);
    }
    
    result = g_strdup_printf ("voice-control "

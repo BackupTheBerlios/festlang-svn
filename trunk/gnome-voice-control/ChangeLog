@@ -1,3 +1,9 @@
+2008-05-06  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* src/gstsphinxsink.c (gst_sphinx_get_command):
+	Check mdef file before selecting acoustic model. Thanks to
+	Mauricio Henriquez <mhenriquezs@terra.cl>.
+
 2008-05-01  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* lang/Makefile.am:
