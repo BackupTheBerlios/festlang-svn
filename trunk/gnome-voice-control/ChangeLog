@@ -1,3 +1,10 @@
+2008-05-08  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* lang/Makefile.am:
+	* lang/desktop-control-es.dict:
+
+	Added spanish dictionary by Mauricio Henriquez <mhenriquezs@terra.cl>.
+
 2008-05-06  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/gstsphinxsink.c (gst_sphinx_get_command):
