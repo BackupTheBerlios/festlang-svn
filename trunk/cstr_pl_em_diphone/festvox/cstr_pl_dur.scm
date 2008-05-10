@@ -1573,6 +1573,6 @@
 )
 
 
-(provide 'cstr_pl_em_dur)
+(provide 'cstr_pl_dur)
 
 

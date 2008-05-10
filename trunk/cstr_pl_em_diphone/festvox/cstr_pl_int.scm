@@ -186,7 +186,7 @@ Reset F0 model information."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'cstr_pl_em_dur)
+(require 'cstr_pl_dur)
 
 (define (cstr_pl::select_duration)
   "(cstr_pl::select_duration)

@@ -26,7 +26,7 @@
 (require 'cstr_pl_lts)
 (require 'cstr_pl_int)
 (require 'cstr_pl_token)
-(require 'cstr_pl_em_dur)
+(require 'cstr_pl_dur)
 (require 'multisyn)
 
 ;; DATA PATHS
