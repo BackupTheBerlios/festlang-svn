@@ -51,6 +51,7 @@
 (require 'cstr_pl_token)
 (require 'cstr_pl_int)
 (require 'cstr_pl_dur)
+(require 'cstr_pl_tobi_f0)
 (require 'mbrola)
 
 (define (cstr_pl_em_mbrola_fix utt)
@@ -90,13 +91,19 @@ Set speaker to em in pl from cstr."
   (cstr_pl::select_tagger)
   (cstr_pl::select_lexicon)
   (cstr_pl::select_phrasing)
-  (cstr_pl::select_intonation)
   (cstr_pl::select_duration)
-  (cstr_pl::select_f0model)
 
-  (set! int_params
-    '((target_f0_mean 180) (target_f0_std 40)
-      (model_f0_mean 110) (model_f0_std 20)))
+;  (cstr_pl::select_intonation)
+;  (cstr_pl::select_f0model)
+;  (set! int_params
+;    '((target_f0_mean 180) (target_f0_std 40)
+;      (model_f0_mean 110) (model_f0_std 20)))
+
+   (cstr_pl::select_tobi_f0)
+   (set! int_lr_params
+	'((target_f0_mean 169) (target_f0_std 40)
+	  (model_f0_mean 169) (model_f0_std 66)))
+
 
  ;; Waveform synthesizer: MBROLA pl1 diphones
   (Parameter.set 'Synth_Method MBROLA_Synth)

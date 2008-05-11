@@ -26,6 +26,7 @@
 (require 'cstr_pl_lts)
 (require 'cstr_pl_int)
 (require 'cstr_pl_token)
+(require 'cstr_pl_tobi_f0)
 (require 'cstr_pl_dur)
 (require 'multisyn)
 
@@ -63,13 +64,19 @@
   (cstr_pl::select_tagger)
   (cstr_pl::select_lexicon)
   (cstr_pl::select_phrasing)
-  (cstr_pl::select_intonation)
   (cstr_pl::select_duration)
-  (cstr_pl::select_f0model)
 
-  (set! int_params
-    '((target_f0_mean 90) (target_f0_std 20)
-      (model_f0_mean 90) (model_f0_std 20)))
+;  (cstr_pl::select_intonation)
+;  (cstr_pl::select_f0model)
+;  (set! int_params
+;    '((target_f0_mean 90) (target_f0_std 20)
+;      (model_f0_mean 90) (model_f0_std 20)))
+
+   (cstr_pl::select_tobi_f0)
+   (set! int_lr_params
+	'((target_f0_mean 90) (target_f0_std 20)
+	  (model_f0_mean 169) (model_f0_std 66)))
+
 
   (Param.set 'Synth_Method 'MultiSyn)
   (Param.set 'unisyn.window_symmetric 0)

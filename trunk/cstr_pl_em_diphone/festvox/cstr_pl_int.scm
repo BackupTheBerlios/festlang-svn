@@ -34,17 +34,61 @@
 ;;;  Accent and F0 prediction
 ;;;
 
-;;; Phrase breaks
-;;;    use punctuation 
+(define (since_punctuation word)
+ "(since_punctuation word)
+Number of words since last punctuation or beginning of utterance."
+ (cond
+   ((null word) 0) ;; beginning or utterance
+   ((not (string-equal "0" (item.feat word "p.lisp_token_end_punc"))) 0)
+   (t
+    (+ 1 (since_punctuation (item.prev word))))))
+
+(define (until_punctuation word)
+ "(until_punctuation word)
+Number of words until next punctuation or end of utterance."
+ (cond
+   ((null word) 0) ;; beginning or utterance
+   ((not (string-equal "0" (token_end_punc word))) 0)
+   (t
+    (+ 1 (until_punctuation (item.next word))))))
+
 (set! cstr_pl_phrase_cart_tree
 '
-((lisp_token_end_punc in ("?" "." "!" ))
+((lisp_token_end_punc in ("?" "." ":" ";"))
   ((BB))
-  ((lisp_token_end_punc in ("'" "\"" "," ";" ":" "-" "--"))
+  ((lisp_token_end_punc in ("'" "\"" ","))
    ((B))
    ((n.name is 0)  ;; end of utterance
     ((BB))
+    ((lisp_since_punctuation > 5)
+     ((lisp_until_punctuation > 5)
+      ((gpos is content)
+       ((n.gpos is content)
+        ((NB))
+        ((B)))   ;; not content so a function word
+       ((NB)))   ;; this is a function word
+      ((NB)))    ;; too close to punctuation
+     ((NB)))     ;; too soon after punctuation
     ((NB))))))
+
+(set! cstr_pl_phrase_cart_tree_1
+'
+((lisp_token_end_punc in ("?" "." ":"))
+  ((BB))
+  ((lisp_token_end_punc in ("'" "\"" "," ";"))
+   ((BB))
+   ((n.name is 0)  ;; end of utterance
+    ((BB))
+    ((lisp_since_punctuation > 5)
+     ((lisp_until_punctuation > 5)
+      ((gpos is content)
+       ((n.gpos content)
+        ((BB))
+        ((BB)))   ;; not content so a function word
+       ((BB)))   ;; this is a function word
+      ((BB)))    ;; too close to punctuation
+     ((BB)))     ;; too soon after punctuation
+    ((BB))))))
 
 (define (cstr_pl::select_phrasing)
   "(cstr_pl::select_phrasing)

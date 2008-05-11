@@ -336,7 +336,7 @@ allows the treatment of numbers, money etc."
      '((prep "bez" "beze" "do" "ku" "mimo" "za" "obok" "dla" "na" "nad" "nade" "o" "od" "ode" "okol~o" "po" "pod" "pode" "przy" "oprucz" "zza" "ponad" "pomimo" "pos~rud""pomie~dzy" "mie~dzy" "wbrew" "ze" "spoza" "z" "do" "znad" "zza" "poza" "przez""poprzez" "na ogul/" "zawczasu" "po prostu")
        (conj "a" "i" "ani" "lub" "bo" "poniewarz" "rze" "rzeby" "jerzeli" "jes~li" "choc~" "no" "oraz" "lecz" "albo" "czyli" "wie~c" "toterz" "terz" "przecierz" "dlatego" "przeto" "aby" "gdyby")
        (particle "irz" "niech" "terz" "ani" "oby")
-       (question "co" "kto" "komu" "jak" "jaki" "jaka" "jakie" "jakiemu" "jako~" "gdzie" "doko~d" "odko~d" "kturemu" "ktury" "ktura" "kture" "czyj" "czyja" "czyje" "ile" "ktury z kolei" "kiedy")
+       (question "co" "kto" "komu" "jak" "jaki" "jaka" "jakie" "jakiemu" "jako~" "gdzie" "doko~d" "odko~d" "kturych" "kturemu" "ktury" "ktura" "kture" "czyj" "czyja" "czyje" "ile" "ktury z kolei" "kiedy")
        (misc "aby" "abys~" "abys~my" "abys~cie" "ale" "ani" "rzebys~" "rzebys~cie" "rzebys~my" "by" "bys~" "bys~my" "bys~cie" "jakby" "jakkolwiek" "jako" "jakos~" "jako~s~" "jakiegos~" "jakiemus~" "jednak"  "gdybys~" "mimo to" "te~dy" "ten" "to" "tego" "temu" "tu" "gdzies~" "kiedys~" "sie~" "ten" "ta" "to" "tamten" "nic" "nikt" "rzaden" "nigdy" "nigdzie")
        (pps "muj" "twuj" "jego" "jej" "nasz" "wasz" "swuj" "ich")
        (aux "jestem" "jestes~" "jest" "jestes~my" "jestes~cie" "so~" "byl~em" "byl~es~" "byl~" "bylis~my" "bylis~cie" "byli" "be~de~" "be~dziesz" "be~dzie" "be~dziemy" "be~dziecie" "be~do~")
@@ -345,6 +345,13 @@ allows the treatment of numbers, money etc."
 (define (cstr_pl::select_tokenizer)
   "(cstr_pl::select_tokenizer)
 Set up tokenizer for pl."
+
+  (set! token.punctuation "\"'`.,:;!?(){}[]")
+  (set! token.prepunctuation "\"'`({[")
+  (set! token.whitespace " \t\n\r")
+  (set! token.singlecharsymbols "")
+
+
   (set! token_to_words cstr_pl_token_to_words)
 )
 
