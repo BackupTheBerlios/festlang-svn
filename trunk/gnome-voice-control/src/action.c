@@ -34,6 +34,7 @@
 #include <cspi/spi.h>
 #include <libspi/keymasks.h>
 #include <glib/gi18n.h>
+#include <gconf/gconf-client.h>
 
 typedef enum {
     ACTION_RUN_BROWSER,
@@ -143,16 +144,33 @@ do_action (VoiceAction action)
 	GList *windows;
 	KeyCode keycode;
 	int x, y;
+	GConfClient *client;
+	gchar *default_app;
 	
+
 	switch(action) {
 
 	    case ACTION_RUN_BROWSER:
-		    g_spawn_command_line_async ("epiphany", NULL);
+		    client = gconf_client_get_default ();
+		    
+		    default_app = gconf_client_get_string (client, "/desktop/gnome/applications/browser/exec", NULL);
+	    	    if (default_app != NULL)
+			    g_spawn_command_line_async(default_app, NULL);
+	    	    else
+			    g_spawn_command_line_async ("epiphany", NULL);
 		    break;
 
 	    case ACTION_RUN_TERMINAL:
-		    g_spawn_command_line_async ("gnome-terminal", NULL);
-		    break;
+		    client = gconf_client_get_default ();
+
+	    	    default_app = gconf_client_get_string (client, "/desktop/gnome/applications/terminal/exec", NULL);
+
+	    	    if (default_app != NULL)
+			    g_spawn_command_line_async (default_app, NULL);
+	    	    else
+			    g_spawn_command_line_async ("gnome-terminal", NULL);
+
+	    	    break;
 
 	    case ACTION_RUN_TEXT_EDITOR:
     		    g_spawn_command_line_async ("gedit", NULL);
@@ -160,8 +178,8 @@ do_action (VoiceAction action)
 
 	    case ACTION_RUN_MAIL:
 		    g_spawn_command_line_async ("evolution", NULL);
-	    	    break;
-	    
+    		    break;
+
 	    case ACTION_CLOSE_WINDOW:
 	    	    screen = wnck_screen_get_default ();
 		    if (screen) {

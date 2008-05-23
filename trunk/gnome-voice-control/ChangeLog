@@ -1,3 +1,8 @@
+2008-05-23  Andrés Estévez Costas  <aecostas@gmail.com>
+
+	* src/action.c (do_action): Check gconf for
+	default terminal and browser.
+
 2008-05-08  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* lang/Makefile.am:
