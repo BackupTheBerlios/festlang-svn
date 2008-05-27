@@ -39,8 +39,7 @@ configure && make && make install. Please make sure bonobo activation
 server correctly finds .server file with applet description. If not
 adjust BONOBO_ACTIVATION_PATH environment variable and restart session.
 
-Please also note that you must have accessibility enabled and must use C
-locale since we only support English now. Go to
+Please also note that you must have accessibility enabled. Go to
 Preferences/Acessibility/Assistive Technologies and enable them.
 
 Once the applet is installed you can add it to the GNOME panel. Right
@@ -57,27 +56,52 @@ your mixer settings and sound recording system setup.
 
 The functions to control windows that we implented are:
 
-  1 - RUN TERMINAL     : open gnome-terminal
-  2 - RUN BROWSER      : open Epiphany
-  3 - RUN MAIL         : open Evolution
-  4 - RUN TEXT EDITOR  : open GEdit
-  5 - CLOSE WINDOW
-  6 - MAXIMIZE WINDOW
-  7 - MINIMIZE WINDOW
-  8 - NEXT WINDOW
+  - RUN TERMINAL     : open default terminal
+  - RUN BROWSER      : open default web browser
+  - RUN MAIL         : open Evolution
+  - RUN TEXT EDITOR  : open GEdit
+  - CLOSE WINDOW
+  - MAXIMIZE WINDOW
+  - MINIMIZE WINDOW
+  - NEXT WINDOW
 
-We can control menus too. For example in GEdit you can try something
-like
+Mouse and keyboard control should work too:
 
-  1 - FILE .. OPEN 
-  2 - HELP .. ABOUT
-  3 - SAVE
-  4 - PRINT
-  5 - UNDO
-  6 - PASTE
-  7 - FIND
-  8 - REPLACE
-  9 - EDIT .. SELECT ALL
+  - MOUSE RIGHT
+  - MOUSE LEFT
+  - MOUSE UP
+  - MOUSE DOWN
+  - CLICK, RIGHT CLICK
+  - PAGE UP
+  - PAGE DOWN
+  - LEFT
+  - RIGHT
+  etc...
 
-and other commands.
+If you have enabled accessibility you can activate actions. For example
+in GEdit you can try something like:
+
+  - FILE .. OPEN 
+  - HELP .. ABOUT
+  - SAVE
+  - PRINT
+  - UNDO
+  - PASTE
+  - FIND
+  - REPLACE
+  - EDIT .. SELECT ALL
+
+Languages
+=========
+
+We support a number of languages now with http://voxforge.org models. In
+order to use Spanish, German or Russian you need to do the following. 
+Download acoustic model for sphinx3 and place it in 
+
+$pocketsphinx_prefix/share/pocketsphinx/model/hmm/voxforge-$LN 
+
+just beside the wsj1. Check that files in the model folder has the same
+layout as in wsj1. Run applet it your locale, it must automatically
+detect the language. In order to add support for a new language, please
+contact developers. But remember it's a very labour work.
 

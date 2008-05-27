@@ -68,17 +68,19 @@ typedef enum {
     ACTION_PASTE,
 
     ACTION_MAIN_MENU,
-    /* FIXME: the rest is not implemented */
-    ACTION_SWITCH_LAYOUT,
+    
     ACTION_MOUSE_LEFT,
     ACTION_MOUSE_RIGHT,
     ACTION_MOUSE_DOWN,
     ACTION_MOUSE_UP,
-    ACTION_SHOW_HELP,
-    ACTION_HOME_FOLDER,
+
+    /* Not implemented yet */
     ACTION_SEARCH,
     ACTION_SHOW_DESKTOP,
     ACTION_LOCK_DESKTOP,
+    ACTION_SHOW_HELP,
+    ACTION_HOME_FOLDER,
+
 } VoiceAction;
 
 typedef struct _VoiceActionCommand {
@@ -91,8 +93,6 @@ typedef struct _VoiceActionCommand {
  * request if you want a new one. We really don't want to have a customizable
  * list because we target AI database which will simply understand you.
  */
-
-/* RIGHT CLICK needs to be before CLICK, as we search for this inside message */
 
 static VoiceActionCommand commands[] = 
 {
@@ -342,11 +342,11 @@ do_action (VoiceAction action)
 		    break;
 
     	    case ACTION_MOUSE_DOWN:
-		    SPI_generateMouseEvent(0,-10,"rel");
+		    SPI_generateMouseEvent(0,10,"rel");
 		    break;
 
 	    case ACTION_MOUSE_UP:
-		    SPI_generateMouseEvent(0,10,"rel");
+		    SPI_generateMouseEvent(0,-10,"rel");
 		    break;	
 
 	    default:
@@ -373,9 +373,9 @@ voice_control_action_process_result (char *message)
 {
 	int i;
 	int result = FALSE;
-	
+
 	for (i = 0; commands[i].command != NULL; i++) {
-		if (g_strrstr (message, _(commands[i].command))) {
+		if (strcmp (message, _(commands[i].command)) == 0) {
 #if DEBUG
 			g_message ("Found command '%s' in message '%s'\n", commands[i].command, message);
 #endif
