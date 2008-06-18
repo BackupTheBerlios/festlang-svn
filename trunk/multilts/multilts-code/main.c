@@ -36,6 +36,7 @@ main (int argc, char* argv[])
     	    lts (buf, result);
     	    for (i = 0; i < LTS_NBEST; i++)
     		lts_dump_string (result[i]);
+    	    printf ("----\n");
       }
 
 }	/*main */

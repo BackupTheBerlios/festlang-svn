@@ -100,6 +100,10 @@ static void utterance_parse (utterance *utt)
 		}
 		continue;
 	    }
+	    if (utt->text[i] > 'z' || utt->text[i] < 'A') {
+		i++;
+		continue;
+	    }
 		
 	    utt->letters[j] = get_letter_index (utt, i);
 	    i += utf8_length(utt->text + i);
@@ -219,21 +223,20 @@ static void utterance_select (utterance *utt)
 {
     char *buf;
     int i;
-    
+
     for (i = 0; utt->predictions[i] != 0; i++)
      if (utt->predictions[i] == PHONE_PAU)
 	utt->phones[i][0] = PHONE_PAU;
      else {
         int j, k;
 #if DEBUG
-        printf ("%d ", utt->predictions[i]);
+        printf ("offset: %d values: ", utt->predictions[i]);
 #endif
 	for (j = utt->predictions[i], k = 0; values[j] < 100; j+=2,k+=2) {
 	    utt->phones[i][k] = values[j] + 1;
 	    utt->phones[i][k+1] = values[j+1];
 #if DEBUG
-    	    printf ("%s %d ", value_names[values[j] - 1], values[j+1]);
-    	    printf ("%d %d ", values[j], values[j+1]); */
+    	    printf ("%d %d ", values[j], values[j+1]);
 #endif	
 	}
 #if DEBUG
@@ -334,12 +337,12 @@ void lts (char *text, char **result)
     utterance_dump_buffer (&utt, result);    
 }
 
-void lts_dump_string (char *string)
+void lts_dump_string (char *str)
 {
     int i;
     
-    for (i = 0; string[i] != 0; i++)
-	if (string[i] < PHONE_LAST)
-	    printf ("%s ", phone_names [string[i]]);
+    for (i = 0; str[i] != 0; i++)
+	if (str[i] < PHONE_LAST)
+	    printf ("%s ", phone_names [str[i]]);
     printf ("\n");
 }
