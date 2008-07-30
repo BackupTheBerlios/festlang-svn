@@ -260,5 +260,14 @@ Define voice for ru."
   (set! current-voice 'msu_ru_nsh_cg)
 )
 
+(proclaim_voice
+ 'msu_ru_nsh_cg
+  '((language russian)
+    (gender male)
+    (dialect moscow)
+    (coding utf-8)
+    (description
+      "Russian clustergen festival voice.")))
+
 (provide 'msu_ru_nsh_cg)
 

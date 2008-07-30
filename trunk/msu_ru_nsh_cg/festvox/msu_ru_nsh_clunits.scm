@@ -261,5 +261,14 @@ Define voice for ru."
       "1"
       "0"))
 
+(proclaim_voice
+ 'msu_ru_nsh_clunits
+  '((language russian)
+    (gender male)
+    (dialect moscow)
+    (coding utf-8)
+    (description
+      "Russian festival voice.")))
+                  
 (provide 'msu_ru_nsh_clunits)
 
