@@ -5,7 +5,7 @@ serverdir       = $(libdir)/bonobo/servers
 server_in_files = GNOME_VoiceControlApplet_Factory.server.in
 server_DATA     = $(server_in_files:.server.in=.server)
 
-APPLET_LOCATION=$(prefix)/libexec/voice_control_applet
+APPLET_LOCATION=$(libexecdir)/voice_control_applet
 APPLET_TYPE=exe
 
 $(server_in_files): $(server_in_files).in Makefile
