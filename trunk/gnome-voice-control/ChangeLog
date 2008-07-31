@@ -1,3 +1,9 @@
+2008-07-31  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* configure.ac:
+	
+	Include AM_MAINTAINER_MODE to fix bug #547735.
+
 2008-05-27  Andrés Estévez Costas  <aecostas@gmail.com>
 
 	* README:
