@@ -29,7 +29,6 @@
 #include <gst/base/gstadapter.h>
 
 #include <pocketsphinx.h>
-#include <sphinx_types.h>
 #include <ad.h>
 #include <cont_ad.h>
 #include <fsg_model.h>
