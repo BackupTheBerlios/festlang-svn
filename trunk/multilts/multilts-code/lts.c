@@ -8,7 +8,7 @@
 #define DEBUG 0
 
 extern const char * phone_names[];
-extern const char value_names[][2];
+extern const char value_names[][3];
 extern const cart_node const cart_nodes[];
 extern const int offsets[];
 extern const short const values[];
@@ -310,7 +310,7 @@ static void utterance_dump_buffer (utterance *utt, char **result)
 	result[j][0] = 0;
         for (i = 0; utt->predictions[i] != 0; i++)
 	     if (utt->selections[i][j] != PHONE_PAU) {
-		strncat (result[j], value_names[utt->selections[i][j] - 2], 2);
+		strncat (result[j], value_names[utt->selections[i][j] - 2], 3);
 	}
     }
 } /* utterance_dump_buffer */
