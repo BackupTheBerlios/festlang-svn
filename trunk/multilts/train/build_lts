@@ -51,6 +51,22 @@ then
 fi
 
 
+if [ "$1" = "make_allowables" ]
+then
+   # Automatic build of allowables
+   if [ -f allowables.scm ]
+   then
+      cp -p allowables.scm allowables.scm-old
+   fi
+
+   $FESTIVAL -b ./lts_build.scm '(dump-lets-phones "lts_scratch/lex_entries.out")'
+
+   $FESTVOXDIR/src/lts/make_allows >allowables.scm
+
+   exit 0
+fi
+
+
 if [ "$1" = "cummulate" ]
 then
 
@@ -61,7 +77,7 @@ then
    fi
 
    echo Find probabilities of letter-phone pairs
-   $FESTIVAL -b allowables.scm '(begin
+   $FESTIVAL -b allowables.scm lts_build.scm '(begin
        (cummulate-pairs "lex_entries.out")
        (save-table "lts_scratch/lex-") )'
 fi
@@ -71,7 +87,7 @@ if [ "$1" = "align" ]
 then
 
    echo Align letter-phone pairs with best path
-   $FESTIVAL -b allowables.scm lts_scratch/lex-pl-tablesp.scm '(begin
+   $FESTIVAL -b allowables.scm lts_build.scm lts_scratch/lex-pl-tablesp.scm '(begin
       (aligndata "lex_entries.out" "lts_scratch/lex.align")
       (build-feat-file "lts_scratch/lex.align" "lts_scratch/lex.feats"))' |
       tee align.log
@@ -81,7 +97,7 @@ if [ "$1" = "traintest" ]
 then
    echo "Split into training and test sets"
    $FESTVOXDIR/src/general/traintest lts_scratch/lex.align
-   $FESTIVAL -b  allowables.scm lts_scratch/lex-pl-tablesp.scm '(begin
+   $FESTIVAL -b  allowables.scm lts_build.scm lts_scratch/lex-pl-tablesp.scm '(begin
       (build-feat-file "lts_scratch/lex.align.train" "lts_scratch/lex.feats.train"))'
 fi
 
@@ -154,7 +170,7 @@ then
    echo Build complete model
    (cd lts_scratch;
        $FESTIVAL --heap 4000000 -b ../allowables.scm -b ../lts_build.scm '(begin
-         (merge_models "lex_lts_rules" "lex_lts_rules.scm" allowables))')
+         (merge_models2 "lex_lts_rules" "lex_lts_rules.scm" allowables))')
    cp -p lts_scratch/lex_lts_rules.scm ./lex_lts_rules.scm
 fi
 
@@ -163,10 +179,10 @@ then
   echo Test model
   if [ -f lts_scratch/lex.align.test ]
   then
-     $FESTIVAL -b allowables.scm lts_scratch/lex_lts_rules.scm '(lts_testset "lts_scratch/lex.align.test" lex_lts_rules)' | tee lts_test.log
+     $FESTIVAL -b allowables.scm -b lts_build.scm lts_scratch/lex_lts_rules.scm '(lts_testset "lts_scratch/lex.align.test" lex_lts_rules)' | tee lts_test.log
      echo "with TEST set"
   else
-     $FESTIVAL -b allowables.scm lts_scratch/lex_lts_rules.scm '(lts_testset "lts_scratch/lex.align" lex_lts_rules)' | tee lts_test.log
+     $FESTIVAL -b allowables.scm -b lts_build.scm lts_scratch/lex_lts_rules.scm '(lts_testset "lts_scratch/lex.align" lex_lts_rules)' | tee lts_test.log
      echo "with ALL data -- no held out test set"
   fi
 fi

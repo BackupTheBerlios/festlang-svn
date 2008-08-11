@@ -334,16 +334,20 @@ file contain predicted phone, and letter with 3 preceding and
 	(ofd (fopen featfile "w"))
 	(entry)
 	(pn)
+	(prev_p)
+	(pprev_p)
 	(sylpos 1))
     (while (not (equal? (set! entry (readfp fd)) (eof-val)))
 	   (set! lets (append '(0 0 0 0 #) (wordexplode (car entry))
 			      '(# 0 0 0 0)))
 	   (set! phones (cdr (cdr entry)))
 	   (set! pn 5)
+	   (set! prev_p "#")
+	   (set! pprev_p "#")
 	   (mapcar
 	    (lambda (p)
 	      (format ofd
-		      "%s  %s %s %s %s  %s  %s %s %s %s  %s\n"
+		      "%s %s %s %s %s  %s  %s %s %s %s  %s\n"
 		      p
 		      (nth (- pn 4) lets)
 		      (nth (- pn 3) lets)
@@ -355,11 +359,16 @@ file contain predicted phone, and letter with 3 preceding and
 		      (nth (+ pn 3) lets)
 		      (nth (+ pn 4) lets)
 		      (car (cdr entry)) ;; pos
+;;		      prev_p
+;;		      pprev_p
 		      ;; sylpos
 		      ;; numsyls
 		      ;; num2end
 		      )
-	      (set! pn (+ 1 pn)))
+	      (set! pn (+ 1 pn))
+	      (set! pprev_p prev_p)
+	      (set! prev_p p)
+	      )
 	    phones))
     (fclose fd)
     (fclose ofd))

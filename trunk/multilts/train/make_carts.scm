@@ -38,22 +38,21 @@
 ;;;                                                                     ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(set_backtrace t)
 
 (define (carttoC name trees odir)
   "(carttoC NAME TREES ODIR)
-Coverts a CART trees to a single C file called ODIR/NAME_cart.c."
+Coverts a CART trees to a single C file called ODIR/cart.c."
   (let 
-    ((ofdc (fopen (path-append odir (string-append name "_cart.c")) "w"))
-     (ofdh (fopen (path-append odir (string-append name "_cart.h")) "w"))
-     (ofvc (fopen (path-append odir (string-append name "_values.c")) "w")))
+    ((ofdc (fopen (path-append odir "cart.c") "w"))
+     (ofdh (fopen (path-append odir "cart.h") "w"))
+     (ofvc (fopen (path-append odir "values.c") "w")))
 
     (set! current_node -1)
     (set! val_table nil)
     (set! letter_table nil)
 
     (set! cart_name name)
-    (format ofdc "#include \"cst_lts.h\"\n")
-    (format ofdc "#include \"cmu_cart.h\"\n")
     (format ofdc "\n\n")
     (format ofdc "static const cst_cart_node %s_cart_nodes[] = {\n" name)
 
@@ -102,11 +101,7 @@ Returns the feature number."
      (t (error (format nil "unknown feat %s\n" fname)))))
 
 (define (carttoC_val_table ofdh f operator)
-  (let ((fn (assoc_string
-	     (if (string-equal operator "is")
-		 (format nil "is_%s" f)
-		 f)
-	     val_table)))
+  (let ((fn (assoc_string f val_table)))
     (cond
      (fn
       (cadr fn))
@@ -120,7 +115,14 @@ Returns the feature number."
 		     nname
 		     (format ofdh "\"%s\",\n" f))
 		    val_table))
-	(carttoC_val_table ofdh f operator))))))
+ 	(carttoC_val_table ofdh f operator))))))
+
+(define (carttoC_val_table1 ofdh f operator)
+  (let ((res (- (length val_table) 1)))
+	(set! val_table
+	      (cons (list f res (format ofdh "%s,\n" f))
+		    val_table))
+ 	res))
 
 (define (carttoC_question_val val)
  "(carttoC_question_val val)
@@ -136,10 +138,10 @@ Dump the nodes in the tree."
      ((cdr tree) ;; a question node
       (format ofdc "{ %d, %s, %s},\n"
 	      (carttoC_feat_num (caar tree))  ;; the feature
-	      (format nil "CTNODE_%s_NO_%05d" cart_name this_node); the no node
+	      (format nil "NODE_NO_%05d" this_node); the no node
 	      (carttoC_question_val (nth 2 (car tree))))
       (carttoC_tree_nodes (car (cdr tree)) ofdc ofdh ofvc)
-      (format ofdh "#define CTNODE_%s_NO_%05d %d\n" cart_name
+      (format ofdh "#define NODE_NO_%05d %d\n"
 	      this_node (+ 1 current_node))
       (carttoC_tree_nodes (car (cdr (cdr tree))) ofdc ofdh ofvc))
      (t  ;; a leaf node
@@ -147,12 +149,25 @@ Dump the nodes in the tree."
 	      "{ 255, %s, 0 },\n"
 	      (carttoC_extract_answer ofvc tree))))))
 
+
+(set! log_base (log 1.003))
+
 (define (carttoC_extract_answer ofvc tree)
   "(carttoC_extract_answer tree)
 Get answer from leaf node.  (this can be redefined if you want different
 behaviour)."
-  (carttoC_val_table ofvc
-		     (format nil "%l" (car tree))
-		     'none))
+;;   (format stderr "%l\n" tree)
+   (car (mapcar 
+	(lambda (item)
+;;	    (format stderr "%l\n" (pair? item))
+	    (if (null (pair? item))
+        	    (carttoC_val_table1 ofvc
+	    	         "255" 'none)
+        	    (begin 
+		       (carttoC_val_table1 ofvc
+	    	          (format nil "%s" (car item)) 'none)
+		       (carttoC_val_table1 ofvc
+	    	          (format nil "%d" (/ (log (cadr item)) log_base)) 'none))))
+    (car tree))))
 
 (provide 'make_cart)
