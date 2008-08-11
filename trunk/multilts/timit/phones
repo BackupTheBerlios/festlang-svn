@@ -1,0 +1,125 @@
+Timit phoneset
+
+aa
+ae
+ah
+ao
+aw
+ax
+axh
+axr
+ay
+b
+bcl
+ch
+d
+dcl
+dh
+dx
+eh
+el
+em
+en
+eng
+epi
+er
+ey
+f
+g
+gcl
+hh
+hv
+ih
+ix
+iy
+jh
+k
+kcl
+l
+m
+n
+ng
+nx
+ow
+oy
+p
+pcl
+q
+r
+s
+sh
+t
+tcl
+th
+uh
+uw
+ux
+v
+w
+y
+z
+zh
+
+
+The mapping between unilex and TIMIT phoneset:
+
+@    ah
+@@r  er
+@r   axr
+a    ae
+aa   aa
+aer  ####### aer r -> ay axr
+ai   ay
+ar   aa
+b    bcl b
+ch   tcl ch
+d    dcl d
+dh   dh
+e    eh
+eh   eh
+ei   ey
+eir  eh r
+f    f
+g    gcl g
+h    h
+hw   w
+i    ih
+ii   ix
+ir   ih
+jh   jh
+k    kcl k
+l    l
+l=   el
+lw   l
+m    m
+m=   em
+n    n
+n=   en
+ng   ng
+oi   oy
+oir  ########## not significant
+oo   ao
+or   ao
+ou   ow
+ow   aw
+owr  ########## owr r -> aw axr
+p    pcl p
+r    r
+s    s
+sh  sh
+t   tcl t
+t^  dx
+th  th
+u   uh
+uh  ah
+ur  uh
+uu  ux
+v   v
+w   w
+y   y
+z   z
+zh  zh
+
+Problems:
+
+where to skip closure and where should we leave them
