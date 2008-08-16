@@ -69,6 +69,7 @@ gst_sphinx_get_command ()
    result = g_strdup_printf ("voice-control "
     "-fwdflat no "
     "-bestpath yes "
+    "-dictcase yes "
     "-hmm " POCKETSPHINX_PREFIX "/share/pocketsphinx/model/hmm/%s%s " 
     "-fsg " GNOMEDATADIR "/gnome-voice-control/desktop-control.fsg "
     "-dict " GNOMEDATADIR "/gnome-voice-control/desktop-control-%s.dict ", 
