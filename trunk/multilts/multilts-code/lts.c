@@ -110,7 +110,7 @@ static void utterance_parse (utterance *utt)
 	    j ++;
 	    whitespace = 0;
 	}
-    if (whitespace = 0)
+    if (whitespace == 0)
         utt->letters[j] = LETTER_PAU;
 } /* utterance_parse */
 
