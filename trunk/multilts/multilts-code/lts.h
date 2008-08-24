@@ -6,8 +6,11 @@
 #ifndef _LTS_H__
 #define _LTS_H__
 
+/* The number of best guesses. It couldn't be changed now */
 #define LTS_NBEST 3
 
+/* This enumeration has phones from the TIMIT phoneset for phone-based representation.
+   Phone zero marks the end of the string and used internally */
 enum {
     PHONE_ZERO = 0,
     PHONE_PAU,
@@ -72,9 +75,19 @@ enum {
     PHONE_LAST
 };
 
+/* 
+   Main functoin. Converts text to phones 
+   
+   @text: the string, which probably consists of several words. Only ASCII symbols are allowed, others
+          are just ignored. The string shouldn't be longer than 256 symbols.
+   @result: the storage for result, it must be preallocated array of the size LTS_NBEST 
+	    of pointers to preallocated strings.
+*/
 void lts (char *text, char **result);
 
+/* Helper functoin. Dumps on the standard output the contents of the string with phone-based
+   representation of the phones. Used for debugging.
+*/
 void lts_dump_string (char *string);
 
 #endif
-

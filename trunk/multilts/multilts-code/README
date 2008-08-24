@@ -4,16 +4,178 @@ N-best LTS with CART tree
 Compilation
 ============
 
-	Under UNIX just type 'make'. It should be compiled with Visual Studio
-	as well, just include all files.
+Under UNIX just type 'make'. It should be compiled with Visual Studio
+as well, just include all the C files present.
 
 =======
  Usage
 =======
 	
-	lts program just reads string by string from standard input and
-	outputs transcription to standard output. You can also point
-	the file to use as input
+lts program just reads string by string from standard input and
+outputs transcription to standard output. You can also point
+the file to use as input
 	
-	lts [file]
+lts [file]
+
+=======================
+ Application interface
+=======================
+
+The interface for external applications is simple and described in the
+header lts.h. 
+
+The main function is lts, the arguments are 
+
+  char *text - the string should not be larger than 256 symbols
+
+  char **result - an array of LTS_NBEST char* strings for result. Each
+  string must be also preallocated. It's not recommended to use less
+  than 256 symbols for each result string. 
+
+The function lts returns no value. It just parses the input and fills
+the result according to the predicted pronunciation. Phonemes are encoded
+by enumeration defined in the same header lts.h. It describes quite
+standard TIMIT phoneset except some unused and not very sensible phones
+like q. There is additional phone PHONE_ZERO which is used internally.
+It just marks the end of pronunciation string.
+
+There is also a helper function to convert phone-based
+representation to a readable form. It's called lts_dump_string. It takes
+the string of phones in phone-based representation as and input and prints
+the readable representation on the standard output. This function is
+mostly used for debugging.
+
+The example of the usage of the LTS is provided in the main.c file, you
+first need to allocate a buffer for result, than call lts to get the
+transcription.
+
+======
+Theory
+======
+
+The LTS conversion is done with method which combines the optimization
+of the sequence of phones in respect to target probability and join
+probability. The target probability is predicted by a CART (Classification
+and Regression Tree). The result of this prediction is the distribution
+of the conditional probability of 
+
+  P (phone | letters)
+
+In current implementation we care about the following letters of the
+word - three letters before the phone and three after that. This
+combination of features is proved to be acceptable for LTS prediction.
+Of course some improvements like taking previous phones into account of
+using part of speech information could be made.
+
+CART tree is trained with the festival with the attached scripts. The
+input of the training is the phonetic dictionary and the information for
+letter-to-sound alignment. The output is the tree which can be converted
+to C-like data structures as well. CART is just one of the methods to
+predict conditional distribution, but it's widely used in LTS. Other
+methods either lack good training package or, more importantly, lack
+efficient  model representation and fast evaluation method.
+
+So actually once we have a sequence of letters like:
+
+  letter_1 letter_2 .... letter_n
+  
+we calculate for each phone the following probability:
+
+  P (phone | letter_{i-2}, letter {i-1}, letter_i, letter_{i+1}, letter {i+1})
+  
+Now once we have an array of probabilities we need to select a phone
+according to the cost function. The function selected is the maximum of
+the common probability
+
+  P (phones | letters) = P(phone_1 | letters) x P (phone_2 | letters)...
+  
+Since we are looking for N-best decision, we choose not only the maximum
+sequence, but other sequences close to maximum. The cost function here
+takes all probabilities into account, that's why it can be considered as
+a join cost. This problem can be solved with kind of dynamic programming.
+
+==============
+Code internals
+==============
+
+The layout of the files is the following:
+
+    cart.[ch] - auto-generated files with tree data
+    values.c  - partly auto-generated file with probability distributions and
+                names of the phones
+    lts.c - the code for translations
+    lts.h - the public header        
+    lts_int.h - internal header
+
+The process of conversion goes in several stages. The state of LTS is stored in special
+structure - utterance. The text is first split on letters by utterance_parse function.
+All letters are converted to lower case, everything else except white spaces is 
+ignored. The result is stored in field letters of the struct utterance.
+
+Next thing is feature extraction, letters around current one are stored in array, then
+distribution probability is predicted. The tree is stored in a C array in cart.c. The
+array consist of structures:
+
+typedef struct _cart_node {
+    unsigned char  feat; /* The feature we'll check (the offset of the letter relatively to the current one).
+			    255 if we reached the leaf and don't need to check anything */
+    unsigned int value;  /* The value of the result for the leaf node or the number of node to check next question */
+    unsigned char  check; /* The value to compare to */
+} cart_node;
+
+The process of distribution calculation is the following. For every letter we've got it's offset
+in a tree array by table "offsets" in cart.c. We start from the first node and check the feature value.
+If value is the same, we go to the next node, otherwise we go to the "no" node which is found
+by value of "value" field of the structure. Once we've reached the leaf node, we'll get the offset
+of the distribution in the table of distributions. This process is implemented as a recursive function
+apply_model.
+
+The distributions are stored in the following way:
+
+_epsilon_,
+-135,
+er,
+-366,
+255,
+
+here the _epsilon_ or er are the predicted values, -135 and -366 are log-based probabilities. 
+The base of the log is 1.003. It's done to simplify calculations and to avoid floating numbers as well.
+255 marks the end of the distribution list.
+
+The result is stored in the array - field of the utterance structure. The next step is to select
+n best predictions in utt->selections. This can be done by dynamic programming, but right now it's
+done much simpler. Since the first best three values include the best value and the values that differ
+from the best only by a single phone, we can do the following - we search the best way in predictions
+for every letter, then we search for a prediction that is almost the best and different form a best
+prediction, then we search for the prediction that is best and differ from the first two ones. This
+way we'll get guaranteed N-best prediction for n=3. Of course for n>3 this algorithm is not giving
+the optimal decision but almost optimal one. But experiments shows that final improvement from a
+4-best prediction is less than a percent, so it's not worth to use them. The selection is done 
+by the function utterance_select.
+
+The last step is to dump result into a string. In distribution, not just a single phone is predicted
+for a letter, it can be a pair of phones, say k and s for letter x. Or it can be no phone like n in 
+ng is translated to empty phone (_epsilon_) and g is translated to phone ng. This is done by
+function utterance_dump_buffer which converts values from internal representation to phone-based
+representation.
+
+Additional parameters defined in the headers are the following:
+
+#define LTS_NBEST 3 - size for n-best.
+#define REG_SIZE 40 - maximum size of the distribution.
+#define STR_SIZE 256 - maximum size of the internal strings. Be careful with this value.
+#define DEBUG 0 - dump debugging output during build, for internal use only.
+
+=================
+Training the tree
+=================
+
+Currently training is done with festival and requires a mix of python, scheme and
+c++ code.
+
+The input data is the dictionary in festival format - lex_entries.out.
+This  lexicon was converted from Unilex with some later hand-made
+corrections. The main work is done by build_lts script, the code is
+generated in c subfolder. Then manual work is required to transfer the
+code to the main repository.
 
