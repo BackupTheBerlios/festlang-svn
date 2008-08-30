@@ -54,9 +54,9 @@ Coverts a CART trees to a single C file called ODIR/cart.c."
 
     (set! cart_name name)
     (format ofdc "\n\n")
-    (format ofdc "static const cst_cart_node %s_cart_nodes[] = {\n" name)
+    (format ofdc "const cart_node cart_nodes[] = {\n")
 
-    (format ofvc "static const char* %s_values[] = {\n" name)
+    (format ofvc "const int offsets[] = {\n")
 
     (mapcar
       (lambda (l)
@@ -64,7 +64,7 @@ Coverts a CART trees to a single C file called ODIR/cart.c."
 	    (format stderr "Processing %s\n" (car l))
 	    (set! letter_table (cons (list (car l) (+ current_node 1)) letter_table))
 	    (carttoC_tree_nodes tree ofdc ofdh ofvc)
-	    (format ofdc "{ 255, 0, 0},\n")
+	    (format ofdc "{ 7, 0, 0},\n")
 	    (set! current_node (+ current_node 1))
 	    ))
 	trees)
@@ -100,7 +100,7 @@ Returns the feature number."
      ((string-equal fname "n.n.n.n.name") 7)
      (t (error (format nil "unknown feat %s\n" fname)))))
 
-(define (carttoC_val_table ofdh f operator)
+(define (carttoC_val_table ofdh f)
   (let ((fn (assoc_string f val_table)))
     (cond
      (fn
@@ -109,13 +109,11 @@ Returns the feature number."
       (let ((nname (format nil "%d" (length val_table))))
 	(set! val_table
 	      (cons (list 
-		     (if (string-equal operator "is")
-			 (format nil "is_%s" f)
-			 f)
+		     f
 		     nname
 		     (format ofdh "\"%s\",\n" f))
 		    val_table))
- 	(carttoC_val_table ofdh f operator))))))
+ 	(carttoC_val_table ofdh f))))))
 
 (define (carttoC_val_table1 ofdh f operator)
   (let ((res (- (length val_table) 1)))
@@ -146,7 +144,7 @@ Dump the nodes in the tree."
       (carttoC_tree_nodes (car (cdr (cdr tree))) ofdc ofdh ofvc))
      (t  ;; a leaf node
       (format ofdc
-	      "{ 255, %s, 0 },\n"
+	      "{ 7, %s, 0 },\n"
 	      (carttoC_extract_answer ofvc tree))))))
 
 
@@ -156,18 +154,8 @@ Dump the nodes in the tree."
   "(carttoC_extract_answer tree)
 Get answer from leaf node.  (this can be redefined if you want different
 behaviour)."
-;;   (format stderr "%l\n" tree)
-   (car (mapcar 
-	(lambda (item)
-;;	    (format stderr "%l\n" (pair? item))
-	    (if (null (pair? item))
-        	    (carttoC_val_table1 ofvc
-	    	         "255" 'none)
-        	    (begin 
-		       (carttoC_val_table1 ofvc
-	    	          (format nil "%s" (car item)) 'none)
-		       (carttoC_val_table1 ofvc
-	    	          (format nil "%d" (/ (log (cadr item)) log_base)) 'none))))
-    (car tree))))
+;;  (format stderr "%l\n" tree)
+    (carttoC_val_table ofvc (format nil "%l" (cdr (reverse (car tree)))))
+)
 
 (provide 'make_cart)
