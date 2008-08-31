@@ -3,21 +3,164 @@
 #include <stdlib.h>
 
 #include "lts.h"
-#include "lts_int.h"
 
 #define DEBUG 0
 
-extern const char * phone_names[];
-extern const char value_names[][3];
-extern const cart_node const cart_nodes[];
-extern const int offsets[];
-extern const value_node values[];
+static FILE* data_file;
+static int data_file_nodes;
+static int data_file_offsets;
+static int data_file_values;
 
 #define LETTER_EOR 7
 #define LETTER_PAU '#'
 #define LETTER_ZERO '0'
 
 #define STR_SIZE 256
+
+/* This header is used in lts internally */
+
+typedef struct _cart_node {
+    unsigned char  feat : 3;
+    unsigned int value : 21;
+    unsigned char  check;
+} cart_node;
+
+typedef struct value_node {
+    unsigned char res;
+    short value;
+} value_node;
+
+const char*  const phone_names [] = {
+"zero",
+"aa",
+"ae",
+"ah",
+"ao",
+"aw",
+"ax",
+"axh",
+"axr",
+"ay",
+"b",
+"bcl",
+"ch",
+"d",
+"dcl",
+"dh",
+"dx",
+"eh",
+"el",
+"em",
+"en",
+"epi",
+"er",
+"ey",
+"f",
+"g",
+"gcl",
+"hh",
+"hv",
+"ih",
+"ix",
+"iy",
+"jh",
+"k",
+"kcl",
+"l",
+"m",
+"n",
+"ng",
+"nx",
+"ow",
+"oy",
+"p",
+"pcl",
+"q",
+"r",
+"s",
+"sh",
+"t",
+"tcl",
+"th",
+"uh",
+"uw",
+"ux",
+"v",
+"w",
+"y",
+"z",
+"zh",
+};
+
+
+const char const value_names [][3] = {
+{PHONE_AA, PHONE_ZERO},
+{PHONE_AE, PHONE_ZERO},
+{PHONE_AH, PHONE_ZERO},
+{PHONE_AH, PHONE_S},
+{PHONE_AH, PHONE_Z},
+{PHONE_AO, PHONE_ZERO},
+{PHONE_AW, PHONE_ZERO},
+{PHONE_AXR, PHONE_ZERO},
+{PHONE_AXR, PHONE_R},
+{PHONE_AY, PHONE_ZERO},
+{PHONE_BCL, PHONE_B, PHONE_ZERO},
+{PHONE_TCL, PHONE_CH, PHONE_ZERO},
+{PHONE_DCL, PHONE_D, PHONE_ZERO},
+{PHONE_DH, PHONE_ZERO},
+{PHONE_DX, PHONE_ZERO},
+{PHONE_EH, PHONE_ZERO},
+{PHONE_EH, PHONE_L},
+{PHONE_EL, PHONE_ZERO},
+{PHONE_EM, PHONE_ZERO},
+{PHONE_EN, PHONE_ZERO},
+{PHONE_ZERO, PHONE_ZERO},
+{PHONE_ER, PHONE_ZERO},
+{PHONE_EY, PHONE_ZERO},
+{PHONE_F, PHONE_ZERO},
+{PHONE_GCL, PHONE_G, PHONE_ZERO},
+{PHONE_GCL, PHONE_G, PHONE_Z},
+{PHONE_GCL, PHONE_G, PHONE_ZH},
+{PHONE_HH, PHONE_ZERO},
+{PHONE_IH, PHONE_ZERO},
+{PHONE_IX, PHONE_ZERO},
+{PHONE_JH, PHONE_ZERO},
+{PHONE_KCL, PHONE_K, PHONE_ZERO},
+{PHONE_KCL, PHONE_K, PHONE_S},
+{PHONE_KCL, PHONE_K, PHONE_SH},
+{PHONE_KCL, PHONE_K, PHONE_W},
+{PHONE_L, PHONE_ZERO},
+{PHONE_M, PHONE_ZERO},
+{PHONE_M, PHONE_AH},
+{PHONE_N, PHONE_ZERO},
+{PHONE_NG, PHONE_ZERO},
+{PHONE_OW, PHONE_ZERO},
+{PHONE_OY, PHONE_ZERO},
+{PHONE_PCL, PHONE_P, PHONE_ZERO},
+{PHONE_R, PHONE_ZERO},
+{PHONE_R, PHONE_IH},
+{PHONE_R, PHONE_R},
+{PHONE_S, PHONE_ZERO},
+{PHONE_SH, PHONE_ZERO},
+{PHONE_TCL, PHONE_T, PHONE_ZERO},
+{PHONE_TH, PHONE_ZERO},
+{PHONE_UH, PHONE_ZERO},
+{PHONE_UX, PHONE_ZERO},
+{PHONE_V, PHONE_ZERO},
+{PHONE_W, PHONE_ZERO},
+{PHONE_W, PHONE_AA},
+{PHONE_W, PHONE_AE},
+{PHONE_W, PHONE_AH},
+{PHONE_Y, PHONE_ZERO},
+{PHONE_Y, PHONE_AH},
+{PHONE_Y, PHONE_AXR},
+{PHONE_Y, PHONE_UH},
+{PHONE_Y, PHONE_UX},
+{PHONE_Z, PHONE_ZERO},
+{PHONE_ZH, PHONE_ZERO},
+};
+
+
 
 /*************************************************************************
  *
@@ -115,12 +258,12 @@ static void utterance_parse (utterance *utt)
 /***************************************************************************/
 
 static unsigned int apply_model(unsigned char *vals,
-			 	 unsigned int start, 
-				 const cart_node* model)
+			 	 unsigned int start)
 {
     cart_node state;
-
-    state = model [start];
+    
+    fseek (data_file, data_file_nodes + start * sizeof (cart_node), SEEK_SET);
+    fread (&state, 1, sizeof(cart_node), data_file);
 
     while (state.feat != LETTER_EOR)
     {
@@ -135,7 +278,8 @@ static unsigned int apply_model(unsigned char *vals,
 	    start = state.value;
 	}
 
-        state = model [start];
+        fseek (data_file, data_file_nodes + start * sizeof (cart_node), SEEK_SET);
+	fread (&state, 1, sizeof(cart_node), data_file);
     }
 
     return state.value;
@@ -143,8 +287,13 @@ static unsigned int apply_model(unsigned char *vals,
 
 static unsigned int letter_start (utterance *utt, int i)
 {
-    if (utt->letters[i] >= 'a')
-        return offsets[utt->letters[i] - 'a'];
+    int letter_offset;
+    
+    if (utt->letters[i] >= 'a') {
+	fseek (data_file, data_file_offsets + (utt->letters[i] - 'a') * sizeof(int), SEEK_SET);
+	fread (&letter_offset, 1, sizeof(int), data_file);
+        return letter_offset;
+    }
     
     return -1;
 }
@@ -203,8 +352,7 @@ static void utterance_lts (utterance *utt)
     		    }
 #endif
 		    phone = apply_model(feature_vector,
-		    		        letter_start_index,
-					cart_nodes);	
+		    		        letter_start_index);
 #if DEBUG
 		    printf ("Result %d\n", phone);
 #endif
@@ -222,16 +370,21 @@ static void utterance_select (utterance *utt)
     int i;
 
     for (i = 0; utt->predictions[i] >= 0; i++) {
+	    value_node val;
+	    fseek (data_file, data_file_values + utt->predictions[i] * LTS_NBEST, SEEK_SET);
 #if DEBUG
-    	    const value_node *val;
     	    int j;
     	    
 	    printf ("offset: %d values: ", utt->predictions[i]);
-	    for (val = values + utt->predictions[i] * LTS_NBEST, j = 0; val->res != 0 && j < LTS_NBEST; val++, j++)
+	    for (j = 0; j < LTS_NBEST; j++) {
+		 fread (&val, 1, sizoef (value), data_file);
 	         printf ("%d %d ", val->res, val->value);
+	    }
 	    printf ("\n");
 #endif
-    	    utt->selections[i][0] = values[utt->predictions[i] * LTS_NBEST].res;
+	    fseek (data_file, data_file_values + utt->predictions[i] * LTS_NBEST * sizeof(value_node), SEEK_SET);
+    	    fread (&val, 1, sizeof (value_node), data_file);
+    	    utt->selections[i][0] = val.res;
     }
 
     {
@@ -248,22 +401,30 @@ static void utterance_select (utterance *utt)
 
 	    for (i = 0; utt->predictions[i] >= 0; i++) {
 		int j;
-		const value_node *val = values + utt->predictions[i] * LTS_NBEST + 1; /* No need to check the best one */
-	
-		for (j = 1; (val->res != 0) && (j < LTS_NBEST); val++, j++) {
+		value_node val;
+	    
+	        fseek (data_file, data_file_values + 
+	    	                  utt->predictions[i] * LTS_NBEST * sizeof(value_node) 
+	    	                  + sizeof(value_node), SEEK_SET); /* No need to check the best one */
+		
+		for (j = 1; j < LTS_NBEST; j++) {
 			int check;
 			int l;
+
+	                fread (&val, 1, sizeof (value_node), data_file);    
+	                if (val.res == 0)
+	            	    break;
 			
 			check = 0;
 			for (l = 0; l < k; l++)
-			    if (val->res == utt->selections[i][l]) {
+			    if (val.res == utt->selections[i][l]) {
 				check = 1;
 				break;
 			    }
 			
-			if (val->value > best_score && check == 0) {
-			    best_phone = val->res;
-			    best_score = val->value;
+			if (val.value > best_score && check == 0) {
+			    best_phone = val.res;
+			    best_score = val.value;
 			    best_i = i;
 			}
 		}
@@ -301,28 +462,18 @@ static void utterance_init (utterance *utt)
 {
     memset (utt->letters, 0, STR_SIZE);
     memset (utt->predictions, 0, STR_SIZE);
-    memset (utt->selections, 0, STR_SIZE * LTS_NBEST);
-
-#if DEBUG
-    FILE *f;
-    int val;
-
-    f = fopen ("tree.dat", "wb");
-    
-    val = 37476;    
-    fwrite ( &val, 1, sizeof(int), f);
-    val = 79206;    
-    fwrite ( &val, 1, sizeof(int), f);
-    val = 26;
-    fwrite ( &val, 1, sizeof(int), f);
-    
-    fwrite ( cart_nodes, 37476, sizeof (cart_node), f);
-    fwrite ( values, 15639, sizeof (value_node), f);
-    fwrite ( offsets, 26, sizeof (int), f);
-    fclose (f);
-#endif
-    
+    memset (utt->selections, 0, STR_SIZE * LTS_NBEST);    
 } /* utterance_init */
+
+void lts_init()
+{	
+    if (data_file == 0) {
+	    data_file = fopen("tree.dat", "r");
+	    fread (&data_file_nodes, 1, sizeof(int), data_file);
+	    fread (&data_file_values, 1, sizeof(int), data_file);
+	    fread (&data_file_offsets, 1, sizeof(int), data_file);
+    }
+}
 
 void lts (char *text, char **result)
 {

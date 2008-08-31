@@ -24,6 +24,9 @@ lts [file]
 The interface for external applications is simple and described in the
 header lts.h. 
 
+First of all data structures must be initialized with lts_init. This function
+reads data file offsets.
+
 The main function is lts, the arguments are 
 
   char *text - the string should not be larger than 256 symbols

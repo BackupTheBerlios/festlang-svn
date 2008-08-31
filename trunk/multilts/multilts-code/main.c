@@ -12,7 +12,9 @@ main (int argc, char* argv[])
 
     char buf[256];
     char *result[LTS_NBEST];
-    
+
+
+    lts_init();    
     for (i = 1; i < argc; i++)
        {
     	    if (strncmp("--help", argv[i], 6) == 0)

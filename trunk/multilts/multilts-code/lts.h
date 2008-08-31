@@ -75,6 +75,11 @@ enum {
 };
 
 /* 
+   Initialize data structures
+*/
+void lts_init (void);
+
+/* 
    Main functoin. Converts text to phones 
    
    @text: the string, which probably consists of several words. Only ASCII symbols are allowed, others
