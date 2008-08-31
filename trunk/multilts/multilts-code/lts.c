@@ -11,13 +11,12 @@ extern const char * phone_names[];
 extern const char value_names[][3];
 extern const cart_node const cart_nodes[];
 extern const int offsets[];
-extern const short const values[];
+extern const value_node values[];
 
-#define LETTER_EOR 255
+#define LETTER_EOR 7
 #define LETTER_PAU '#'
 #define LETTER_ZERO '0'
 
-#define REG_SIZE 40
 #define STR_SIZE 256
 
 /*************************************************************************
@@ -55,7 +54,6 @@ typedef struct utterance
     
     int  predictions[STR_SIZE];
 
-    int  phones[STR_SIZE][REG_SIZE];
     int  selections[STR_SIZE][LTS_NBEST];
     int  selections_buffer[STR_SIZE][LTS_NBEST];
         
@@ -190,8 +188,6 @@ static void utterance_lts (utterance *utt)
 	    letter_start_index = letter_start (utt, i);
 	    if (letter_start_index == (unsigned int) -1) 
 	        {
-	    	    utt->predictions[j] = PHONE_PAU;
-	    	    j++;
 	    	    continue;
 	        }
     	    else 
@@ -209,95 +205,80 @@ static void utterance_lts (utterance *utt)
 		    phone = apply_model(feature_vector,
 		    		        letter_start_index,
 					cart_nodes);	
-#if DEBUG	
+#if DEBUG
 		    printf ("Result %d\n", phone);
 #endif
 		    utt->predictions[j] = phone;
 	    	    j++;
 	    	}
 	}
+    utt->predictions[j] = -1;
+    j++;
 } /* utterance_lts */
 
 /***************************************************************************/
 static void utterance_select (utterance *utt)
 {
-    char *buf;
     int i;
 
-    for (i = 0; utt->predictions[i] != 0; i++)
-     if (utt->predictions[i] == PHONE_PAU)
-	utt->phones[i][0] = PHONE_PAU;
-     else {
-        int j, k;
+    for (i = 0; utt->predictions[i] >= 0; i++) {
 #if DEBUG
-        printf ("offset: %d values: ", utt->predictions[i]);
+    	    const value_node *val;
+    	    int j;
+    	    
+	    printf ("offset: %d values: ", utt->predictions[i]);
+	    for (val = values + utt->predictions[i] * LTS_NBEST, j = 0; val->res != 0 && j < LTS_NBEST; val++, j++)
+	         printf ("%d %d ", val->res, val->value);
+	    printf ("\n");
 #endif
-	for (j = utt->predictions[i], k = 0; values[j] < 100; j+=2,k+=2) {
-	    utt->phones[i][k] = values[j] + 1;
-	    utt->phones[i][k+1] = values[j+1];
-#if DEBUG
-    	    printf ("%d %d ", values[j], values[j+1]);
-#endif	
-	}
-#if DEBUG
-        printf ("\n");
-#endif	
+    	    utt->selections[i][0] = values[utt->predictions[i] * LTS_NBEST].res;
     }
 
-    for (i = 0; utt->predictions[i] != 0; i++) {
-	int j;
-	int best = -20000;
-	
-	for (j = 0; utt->phones[i][j] != 0; j+=2) {
-		if (utt->phones[i][j + 1] > best) {
-		    utt->selections[i][0] = utt->phones[i][j];
-		    best = utt->phones[i][j + 1];
-		}
-	    }
-    }    
-    
     {
         int k = 1;
       
         while (k < LTS_NBEST) {
-            int best_first; int best_first_i; int best_first_j;
+            char best_phone;
+            int  best_score;
+            int  best_i;
 
-	    best_first = -20000;
-	    best_first_i = -1;
-	    best_first_j = -1;
-	    for (i = 0; utt->predictions[i] != 0; i++) {
+	    best_score = -20000;
+	    best_phone = 0;
+	    best_i = -1;
+
+	    for (i = 0; utt->predictions[i] >= 0; i++) {
 		int j;
+		const value_node *val = values + utt->predictions[i] * LTS_NBEST + 1; /* No need to check the best one */
 	
-		for (j = 0; utt->phones[i][j] != 0; j+=2) {
+		for (j = 1; (val->res != 0) && (j < LTS_NBEST); val++, j++) {
 			int check;
 			int l;
 			
 			check = 0;
 			for (l = 0; l < k; l++)
-			    if (utt->phones[i][j] == utt->selections[i][l]) {
+			    if (val->res == utt->selections[i][l]) {
 				check = 1;
 				break;
 			    }
 			
-			if (utt->phones[i][j + 1] > best_first && check == 0) {
-			    best_first_i = i;
-			    best_first_j = j;
-			    best_first = utt->phones[i][j + 1];
+			if (val->value > best_score && check == 0) {
+			    best_phone = val->res;
+			    best_score = val->value;
+			    best_i = i;
 			}
 		}
     	    }    
-	    for (i = 0; utt->predictions[i] != 0; i++) {
+#if DEBUG
+	    printf ("Found at step %d best one %d %d \n", k, best_i, best_phone);
+#endif
+	    for (i = 0; utt->predictions[i] >= 0; i++) {
 		utt->selections[i][k] = utt->selections[i][0];
 	    }    
-#if DEBUG
-	    printf ("%d %d\n", best_first_i, best_first_j);
-#endif
-	    if (best_first_i > 0)
-    		utt->selections[best_first_i][k] = utt->phones[best_first_i][best_first_j];
+	    if (best_i >= 0)
+    		utt->selections[best_i][k] = best_phone;
 	    k++;
 	}
     }
-
 } /* utterance_select */
 
 /***************************************************************************/
@@ -308,9 +289,9 @@ static void utterance_dump_buffer (utterance *utt, char **result)
     
     for (j = 0; j < LTS_NBEST; j++) {
 	result[j][0] = 0;
-        for (i = 0; utt->predictions[i] != 0; i++)
-	     if (utt->selections[i][j] != PHONE_PAU) {
-		strncat (result[j], value_names[utt->selections[i][j] - 2], 3);
+        for (i = 0; utt->predictions[i] >= 0; i++)
+	     if (utt->selections[i][j] != PHONE_ZERO) {
+		strncat (result[j], value_names[utt->selections[i][j] - 1], 3);
 	}
     }
 } /* utterance_dump_buffer */
@@ -320,8 +301,26 @@ static void utterance_init (utterance *utt)
 {
     memset (utt->letters, 0, STR_SIZE);
     memset (utt->predictions, 0, STR_SIZE);
-    memset (utt->phones, 0, STR_SIZE * REG_SIZE);
     memset (utt->selections, 0, STR_SIZE * LTS_NBEST);
+
+#if DEBUG
+    FILE *f;
+    int val;
+
+    f = fopen ("tree.dat", "wb");
+    
+    val = 37476;    
+    fwrite ( &val, 1, sizeof(int), f);
+    val = 79206;    
+    fwrite ( &val, 1, sizeof(int), f);
+    val = 26;
+    fwrite ( &val, 1, sizeof(int), f);
+    
+    fwrite ( cart_nodes, 37476, sizeof (cart_node), f);
+    fwrite ( values, 15639, sizeof (value_node), f);
+    fwrite ( offsets, 26, sizeof (int), f);
+    fclose (f);
+#endif
     
 } /* utterance_init */
 

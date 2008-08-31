@@ -13,7 +13,6 @@
    Phone zero marks the end of the string and used internally */
 enum {
     PHONE_ZERO = 0,
-    PHONE_PAU,
     PHONE_AA,
     PHONE_AE,
     PHONE_AH,

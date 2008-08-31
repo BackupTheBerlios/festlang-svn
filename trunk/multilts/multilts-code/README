@@ -117,9 +117,9 @@ distribution probability is predicted. The tree is stored in a C array in cart.c
 array consist of structures:
 
 typedef struct _cart_node {
-    unsigned char  feat; /* The feature we'll check (the offset of the letter relatively to the current one).
-			    255 if we reached the leaf and don't need to check anything */
-    unsigned int value;  /* The value of the result for the leaf node or the number of node to check next question */
+    unsigned char  feat : 3; /* The feature we'll check (the offset of the letter relatively to the current one).
+			    7 if we reached the leaf and don't need to check anything */
+    unsigned int value : 21;  /* The value of the result for the leaf node or the number of node to check next question */
     unsigned char  check; /* The value to compare to */
 } cart_node;
 
@@ -132,15 +132,24 @@ apply_model.
 
 The distributions are stored in the following way:
 
-_epsilon_,
--135,
-er,
--366,
-255,
+typedef struct value_node {
+    unsigned char res;
+    short value;
+} value_node;
+
+{  aa ,  0 },
+{  0 ,  -5380 },
+{  0 ,  -5380 },
+{  aa ,  -135 },
+{  er ,  -366 },
+{  0 ,  -5380 },
+{  er ,  0 },
+{  0 ,  -5380 },
+{  0 ,  -5380 },
 
 here the _epsilon_ or er are the predicted values, -135 and -366 are log-based probabilities. 
 The base of the log is 1.003. It's done to simplify calculations and to avoid floating numbers as well.
-255 marks the end of the distribution list.
+For each distribution only 3 best values are stored to simplify search.
 
 The result is stored in the array - field of the utterance structure. The next step is to select
 n best predictions in utt->selections. This can be done by dynamic programming, but right now it's
@@ -162,7 +171,6 @@ representation.
 Additional parameters defined in the headers are the following:
 
 #define LTS_NBEST 3 - size for n-best.
-#define REG_SIZE 40 - maximum size of the distribution.
 #define STR_SIZE 256 - maximum size of the internal strings. Be careful with this value.
 #define DEBUG 0 - dump debugging output during build, for internal use only.
 
@@ -171,7 +179,7 @@ Training the tree
 =================
 
 Currently training is done with festival and requires a mix of python, scheme and
-c++ code.
+C++ code.
 
 The input data is the dictionary in festival format - lex_entries.out.
 This  lexicon was converted from Unilex with some later hand-made
