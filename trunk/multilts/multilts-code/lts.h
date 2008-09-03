@@ -94,4 +94,9 @@ void lts (char *text, char **result);
 */
 void lts_dump_string (char *string);
 
+/*
+ Free allocated resources
+ */
+void lts_free (void);
+
 #endif

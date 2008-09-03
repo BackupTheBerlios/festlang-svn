@@ -1,33 +1,38 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "lts.h"
+#include "Srv_Param.h"
 
 #define DEBUG 0
 
+#if DEBUG
+static FILE* log_file;
+#endif
+
 static FILE* data_file;
+
 static int data_file_nodes;
 static int data_file_offsets;
 static int data_file_values;
 
-#define LETTER_EOR 7
+#define FEATURE_EOR 7
 #define LETTER_PAU '#'
 #define LETTER_ZERO '0'
 
 #define STR_SIZE 256
 
-/* This header is used in lts internally */
-
 typedef struct _cart_node {
-    unsigned char  feat : 3;
-    unsigned int value : 21;
-    unsigned char  check;
+    unsigned char feat;
+    unsigned int value;
+    unsigned char check;
 } cart_node;
 
 typedef struct value_node {
     unsigned char res;
-    short value;
+    short score;
 } value_node;
 
 const char*  const phone_names [] = {
@@ -93,7 +98,7 @@ const char*  const phone_names [] = {
 };
 
 
-const char const value_names [][3] = {
+const char value_names [][3] = {
 {PHONE_AA, PHONE_ZERO},
 {PHONE_AE, PHONE_ZERO},
 {PHONE_AH, PHONE_ZERO},
@@ -194,17 +199,13 @@ typedef struct utterance
 {
     char text[STR_SIZE];
     char letters[STR_SIZE];
-    
     int  predictions[STR_SIZE];
-
     int  selections[STR_SIZE][LTS_NBEST];
-    int  selections_buffer[STR_SIZE][LTS_NBEST];
-        
+    int  selections_buffer[STR_SIZE][LTS_NBEST];        
 } utterance;
 
 static int get_letter_index (utterance *utt, int i)
 {
-    int j;
     int result = LETTER_PAU;
 
     result = tolower(utt->text[i]);
@@ -253,24 +254,25 @@ static void utterance_parse (utterance *utt)
 	}
     if (whitespace == 0)
         utt->letters[j] = LETTER_PAU;
-} /* utterance_parse */
-
-/***************************************************************************/
+}
 
 static unsigned int apply_model(unsigned char *vals,
 			 	 unsigned int start)
 {
     cart_node state;
+    char buf[4];
     
-    fseek (data_file, data_file_nodes + start * sizeof (cart_node), SEEK_SET);
-    fread (&state, 1, sizeof(cart_node), data_file);
+    fseek (data_file, data_file_nodes + start * 4, SEEK_SET);
+    fread (buf, 1, 4, data_file);
+    state.check  = buf[3];
+    state.feat = buf[0] & 0x7;
+    state.value = (*(int *)buf & 0xffffff) >> 3;
 
-    while (state.feat != LETTER_EOR)
-    {
+    while (state.feat != FEATURE_EOR) {
 
 #if DEBUG
-	printf ("state is %d offset is %d check is %d\n", state.feat, start, state.check);
-	printf ("Answer is %s\n", vals[state.feat] == state.check ? "yes" : "no");
+	fprintf (log_file, "state is %d offset is %d check is %d\n", state.feat, start, state.check);
+	fprintf (log_file, "Answer is %s\n", vals[state.feat] == state.check ? "yes" : "no");
 #endif
 	if (vals[state.feat] == state.check) {
 	    start++;
@@ -278,8 +280,11 @@ static unsigned int apply_model(unsigned char *vals,
 	    start = state.value;
 	}
 
-        fseek (data_file, data_file_nodes + start * sizeof (cart_node), SEEK_SET);
-	fread (&state, 1, sizeof(cart_node), data_file);
+        fseek (data_file, data_file_nodes + start * 4, SEEK_SET);
+        fread (buf, 1, 4, data_file);
+	state.check  = buf[3];
+        state.feat = buf[0] & 0x7;
+	state.value = (*(int *)buf & 0xffffff) >> 3;
     }
 
     return state.value;
@@ -300,27 +305,23 @@ static unsigned int letter_start (utterance *utt, int i)
 
 static void fill_feats (utterance *utt, int i,  unsigned char*vector)
 {
-   int j;
+    int j;
 
-   for (j = 0; j < 7; j++)
-    {
+    for (j = 0; j < 7; j++) {
 	vector[j] = LETTER_ZERO;
     }
 
-   for (j = -1; j > -4; j--)
-    {
+    for (j = -1; j > -4; j--) {
         vector [j+4] = utt->letters[i+j];
         if (utt->letters[i+j] == LETTER_PAU)
-	    break;	
+	    break;		
     }
     
-   for (j = 1; j < 4; j++)
-    {	
+    for (j = 1; j < 4; j++) {	
         vector [j+3] = utt->letters[i+j];
         if (utt->letters[i+j] == LETTER_PAU)
 	    break;
-    }
-    
+    }    
     return;
 }
 
@@ -345,16 +346,16 @@ static void utterance_lts (utterance *utt)
 #if DEBUG
 		    {
 		      int k;
-		      printf ("Vector is ");
+		      fprintf (log_file, "Vector is ");
 		      for (k = 1; k < 7; k++)
-		    	  printf ("%d ", feature_vector[k]);
-		      printf ("letter is %d start index is %d\n", utt->letters[i], letter_start_index);
+		    	 fprintf (log_file, "%d ", feature_vector[k]);
+		      fprintf (log_file, "letter is %d start index is %d\n", utt->letters[i], letter_start_index);
     		    }
 #endif
 		    phone = apply_model(feature_vector,
 		    		        letter_start_index);
 #if DEBUG
-		    printf ("Result %d\n", phone);
+		    fprintf (log_file, "Result %d\n", phone);
 #endif
 		    utt->predictions[j] = phone;
 	    	    j++;
@@ -362,25 +363,26 @@ static void utterance_lts (utterance *utt)
 	}
     utt->predictions[j] = -1;
     j++;
-} /* utterance_lts */
+}
 
-/***************************************************************************/
 static void utterance_select (utterance *utt)
 {
     int i;
+#if DEBUG
+    int j;
+#endif
 
     for (i = 0; utt->predictions[i] >= 0; i++) {
 	    value_node val;
 	    fseek (data_file, data_file_values + utt->predictions[i] * LTS_NBEST, SEEK_SET);
 #if DEBUG
-    	    int j;
     	    
-	    printf ("offset: %d values: ", utt->predictions[i]);
+	    fprintf (log_file, "offset: %d values: ", utt->predictions[i]);
 	    for (j = 0; j < LTS_NBEST; j++) {
-		 fread (&val, 1, sizoef (value), data_file);
-	         printf ("%d %d ", val->res, val->value);
+		 fread (&val, 1, sizeof (value_node), data_file);
+	         fprintf (log_file, "item %d score %d ", val.res, val.score);
 	    }
-	    printf ("\n");
+	    fprintf (log_file, "\n");
 #endif
 	    fseek (data_file, data_file_values + utt->predictions[i] * LTS_NBEST * sizeof(value_node), SEEK_SET);
     	    fread (&val, 1, sizeof (value_node), data_file);
@@ -422,15 +424,15 @@ static void utterance_select (utterance *utt)
 				break;
 			    }
 			
-			if (val.value > best_score && check == 0) {
+			if (val.score > best_score && check == 0) {
 			    best_phone = val.res;
-			    best_score = val.value;
+			    best_score = val.score;
 			    best_i = i;
 			}
 		}
     	    }    
 #if DEBUG
-	    printf ("Found at step %d best one %d %d \n", k, best_i, best_phone);
+	    fprintf (log_file, "Found best one at step %d offset %d phone %d \n", k, best_i, best_phone);
 #endif
 	    for (i = 0; utt->predictions[i] >= 0; i++) {
 		utt->selections[i][k] = utt->selections[i][0];
@@ -440,13 +442,11 @@ static void utterance_select (utterance *utt)
 	    k++;
 	}
     }
-} /* utterance_select */
+}
 
-/***************************************************************************/
 static void utterance_dump_buffer (utterance *utt, char **result)
 {
     int i, j;
-    char buf[10];
     
     for (j = 0; j < LTS_NBEST; j++) {
 	result[j][0] = 0;
@@ -455,23 +455,31 @@ static void utterance_dump_buffer (utterance *utt, char **result)
 		strncat (result[j], value_names[utt->selections[i][j] - 1], 3);
 	}
     }
-} /* utterance_dump_buffer */
+}
 
-/***************************************************************************/
 static void utterance_init (utterance *utt)
 {
     memset (utt->letters, 0, STR_SIZE);
     memset (utt->predictions, 0, STR_SIZE);
     memset (utt->selections, 0, STR_SIZE * LTS_NBEST);    
-} /* utterance_init */
+}
+
+/***************************************************************************/
 
 void lts_init()
 {	
-    if (data_file == 0) {
-	    data_file = fopen("tree.dat", "r");
+    char tree_filename[STR_SIZE];
+
+    ParamGetValue("G2P_Tree_File", PARAM_STRING, tree_filename);
+
+    if (data_file == NULL) {
+	    data_file = fopen(tree_filename, "r");
 	    fread (&data_file_nodes, 1, sizeof(int), data_file);
 	    fread (&data_file_values, 1, sizeof(int), data_file);
 	    fread (&data_file_offsets, 1, sizeof(int), data_file);
+#if DEBUG
+	    log_file = fopen("g2p_log.txt","wt");
+#endif
     }
 }
 
@@ -493,6 +501,30 @@ void lts_dump_string (char *str)
     
     for (i = 0; str[i] != 0; i++)
 	if (str[i] < PHONE_LAST)
-	    printf ("%s ", phone_names [str[i]]);
+	    printf ("%s ", phone_names [(int)str[i]]);
     printf ("\n");
+}
+
+int lts_copy_string (char** phones, char *str)
+{
+    int i;
+    int num_phon;
+    num_phon = 0;
+    
+    for (i = 0; str[i] != 0; i++) {
+	    if (str[i] < PHONE_LAST) {
+	    	    strcpy(phones[i], phone_names[(int)str[i]]);
+		    num_phon++;
+	    }
+    }
+    return num_phon;
+}
+
+void lts_free()
+{
+#if DEBUG
+    fclose(log_file);
+#endif
+    fclose(data_file);
+    data_file = NULL;
 }

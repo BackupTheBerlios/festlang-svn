@@ -4,9 +4,10 @@ SOURCES = \
 
 HEADERS = \
 	lts.h \
+	Srv_Param.h
 
 lts: $(SOURCES) $(HEADERS)
-	gcc -O0 -g -o lts $(SOURCES)
+	gcc -O0 -g -Wall -Werror -o lts $(SOURCES)
 
 clean:
 	rm -rf lts

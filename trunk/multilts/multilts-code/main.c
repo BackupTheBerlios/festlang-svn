@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "lts.h"
 
@@ -40,5 +41,6 @@ main (int argc, char* argv[])
     		lts_dump_string (result[i]);
     	    printf ("----\n");
       }
-
+    
+    return 0;
 }	/*main */
