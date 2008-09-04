@@ -473,7 +473,7 @@ void lts_init()
     ParamGetValue("G2P_Tree_File", PARAM_STRING, tree_filename);
 
     if (data_file == NULL) {
-	    data_file = fopen(tree_filename, "r");
+	    data_file = fopen(tree_filename, "rb");
 	    fread (&data_file_nodes, 1, sizeof(int), data_file);
 	    fread (&data_file_values, 1, sizeof(int), data_file);
 	    fread (&data_file_offsets, 1, sizeof(int), data_file);
