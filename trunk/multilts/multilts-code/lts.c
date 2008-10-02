@@ -372,6 +372,10 @@ static void utterance_select (utterance *utt)
     int j;
 #endif
 
+    /* Get the best prediction from the data, since the 
+       data distribution is already sorted, this 
+       is just the first element of the array
+     */
     for (i = 0; utt->predictions[i] >= 0; i++) {
 	    value_node val;
 	    fseek (data_file, data_file_values + utt->predictions[i] * LTS_NBEST, SEEK_SET);
@@ -412,18 +416,21 @@ static void utterance_select (utterance *utt)
 		for (j = 1; j < LTS_NBEST; j++) {
 			int check;
 			int l;
-
+		    
+			/* Reads the distribution for the corresponding selection from the data */
 	                fread (&val, 1, sizeof (value_node), data_file);    
 	                if (val.res == 0)
 	            	    break;
 			
+			/* Checks if this item was not selected already */
 			check = 0;
-			for (l = 0; l < k; l++)
+			for (l = 0; l < k; l++) {
 			    if (val.res == utt->selections[i][l]) {
 				check = 1;
 				break;
 			    }
-			
+			}
+			/* Check if this score is optimal and stores as a best one*/
 			if (val.score > best_score && check == 0) {
 			    best_phone = val.res;
 			    best_score = val.score;
@@ -434,11 +441,13 @@ static void utterance_select (utterance *utt)
 #if DEBUG
 	    fprintf (log_file, "Found best one at step %d offset %d phone %d \n", k, best_i, best_phone);
 #endif
+	    /* Copies the best selection to result and changes the match if it was found */
 	    for (i = 0; utt->predictions[i] >= 0; i++) {
 		utt->selections[i][k] = utt->selections[i][0];
 	    }    
-	    if (best_i >= 0)
+	    if (best_i >= 0) {
     		utt->selections[best_i][k] = best_phone;
+    	    }
 	    k++;
 	}
     }
@@ -450,9 +459,10 @@ static void utterance_dump_buffer (utterance *utt, char **result)
     
     for (j = 0; j < LTS_NBEST; j++) {
 	result[j][0] = 0;
-        for (i = 0; utt->predictions[i] >= 0; i++)
+        for (i = 0; utt->predictions[i] >= 0; i++) {
 	     if (utt->selections[i][j] != PHONE_ZERO) {
 		strncat (result[j], value_names[utt->selections[i][j] - 1], 3);
+	     }
 	}
     }
 }
