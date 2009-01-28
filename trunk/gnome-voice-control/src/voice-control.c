@@ -240,7 +240,9 @@ show_notification(VoiceControlApplet *voice_control, const gchar *message)
 static void
 on_sink_message (VoiceControlApplet *voice_control, const gchar *message)
 {
-	show_notification (voice_control, message);
+	g_message ("Got result %s", message);
+	
+//	show_notification (voice_control, g_strdup (message));
 	
 	if (voice_control_action_process_result (message))
 		return;
@@ -443,7 +445,7 @@ voice_control_pipeline_bus_callback (GstBus *bus,
 		    }
 		}
 	}
-	return;	
+	return TRUE;	
 }
 
 static void

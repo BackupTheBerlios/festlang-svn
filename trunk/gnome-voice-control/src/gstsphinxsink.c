@@ -331,10 +331,8 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
   
 	
 	if (sphinxsink->ad.calibrated) {
-		g_message ("Processing bytes");
     		gst_sphinx_sink_process_chunk (sphinxsink);
     	} else {
-		g_message ("Calibrating bytes");
     		gst_sphinx_sink_calibrate_chunk (sphinxsink);
     	}
         gst_adapter_flush (sphinxsink->adapter, REQUIRED_FRAME_BYTES);
