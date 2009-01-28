@@ -9,26 +9,36 @@ toolbar items activation, text navigation and many more.
 GnomeVoiceControl Requirements
 ==============================
 
-pocketsphinx:
-
- http://cmusphinx.org/download/nightly/pocketsphinx.nightly.tar.gz
-
 GStreamer development packages: gstreamer-devel gstreamer-plugins-base-devel
 
  http://gstreamer.freedesktop.org
 
-GNOME development packages: libwnck-dev, libatspi-dev, gnome-panel-dev 
-startup-notification-devel
-
- http://gnome.org
+GNOME development packages: libwnck-dev, libatspi-dev, gnome-panel-dev, startup-notification-devel
 
 GNOME build system: libtool gnome-common intltool
 
  http://gnome.org
- 
-libnotify:
 
-http://www.galago-project.org/news/index.php
+Libnotify
+
+ http://www.galago-project.org/news/index.php
+
+Ubuntu users can run this command:
+
+  sudo apt-get install libpanel-applet2-0 libgnomeui32 libgstreamer0.10-0 libwnck22 libnotify-bin subversion 
+
+  sudo apt-get install libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev libwnck-dev \
+    libatspi-dev libpanel-applet2-dev  libstartup-notification0-dev libtool
+    gnome-common intltool libnotify-dev python-all-dev
+
+sphinxbase
+
+ http://downloads.sourceforge.net/cmusphinx/sphinxbase-0.4.1.tar.bz2
+
+pocketsphinx
+
+ http://downloads.sourceforge.net/cmusphinx/pocketsphinx-0.5.1.tar.bz2 (Stable version)
+
  
 Installation
 ============
@@ -38,6 +48,10 @@ need to set PKG_CONFIG_PATH environment variable. The rest is usual
 configure && make && make install. Please make sure bonobo activation
 server correctly finds .server file with applet description. If not
 adjust BONOBO_ACTIVATION_PATH environment variable and restart session.
+
+Or link .server path in /usr/lib:
+
+  sudo ln -s /usr/local/lib/bonobo/servers/GNOME_VoiceControlApplet_Factory.server /usr/lib/bonobo/servers/
 
 Please also note that you must have accessibility enabled. Go to
 Preferences/Acessibility/Assistive Technologies and enable them.
@@ -49,10 +63,10 @@ you will found a icon VoiceControl, add it.
 To start the real control over desktop, click with the right button on 
 the VoiceControl applet area and select Start Control. The system will
 pass by the states Idle -> Calibrating -> Ready. When the system is
-ready you can start to speech, giving the commands by voice. If speech
-is detected applet will show Listening and in the end of command it will
-run it. If it doesn't work or system locks on calibration please check
-your mixer settings and sound recording system setup.
+ready you can say command. If speech is detected applet will show 
+Listening and in the end of command the notification will appear. If it
+doesn't work or system locks on calibration please check your mixer
+settings and sound recording system setup.
 
 The functions to control windows that we implented are:
 
