@@ -83,18 +83,13 @@ struct _GstSphinxSink {
 
 struct _GstSphinxSinkClass {
   GstBaseSinkClass parent_class;
-
-  void (*initialization)  (GstElement *element);
-  void (*after_initialization)  (GstElement *element);
-  void (*calibration)     (GstElement *element);
-  void (*ready)           (GstElement *element);
-  void (*listening)       (GstElement *element);
-  void (*message)         (GstElement *element, gchar *message);
 };
 
 GType gst_sphinx_sink_get_type (void);
 
 void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *words);
+
+gboolean gst_sphinx_sink_running (GstSphinxSink *sink);
 
 G_END_DECLS
 

@@ -369,7 +369,7 @@ voice_control_action_append_commands (GSList *list)
 }
 
 gboolean
-voice_control_action_process_result (char *message)
+voice_control_action_process_result (const char *message)
 {
 	int i;
 	int result = FALSE;

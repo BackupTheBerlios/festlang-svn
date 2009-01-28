@@ -29,7 +29,7 @@ GSList*
 voice_control_action_append_commands (GSList *commands);
 
 gboolean
-voice_control_action_process_result (char *command);
+voice_control_action_process_result (const char *command);
 
 #endif /* _ACTION_H_ */
 

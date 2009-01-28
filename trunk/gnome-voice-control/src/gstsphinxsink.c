@@ -117,19 +117,6 @@ GST_ELEMENT_DETAILS ("Sphinx Sink",
     "Sink to recognize audio",
     "Nickolay V. Shmyrev <nshmyrev@yandex.ru>");
 
-
-/* SphinxSink signals and args */
-enum
-{
-  SIGNAL_INITIALIZATION,
-  SIGNAL_AFTER_INITIALIZATION,
-  SIGNAL_CALIBRATION,
-  SIGNAL_LISTENING,
-  SIGNAL_READY,
-  SIGNAL_MESSAGE,
-  LAST_SIGNAL
-};
-
 static void
 _do_init (GType filesink_type)
 {	
@@ -144,8 +131,6 @@ static gboolean gst_sphinx_sink_start(GstBaseSink * asink);
 static gboolean gst_sphinx_sink_stop (GstBaseSink * asink);
 static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * sink, GstBuffer * buffer);
 
-static guint gst_sphinx_sink_signals[LAST_SIGNAL] = { 0 };
-
 static void
 gst_sphinx_sink_base_init (gpointer g_class)
 {
@@ -155,7 +140,6 @@ gst_sphinx_sink_base_init (gpointer g_class)
       gst_static_pad_template_get (&sinktemplate));
   gst_element_class_set_details (gstelement_class, &gst_sphinx_sink_details);
 }
-
 
 static void
 gst_sphinx_sink_finalize (GObject * gobject)
@@ -184,36 +168,21 @@ gst_sphinx_sink_class_init (GstSphinxSinkClass * klass)
   gstbase_sink_class->start = GST_DEBUG_FUNCPTR (gst_sphinx_sink_start);
   gstbase_sink_class->stop = GST_DEBUG_FUNCPTR (gst_sphinx_sink_stop);
   gstbase_sink_class->render = GST_DEBUG_FUNCPTR (gst_sphinx_sink_render);
+}
 
-  gst_sphinx_sink_signals[SIGNAL_INITIALIZATION] =
-      g_signal_new ("initialization", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
-      G_STRUCT_OFFSET (GstSphinxSinkClass, initialization), NULL, NULL,
-      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
-
-  gst_sphinx_sink_signals[SIGNAL_AFTER_INITIALIZATION] =
-      g_signal_new ("after_initialization", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
-      G_STRUCT_OFFSET (GstSphinxSinkClass, after_initialization), NULL, NULL,
-      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
-
-  gst_sphinx_sink_signals[SIGNAL_CALIBRATION] =
-      g_signal_new ("calibration", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
-      G_STRUCT_OFFSET (GstSphinxSinkClass, calibration), NULL, NULL,
-      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
-
-  gst_sphinx_sink_signals[SIGNAL_LISTENING] =
-      g_signal_new ("listening", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
-      G_STRUCT_OFFSET (GstSphinxSinkClass, listening), NULL, NULL,
-      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
-
-  gst_sphinx_sink_signals[SIGNAL_READY] =
-      g_signal_new ("ready", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
-      G_STRUCT_OFFSET (GstSphinxSinkClass, calibration), NULL, NULL,
-      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0, G_TYPE_NONE);
-
-  gst_sphinx_sink_signals[SIGNAL_MESSAGE] =
-      g_signal_new ("message", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
-      G_STRUCT_OFFSET (GstSphinxSinkClass, message), NULL, NULL,
-      g_cclosure_marshal_VOID__STRING, G_TYPE_NONE, 1, G_TYPE_STRING);
+static void
+gst_sphinx_sink_send_message (GstSphinxSink *sphinxsink, gchar *message, gchar *text)
+{
+  GstStructure *s;
+  GstMessage *msg;	    
+  
+  if (text)
+    s = gst_structure_new (message, "text", G_TYPE_STRING, text, NULL);
+  else
+    s = gst_structure_new (message, NULL);
+  
+  msg = gst_message_new_element (GST_OBJECT (sphinxsink), s);
+  gst_element_post_message (GST_ELEMENT (sphinxsink), msg);
 }
 
 static void
@@ -269,8 +238,7 @@ static void gst_sphinx_sink_calibrate_chunk (GstSphinxSink *sphinxsink)
 	char *adbuf;
 
         if (!sphinxsink->ad.calibrate_started) {
-    	    g_signal_emit (sphinxsink,
-		    gst_sphinx_sink_signals[SIGNAL_CALIBRATION], 0, NULL);
+    	    gst_sphinx_sink_send_message (sphinxsink, "calibration", NULL);
 	    sphinxsink->ad.calibrate_started = TRUE;
 	}
 
@@ -282,8 +250,8 @@ static void gst_sphinx_sink_calibrate_chunk (GstSphinxSink *sphinxsink)
 	    sphinxsink->ad.calibrated = TRUE;
     	    sphinxsink->ad.listening = 0;
     	    
-	    g_signal_emit (sphinxsink,
-	        gst_sphinx_sink_signals[SIGNAL_READY], 0, NULL);
+    	    g_message ("Sending ready");
+    	    gst_sphinx_sink_send_message (sphinxsink, "ready", NULL);
 	}
 }
 
@@ -317,28 +285,22 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
 	    	      }
 	    	      stripped_hyp [j] = 0;
 	    	      
-		      g_signal_emit (sphinxsink,
-		                     gst_sphinx_sink_signals[SIGNAL_MESSAGE], 
-			             0, stripped_hyp);
-		      g_free (stripped_hyp);
+	    	      gst_sphinx_sink_send_message (sphinxsink, "message", stripped_hyp);
 	      }
 
 	      sphinxsink->last_ts = 0;
 	      sphinxsink->ad.listening = 0;
-	      g_signal_emit (sphinxsink,
-	          gst_sphinx_sink_signals[SIGNAL_READY], 0, NULL);
+    	      gst_sphinx_sink_send_message (sphinxsink, "ready", NULL);
 
 	} else if (k != 0) {
 	     if (sphinxsink->ad.listening == 0) {
 	    	    ps_start_utt (sphinxsink->decoder, NULL);
 	    	    sphinxsink->ad.listening = 1;
-	     }
+		    gst_sphinx_sink_send_message (sphinxsink, "listening", NULL);
+	    }
 	
 	     ps_process_raw (sphinxsink->decoder, adbuf, k, 0, 0);
 	     sphinxsink->last_ts = sphinxsink->cont->read_ts;
-
-	     g_signal_emit (sphinxsink,
-	          gst_sphinx_sink_signals[SIGNAL_LISTENING], 0, NULL);
 	}
 }
 
@@ -355,21 +317,24 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
 #endif
 
   if (!sphinxsink->ad.initialized) {
-          g_signal_emit (sphinxsink,
-	        gst_sphinx_sink_signals[SIGNAL_INITIALIZATION], 0, NULL);
+          gst_sphinx_sink_send_message (sphinxsink, "initialization", NULL);
 	  gst_sphinx_decoder_init (sphinxsink);
-          g_signal_emit (sphinxsink,
-	        gst_sphinx_sink_signals[SIGNAL_AFTER_INITIALIZATION], 0, NULL);
+          gst_sphinx_sink_send_message (sphinxsink, "after_initialization", NULL);
 	  sphinxsink->ad.initialized = TRUE;
+	  return;
   }
 
   gst_buffer_ref (buffer);
   gst_adapter_push (sphinxsink->adapter, buffer);
-  
+   
   while (gst_adapter_available (sphinxsink->adapter) >= REQUIRED_FRAME_BYTES) {
+  
+	
 	if (sphinxsink->ad.calibrated) {
+		g_message ("Processing bytes");
     		gst_sphinx_sink_process_chunk (sphinxsink);
     	} else {
+		g_message ("Calibrating bytes");
     		gst_sphinx_sink_calibrate_chunk (sphinxsink);
     	}
         gst_adapter_flush (sphinxsink->adapter, REQUIRED_FRAME_BYTES);
@@ -421,6 +386,9 @@ void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *phrases)
 {	
 	fsg_set_t *fsgs;
 
+	if (sink->ad.listening)
+		return;
+		
 	sink->fsg = gst_sphinx_construct_fsg (sink, phrases);
 
         fsgs = ps_get_fsgset(sink->decoder);
@@ -433,3 +401,7 @@ void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *phrases)
 #endif
 }
 
+gboolean gst_sphinx_sink_running (GstSphinxSink *sink)
+{
+	return sink->ad.initialized;
+}

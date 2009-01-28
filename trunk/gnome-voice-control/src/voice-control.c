@@ -66,7 +66,6 @@ typedef struct {
 	GstElement* 	   sink;
 	
 	ControlSpiListener*	   spi_listener;
-	gchar* last_message;
 } VoiceControlApplet;
 
 typedef struct {
@@ -150,90 +149,54 @@ control_stop (BonoboUIComponent  *uic,
 }
 
 static void
-on_sink_initialization (GObject *sink, gpointer data)
+on_sink_initialization (VoiceControlApplet *voice_control)
 {
-	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
-
-	gdk_threads_enter ();
 	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_STOP, GTK_ICON_SIZE_MENU);
 	voice_control_set_text (voice_control, _("Init"), _("Loading acoustic and language model, wait a bit"));
-	gdk_threads_leave ();
 }
 
 static void
-on_sink_after_initialization (GObject *sink, gpointer data)
+on_sink_after_initialization (VoiceControlApplet *voice_control)
 {
 	GSList *commands;
-	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
-
+	
 	commands = voice_control_action_append_commands (NULL);	
 	gst_sphinx_sink_set_fsg (GST_SPHINX_SINK(voice_control->sink), commands);
 	g_slist_free (commands);
-
 }
 
 static void
-on_sink_calibration (GObject *sink, gpointer data)
+on_sink_calibration (VoiceControlApplet *voice_control)
 {
-	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
-
-	gdk_threads_enter ();
 	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_STOP, GTK_ICON_SIZE_MENU);
 	voice_control_set_text (voice_control, _("Calibration"), _("Tuning up acoustic parameters"));
-	gdk_threads_leave ();
 }
 
 static void
-on_sink_listening (GObject *sink, gpointer data)
+on_sink_listening (VoiceControlApplet *voice_control)
 {
-	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
-	GError *err = NULL;
-
-	gdk_threads_enter ();
-	notify_notification_close(voice_control->notif, &err);
-	if (err) {
-		g_warning("Failed to show notifcation: %s\n", err->message);
-		g_error_free(err);
-	}
-
 	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_YES, GTK_ICON_SIZE_MENU);
 	voice_control_set_text (voice_control, _("Listening"), _("Processing speech"));
-	gdk_threads_leave ();
 }
 
 static void
-on_sink_ready (GObject *sink, gpointer data)
+on_sink_ready (VoiceControlApplet *voice_control)
 {
-	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 
-	gdk_threads_enter ();
 	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_YES, GTK_ICON_SIZE_MENU);
 	voice_control_set_text (voice_control, _("Ready"), _("Ready for input"));
-	gdk_threads_leave ();
 }
 
 static gboolean 
-process_action (gpointer data)
+process_action (VoiceControlApplet *voice_control, const gchar *message)
 {
-	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 	GSList *l, *nodes;
-	GError *err = NULL;
-	notify_notification_update(voice_control->notif,
-				   "Speech Input",
-				   voice_control->last_message, NULL);
-	notify_notification_set_timeout(voice_control->notif,
-					NOTIFY_EXPIRES_DEFAULT);
-	notify_notification_show(voice_control->notif, &err);
-	if (err) {
-		g_warning("Failed to show notifcation: %s\n", err->message);
-		g_error_free(err);
-	}
 
 	nodes = control_spi_listener_get_object_list (voice_control->spi_listener);
 
 	for (l = nodes; l; l = l->next) {
 		AccessibleItem *item = (AccessibleItem *)l->data;
-		if (g_strrstr(voice_control->last_message, item->name)) {
+		if (g_strrstr(message, item->name)) {
 			AccessibleAction *action;
 			
 			g_message ("Running action '%s' accessible %p", item->name, item->accessible);
@@ -247,14 +210,13 @@ process_action (gpointer data)
 }
 
 static gboolean
-show_notification(gpointer data)
+show_notification(VoiceControlApplet *voice_control, const gchar *message)
 {
-	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 	GError *err = NULL;
 
 	notify_notification_update(voice_control->notif,
 				   "Speech Input",
-				   voice_control->last_message, NULL);
+				   message, NULL);
 	notify_notification_set_timeout(voice_control->notif,
 					NOTIFY_EXPIRES_DEFAULT);
 	notify_notification_show(voice_control->notif, &err);
@@ -276,20 +238,14 @@ show_notification(gpointer data)
  * @return void  
  */
 static void
-on_sink_message (GObject *sink, gchar *message, gpointer data)
+on_sink_message (VoiceControlApplet *voice_control, const gchar *message)
 {
-	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
-
-	if (voice_control->last_message)
-		g_free (voice_control->last_message);
-	voice_control->last_message = g_strdup (message);
-	
-	g_idle_add (show_notification, voice_control);
+	show_notification (voice_control, message);
 	
 	if (voice_control_action_process_result (message))
 		return;
 
-	g_idle_add (process_action, data);		
+	process_action (voice_control, message);
 	
 	return;
 }
@@ -299,6 +255,9 @@ voice_control_ui_changed (ControlSpiListener *listener, gpointer data)
 {
 	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
 	GSList *l, *nodes, *commands;
+	
+	if (!gst_sphinx_sink_running (GST_SPHINX_SINK (voice_control->sink)))
+		return;
 	
 	nodes = control_spi_listener_get_object_list (listener);
 	commands = NULL;
@@ -344,7 +303,7 @@ display_about_dialog (BonoboUIComponent  *uic,
 	voice_control->about_dialog = gtk_about_dialog_new ();
 	g_object_set (voice_control->about_dialog,
 		      "name", _("VoiceControl"),
-		      "version", "0.2.0",
+		      "version", VERSION,
 		      "copyright", "Copyright \xc2\xa9 1998-2002 Free Software Foundation, Inc.",
 		      "comments", descr,
 		      "authors", (const char **) authors,
@@ -454,39 +413,64 @@ voice_control_applet_destroy (GtkObject *object)
 	GTK_OBJECT_CLASS (voice_control_applet_parent_class)->destroy (object);
 }
 
+static gboolean
+voice_control_pipeline_bus_callback (GstBus *bus,
+				     GstMessage *message,
+				     gpointer data)
+{
+	VoiceControlApplet *voice_control = (VoiceControlApplet *) data;
+	g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
+
+	switch (GST_MESSAGE_TYPE (message)) {
+		case GST_MESSAGE_ELEMENT: {
+		    const GstStructure *str = gst_message_get_structure (message);
+		    const gchar *name = gst_structure_get_name (str);
+		    
+		    g_message ("Got structure %s", name);
+		    
+		    if (strcmp (name, "initialization") == 0) {
+			    on_sink_initialization (voice_control);
+		    } else if (strcmp (name, "after_initialization") == 0) {
+			    on_sink_after_initialization (voice_control);
+		    } else if (strcmp (name, "calibration") == 0) {
+			    on_sink_calibration (voice_control);
+		    } else if (strcmp (name, "listening") == 0) {
+			    on_sink_listening (voice_control);
+		    } else if (strcmp (name, "ready") == 0) {
+			    on_sink_ready (voice_control);
+		    } else if (strcmp (name, "message") == 0) {
+			    on_sink_message (voice_control, gst_structure_get_string (str, "text"));
+		    }
+		}
+	}
+	return;	
+}
+
 static void
 voice_control_applet_create_pipeline (VoiceControlApplet *voice_control)
 {
-      GError *error = NULL;
+	GError *error = NULL;
+	GstBus *bus;
 
-      voice_control->pipeline = gst_parse_launch ("gconfaudiosrc ! sphinxsink name=sink", &error);
+	voice_control->pipeline = gst_parse_launch ("gconfaudiosrc ! sphinxsink name=sink", &error);
       
-      if (error != NULL) {
-    	    g_warning ("Can't create pipeline: %s", error->message);
-    	    return;
-      }
+	if (error != NULL) {
+		g_warning ("Can't create pipeline: %s", error->message);
+		return;
+	}
 
-      voice_control->sink = gst_bin_get_by_name(GST_BIN (voice_control->pipeline),
-    						"sink");
-      if (!voice_control->sink) {
-    	    g_warning ("Pipeline has no sink");
-    	    return;
-      }
-    	
-      g_signal_connect (voice_control->sink, "initialization",
-    		        G_CALLBACK(on_sink_initialization), voice_control);
-      g_signal_connect (voice_control->sink, "after_initialization",
-    		        G_CALLBACK(on_sink_after_initialization), voice_control);
-      g_signal_connect (voice_control->sink, "calibration",
-    		        G_CALLBACK(on_sink_calibration), voice_control);
-      g_signal_connect (voice_control->sink, "listening",
-    			G_CALLBACK(on_sink_listening), voice_control);
-      g_signal_connect (voice_control->sink, "ready",
-    			G_CALLBACK(on_sink_ready), voice_control);
-      g_signal_connect (voice_control->sink, "message",
-    			G_CALLBACK(on_sink_message), voice_control);
-    
-      return;
+	voice_control->sink = gst_bin_get_by_name(GST_BIN (voice_control->pipeline),
+	                                          "sink");
+	if (!voice_control->sink) {
+    		g_warning ("Pipeline has no sink");
+		return;
+	}
+
+	bus = gst_pipeline_get_bus (GST_PIPELINE (voice_control->pipeline));
+	gst_bus_add_watch (bus, voice_control_pipeline_bus_callback, voice_control);
+	gst_object_unref (bus);
+      
+    	return;
 }
 
 static void
@@ -549,9 +533,7 @@ int main (int argc, char *argv [])
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 	textdomain (GETTEXT_PACKAGE);
 	
-	g_thread_init (NULL);
 	gst_init (&argc, &argv);
-	gdk_threads_init ();
 
 	if (!notify_init("voice-control-applet")) {
 		g_warning("Failed to initialize libnotify\n");
