@@ -43,6 +43,7 @@
 #include "EST_TSimpleVector.h"
 #include "EST_matrix_support.h"
 #include <fstream>
+#include <cstring>
 #include "EST_cutils.h"
 
 template<class T> void EST_TSimpleVector<T>::copy(const EST_TSimpleVector<T> &a)

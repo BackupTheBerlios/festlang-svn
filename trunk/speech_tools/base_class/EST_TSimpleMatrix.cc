@@ -44,6 +44,7 @@
 #include "EST_TVector.h"
 #include <fstream>
 #include <iostream>
+#include <cstring>
 #include "EST_cutils.h"
 
 template<class T> 
