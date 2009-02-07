@@ -1,3 +1,9 @@
+2009-02-08  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* src/gstsphinxsink.c (gst_sphinx_sink_render):
+	
+	Fixes return to avoid blocking.
+
 2009-01-28  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/action.c (voice_control_action_process_result):

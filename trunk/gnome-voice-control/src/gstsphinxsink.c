@@ -321,7 +321,7 @@ static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * bu
 	  gst_sphinx_decoder_init (sphinxsink);
           gst_sphinx_sink_send_message (sphinxsink, "after_initialization", NULL);
 	  sphinxsink->ad.initialized = TRUE;
-	  return;
+	  return GST_FLOW_OK;
   }
 
   gst_buffer_ref (buffer);
