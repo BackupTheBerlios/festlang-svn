@@ -460,12 +460,12 @@ EST_read_status EST_TrackFile::load_est_ts(EST_TokenStream &ts,
     const int BINARY_CHANNEL_BUFFER_SIZE=1024;
     float *frame=0; 
     float frame_buffer[BINARY_CHANNEL_BUFFER_SIZE];
-    if( !ascii )
+    if( !ascii ) {
       if( num_channels > BINARY_CHANNEL_BUFFER_SIZE )
 	frame = new float[num_channels];
       else
 	frame = frame_buffer;
-
+    }
     // there are too many ifs here
     for (i = 0; i < num_frames; ++i)
     {
@@ -684,8 +684,8 @@ EST_write_status EST_TrackFile::save_esps(const EST_String filename, EST_Track t
 	cerr << "no output written\n";
 	return write_fail;
     }
-    
-    if (include_time = (track_tosave.equal_space() != TRUE))
+    include_time = (track_tosave.equal_space() != TRUE);
+    if (include_time)
     {
 	shift = EST_Track::default_frame_shift;
 	extra_channels++;
