@@ -358,7 +358,7 @@ void festival_lisp_vars(void)
     //  Modify my PATH to include these directories
     siod_set_lval("etc-path",cons(rintern(etcdir),
 				  cons(rintern(etcdircommon),NIL)));
-    char *path = getenv("PATH");
+    const char *path = getenv("PATH");
     if (path == 0)
 	path = "";
     char *newpath = walloc(char,1024+strlen(path)+strlen(etcdir)+

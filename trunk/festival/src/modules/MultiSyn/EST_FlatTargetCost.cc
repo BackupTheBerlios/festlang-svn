@@ -219,14 +219,14 @@ TCData *EST_FlatTargetCost::flatpack(EST_Item *seg) const
     (*f)[PSYL]=0;
 
   // seg word feature
-  if(word=tc_get_word(seg))
+  if((word=tc_get_word(seg)) != NULL)
     (*f)[WORD]=simple_id(word->S("id"));
   else
     (*f)[WORD]=0;
   
 
   // Next seg word features
-  if(word=tc_get_word(seg->next()))
+  if((word=tc_get_word(seg->next())) != NULL)
     (*f)[NWORD]=simple_id(word->S("id"));
   else
     (*f)[NWORD]=0;
@@ -263,7 +263,7 @@ TCData *EST_FlatTargetCost::flatpack(EST_Item *seg) const
     (*f)[WORDPOS]=3; // final
 
   // pbreak
-  if ( word = tc_get_word(seg) )
+  if ((word = tc_get_word(seg)) != NULL )
     {
       if ( word->S("pbreak") == "NB" )
 	(*f)[PBREAK]=0;
@@ -276,7 +276,7 @@ TCData *EST_FlatTargetCost::flatpack(EST_Item *seg) const
     (*f)[PBREAK]=-1;
 
   // seg punc and pos
-  if(word = tc_get_word(seg))
+  if((word = tc_get_word(seg)) != NULL)
     {
       (*f)[POS]=simple_pos(word->S("pos"));
       (*f)[PUNC]=simple_punc(parent(word,"Token")->S("punc","NONE"));
@@ -288,7 +288,7 @@ TCData *EST_FlatTargetCost::flatpack(EST_Item *seg) const
     }
 
   // next seg punc and pos
-  if (word = tc_get_word(seg->next()))
+  if ((word = tc_get_word(seg->next())) != NULL)
     {
       (*f)[NPOS]=simple_pos(word->S("pos"));
       (*f)[NPUNC]=simple_punc(parent(word,"Token")->S("punc","NONE"));
@@ -395,6 +395,8 @@ float EST_FlatTargetCost::out_of_lex_cost() const
   
   if( c->a_no_check(NBAD_OOL) != t->a_no_check(NBAD_OOL) )
     return 1.0;
+
+  return 0.0;
 }
 
 float EST_FlatTargetCost::bad_duration_cost() const
