@@ -64,7 +64,7 @@
 	 '(utts_dir "festival/utts/")
 	 '(utts_ext ".utt")
 	 '(dur_pen_weight 0.5)
-	 '(f0_pen_weight 0.5)
+	 '(f0_pen_weight 0.9)
 	 '(get_stds_per_unit t)
 	 '(ac_left_context 0.8)
 	 '(ac_weights

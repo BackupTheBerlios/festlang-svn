@@ -41,6 +41,8 @@
 Specific token to word rules for the voice msu_ru_nsh.  Returns a list
 of words that expand given token with name."
   (cond
+   ((string-matches name "РФ")
+    (list "эр+эф"))
    ((string-matches name "[0-9]*")
     (if (string-equal (item.feat token "n.name") "года")
     (msu_ru::number token name "year")

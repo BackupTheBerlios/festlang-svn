@@ -337,7 +337,8 @@ Predict lexical stress by decision tree."
     (if (< 0 (stressed_offset phones 0))
 	(begin
     	    (set! stress (stressed_offset phones 0))
-	    (format stderr "offset is %l\n" stress))
+;	    (format stderr "offset is %l\n" stress)
+	    )
 	(begin    
     	    (utt.relation.create utt 'Letter)
 	    (set! si (utt.relation.append utt 'Letter))
@@ -435,7 +436,7 @@ Return pronunciation of word not in lexicon."
     	        (t syls)))
       (list word pos syls)
       )))
-   (format stderr "%l\n" result)
+;;   (format stderr "%l\n" result)
    result))
 
 
@@ -446,8 +447,18 @@ Reduce vowels according to the stress."
   (mapcar
    (lambda (s)
      (let ((segment_name (item.name s)) (s1 (item.next s)))
-
      (cond 
+       ;; небыло stress
+        ((and (string-equal (item.feat s "nn.name") "o")
+    	      (string-equal (item.feat s "n.name") "l")
+    	      (string-equal segment_name "y")
+    	      (string-equal (item.feat s "p.name") "b")
+    	      (string-equal (item.feat s "pp.name") "i")
+    	      (not (null (item.prev s)))
+    	      (string-equal (item.feat (item.prev s) "pp.name") "nn"))
+    		 (begin 
+    		   (item.set_name (item.prev (item.prev s)) "ee")
+        	   (item.set_name s "ay")))
         ((and (member_string segment_name '(a o u i y e))
     	    (string-equal (item.feat s "R:SylStructure.parent.stress") "1"))
     		(if (and (string-equal segment_name "i")
@@ -620,6 +631,7 @@ Reduce vowels according to the stress."
     ( е [ г ] о с я # = v )
     ( е [ г ] о - н = v )
 
+    ( [ г ] к = h )
     ( к р е м л [ е ] в  = o )    
     ( # [ е е ] # = j e j o )
     ( л [ ь о ] = j o )

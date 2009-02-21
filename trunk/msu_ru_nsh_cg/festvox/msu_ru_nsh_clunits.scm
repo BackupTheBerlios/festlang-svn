@@ -96,7 +96,7 @@
        (list 'db_dir msu_ru_nsh::dir)
        '(name msu_ru_nsh)
        '(index_name msu_ru_nsh)
-       '(f0_join_weight 0.0)
+       '(f0_join_weight 0.5)
        '(join_weights
          (0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 ))
        '(trees_dir "festival/trees/")
@@ -107,10 +107,11 @@
        ;;  Run time parameters 
        '(join_method windowed)
        ;; if pitch mark extraction is bad this is better than the above
-;       '(join_method smoothedjoin)
+;      '(join_method smoothedjoin)
 ;      '(join_method modified_lpc)
-       '(continuity_weight 20.0)
-       '(log_scores 1)  ;; good for high variance joins (not so good for ldom)
+;       '(join_method simple)
+       '(continuity_weight 5.0)
+;       '(log_scores 1)  ;; good for high variance joins (not so good for ldom)
        '(optimal_coupling 1)
        '(extend_selections 2)
        '(pm_coeffs_dir "mcep/")
@@ -262,13 +263,13 @@ Define voice for ru."
       "0"))
 
 (proclaim_voice
- 'msu_ru_nsh_clunits
+ 'msu_ru_nsh_cg
   '((language russian)
     (gender male)
     (dialect moscow)
     (coding utf-8)
     (description
-      "Russian festival voice.")))
-                  
+      "Russian clunits festival voice.")))
+
 (provide 'msu_ru_nsh_clunits)
 
