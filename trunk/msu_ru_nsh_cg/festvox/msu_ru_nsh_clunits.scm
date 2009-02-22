@@ -110,7 +110,7 @@
 ;      '(join_method smoothedjoin)
 ;      '(join_method modified_lpc)
 ;       '(join_method simple)
-       '(continuity_weight 5.0)
+       '(continuity_weight 10.0)
 ;       '(log_scores 1)  ;; good for high variance joins (not so good for ldom)
        '(optimal_coupling 1)
        '(extend_selections 2)
