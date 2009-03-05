@@ -45,7 +45,7 @@ import java.awt.*;
 
 import cstr.util.*;
 
-public class UtteranceFileFormat extends Enum
+public class UtteranceFileFormat extends cstr.util.Enum
 {
   static EnumValues values = init("UtteranceFileFormat");
   
@@ -79,9 +79,9 @@ public class UtteranceFileFormat extends Enum
       return (UtteranceFileFormat)getValue(s, values);
     }
 
-  public static Enum [] getValues()
+  public static cstr.util.Enum [] getValues()
     {
-      return (Enum [])getValues(values);
+      return (cstr.util.Enum [])getValues(values);
     }
 
   

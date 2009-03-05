@@ -45,7 +45,7 @@ import java.awt.*;
 
 import cstr.util.*;
 
-public class TrackFileFormat extends Enum
+public class TrackFileFormat extends cstr.util.Enum
 {
   static EnumValues values = init("TrackFileFormat");
   
@@ -86,9 +86,9 @@ public class TrackFileFormat extends Enum
       return (TrackFileFormat)getValue(s, values);
     }
 
-  public static Enum [] getValues()
+  public static cstr.util.Enum [] getValues()
     {
-      return (Enum [])getValues(values);
+      return (cstr.util.Enum [])getValues(values);
     }
 
   

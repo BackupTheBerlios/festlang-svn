@@ -142,4 +142,4 @@ DOCXX_ARGS = -a -f -B banner.inc -M sane -D 'SYSTEM "$(EST_HOME)/doc/sane.dtd"'
 COMPILER_VERSION_COMMAND=true
 JAVA_COMPILER_VERSION_COMMAND=true
 
-JAVA_SYSTEM_INCLUDES  = -I$(JAVA_HOME)/include/genunix
+JAVA_SYSTEM_INCLUDES  = -I$(JAVA_HOME)/include/linux

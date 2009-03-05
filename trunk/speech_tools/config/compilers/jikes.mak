@@ -52,7 +52,7 @@ else
 endif
 endif
 
-JAVAFLAGS = -depend
+JAVAFLAGS = 
 
 DEBUG_JAVAFLAGS = -g
 

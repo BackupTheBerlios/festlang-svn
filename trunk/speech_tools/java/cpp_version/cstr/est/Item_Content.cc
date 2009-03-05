@@ -276,12 +276,13 @@ Java_cstr_est_Item_1Content_cpp_1get(JNIEnv *env,
   const char *name = env->GetStringUTFChars(jname, 0);
   
   EST_Val def("hidden");
-  const EST_Val *val;
+  const EST_Val* val;
+  EST_feat_status stat=efs_ok;
 
   if (rel != NULL)
     {
       EST_Item *item = item_c->Relation(rel->name());
-      val = &(item->f(name, def));
+      val = new EST_Val(getFloat(*item,name, def, stat));
     }
   else
     val = &(item_c)->f(name, def);
