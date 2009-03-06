@@ -1257,7 +1257,7 @@ LISP user_gc(LISP args)
  errjmp_ok = 0;
  old_status_flag = gc_status_flag;
  if NNULLP(args)
-   if NULLP(car(args)) gc_status_flag = 0; else gc_status_flag = 1;
+   {if NULLP(car(args)) gc_status_flag = 0; else gc_status_flag = 1;}
  gc_mark_and_sweep();
  gc_status_flag = old_status_flag;
  errjmp_ok = ej_ok;
@@ -1277,8 +1277,8 @@ LISP set_backtrace(LISP n)
 LISP gc_status(LISP args)
 {LISP l;
  int n;
- if NNULLP(args) 
-   if NULLP(car(args)) gc_status_flag = 0; else gc_status_flag = 1;
+ if NNULLP(args)
+   {if NULLP(car(args)) gc_status_flag = 0; else gc_status_flag = 1;}
  if (gc_kind_copying == 1)
    {if (gc_status_flag)
       fput_st(fwarn,"garbage collection is on\n");
@@ -1542,7 +1542,7 @@ int flush_ws(struct gen_readio *f,const char *eoferr)
  commentp = 0;
  while(1)
    {c = GETC_FCN(f);
-    if (c == EOF) if (eoferr) err(eoferr,NIL); else return(c);
+    if (c == EOF) {if (eoferr) err(eoferr,NIL); else return(c);}
     if (commentp) {if (c == '\n') commentp = 0;}
     else if (c == ';') commentp = 1;
     else if (!isspace(c)) return(c);}}

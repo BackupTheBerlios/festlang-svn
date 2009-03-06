@@ -217,7 +217,7 @@ static int play_sunau_wave(EST_Wave &inwave, EST_Option &al)
     // Play wave through /dev/audio using 8K ulaw encoding
     // works for Suns as well as Linux and FreeBSD machines
     int rcode;
-    char *audiodevice;
+    const char *audiodevice;
 
     inwave.resample(8000);
 
@@ -330,7 +330,7 @@ static int record_sunau_wave(EST_Wave &wave, EST_Option &al)
     unsigned char *ulawwave;
     short *waveform;
     const int AUDIOBUFFSIZE = 256;
-    char *audiodevice;
+    const char *audiodevice;
 
     if (al.present("-audiodevice"))
 	audiodevice = al.val("-audiodevice");

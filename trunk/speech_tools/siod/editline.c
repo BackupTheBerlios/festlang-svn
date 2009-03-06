@@ -248,7 +248,7 @@ STATIC void TTYput(ECHAR c)
     Screen[ScreenCount] = c;
     if (++ScreenCount >= ScreenSize - 1) {
 	ScreenSize += SCREEN_INC;
-	RENEW(Screen, char, ScreenSize);
+	RENEW(Screen, ECHAR, ScreenSize);
     }
 }
 
@@ -302,7 +302,7 @@ STATIC int screen_pos()
 {
     /* Returns the number of characters printed from beginning of line  */
     /* includes the size of the prompt and and meta/ctl char expansions */
-    int p = strlen(Prompt);
+    int p = strlen((char*)Prompt);
     int i;
     
     for (i=0; i < Point; i++)
@@ -471,7 +471,7 @@ STATIC void reposition(int reset)
 {
     int		i,PPoint;
     int pos;
-    char ppp[2];
+    unsigned char ppp[2];
 
     if (reset)
     {
@@ -672,7 +672,7 @@ STATIC void clear_line()
     TTYputs(bol);
     for (i=screen_pos()/TTYwidth; i > 0; i--)
 	if (upline) TTYputs(upline);
-    for (i=0; i < strlen(Prompt); i++)
+    for (i=0; i < strlen((char *)Prompt); i++)
 	TTYput(' ');
     Point = 0;
     ceol();
@@ -710,7 +710,7 @@ STATIC STATUS insert_string(ECHAR *p)
     End += len;
     Line[End] = '\0';
     pos0 = screen_pos();
-    pos1 = printlen((char *)&Line[Point]);
+    pos1 = printlen((unsigned char *)&Line[Point]);
     TTYstring(&Line[Point]);
     Point += len;
     if ((pos0+pos1)%TTYwidth == 0)
@@ -721,7 +721,7 @@ STATIC STATUS insert_string(ECHAR *p)
     if (upline && (Point != End))
     {
 	pos0 = screen_pos();
-	pos1 = printlen((char *)&Line[Point]);
+	pos1 = printlen((unsigned char *)&Line[Point]);
 	for (i=((pos0%TTYwidth)+pos1)/TTYwidth; i > 0; i--)
 	    if (upline) TTYputs(upline);
 	TTYputs(bol);
@@ -846,7 +846,7 @@ STATIC ECHAR *search_hist(ECHAR *search, ECHAR *(*move)())
 STATIC STATUS h_search()
 {
     static int	Searching;
-    CONST char	*old_prompt;
+    CONST unsigned char	*old_prompt;
     ECHAR	*(*move)();
     ECHAR	*p;
 
@@ -856,7 +856,7 @@ STATIC STATUS h_search()
 
     clear_line();
     old_prompt = Prompt;
-    Prompt = "Search: ";
+    Prompt = (unsigned char *)"Search: ";
     TTYputs((ECHAR *)Prompt);
     move = Repeat == NO_ARG ? prev_hist : next_hist;
     p = search_hist(editinput(), move);
@@ -919,7 +919,7 @@ STATIC STATUS delete_string(int count)
     wfree(tLine);
     End -= count;
     pos0 = screen_pos();
-    pos1 = printlen((char *)&Line[Point]);
+    pos1 = printlen((unsigned char *)&Line[Point]);
     TTYstring(&Line[Point]);
     if ((pos1 > 0) && (pos0+pos1)%TTYwidth == 0)
 	if (downline && RequireNLforWrap) TTYputs(downline);
@@ -1024,7 +1024,7 @@ STATIC char *rsearch_hist(char *patt, int *lpos,int *cpos)
 STATIC STATUS h_risearch()
 {
     STATUS	s;
-    CONST char	*old_prompt;
+    CONST unsigned char	*old_prompt;
     char *pat, *hist, *nhist;
     char *nprompt;
     int patsize, patend, i;
@@ -1044,7 +1044,7 @@ STATIC STATUS h_risearch()
     do 
     {
 	sprintf(nprompt,"(reverse-i-search)`%s': ",pat);
-	Prompt = nprompt;
+	Prompt = (unsigned char*)nprompt;
 	kill_line();
 	do_insert_hist((ECHAR *)hist);
 	if (patend != 0)
@@ -1351,8 +1351,8 @@ char *readline(CONST char *prompt)
     rl_ttyset(0);
     hist_add(el_NIL);
     ScreenSize = SCREEN_INC;
-    Screen = NEW(char, ScreenSize);
-    Prompt = prompt ? prompt : (char *)el_NIL;
+    Screen = NEW(unsigned char, ScreenSize);
+    Prompt = (unsigned char *)(prompt ? prompt : (char*)el_NIL);
     el_intr_pending = 0;
     if (el_no_echo == 1)
     {

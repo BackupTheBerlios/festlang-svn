@@ -556,7 +556,7 @@ EST_Token &EST_TokenStream::must_get(EST_String expected, bool *ok)
 {
   EST_Token &tok = get();
 
-  if (tok != expected)
+  if (tok != expected) {
     if (ok != NULL)
       {
 	*ok=FALSE;
@@ -567,6 +567,7 @@ EST_Token &EST_TokenStream::must_get(EST_String expected, bool *ok)
 	      (const char *)expected, 
 	      (const char *)(EST_String)tok,
 	      (const char *)pos_description());
+   }
 
   if (ok != NULL)
     *ok=TRUE;

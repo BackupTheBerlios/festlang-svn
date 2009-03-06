@@ -413,7 +413,7 @@ void EST_UList::sort_unique(EST_UList &l,
 	for(l_ptr=l.head(); l_ptr != 0; l_ptr=next(l_ptr)){
 	    
 	    m_ptr=next(l_ptr);
-	    if(m_ptr != 0)
+	    if(m_ptr != 0) {
 		if(gt(l_ptr, m_ptr)){
 		    l.exchange(l_ptr,m_ptr);
 		    sorted=false;
@@ -421,6 +421,7 @@ void EST_UList::sort_unique(EST_UList &l,
 		    l.remove(m_ptr, item_free);
 		    sorted=false;
 		}
+	    }
 	}
     }
 }
