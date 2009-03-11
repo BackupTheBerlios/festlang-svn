@@ -942,8 +942,8 @@ EST_String downcase(const EST_String &s)
     int i;
 
     for (i=0; i < s.length(); i++)
-	if (isupper(s(i)))
-	    t[i] = tolower(s(i));
+	if (isupper((unsigned char)s(i)))
+	    t[i] = tolower((unsigned char)s(i));
 	else
 	    t[i] = s(i);
     return t;
@@ -955,8 +955,8 @@ EST_String upcase(const EST_String &s)
     int i;
 
     for (i=0; i < s.length(); i++)
-	if (islower(s(i)))
-	    t[i] = toupper(s(i));
+	if (islower((unsigned char)s(i)))
+	    t[i] = toupper((unsigned char)s(i));
 	else
 	    t[i] = s(i);
     return t;
@@ -1267,7 +1267,7 @@ long EST_String::Long(bool *valid) const
 
   long val = strtol(str(), &end, 10);
 
-  if (end==NULL|| *end != '\0')
+  if (end==NULL|| *end != '\0') {
     if (valid != NULL)
       {
 	*valid=0;
@@ -1279,7 +1279,8 @@ long EST_String::Long(bool *valid) const
 		(const char *)str());
 	exit(0);
       }
-
+  }
+  
   if (valid)
     *valid=1;
   
@@ -1293,7 +1294,8 @@ int EST_String::Int(bool *valid) const
   if (valid && !*valid)
     return 0L;
 
-  if (val > INT_MAX || val < INT_MIN)
+  if (val > INT_MAX || val < INT_MIN)  
+    {
     if (valid != NULL)
       {
 	*valid=0;
@@ -1305,6 +1307,7 @@ int EST_String::Int(bool *valid) const
 	       val);
 	exit(0);
       }
+    }
 
   return val;
 }
@@ -1316,6 +1319,7 @@ double EST_String::Double(bool *valid) const
   double val = strtod(str(), &end);
 
   if (end==NULL|| *end != '\0')
+    {
     if (valid != NULL)
       {
 	*valid=0;
@@ -1327,6 +1331,7 @@ double EST_String::Double(bool *valid) const
 		(const char *)str());
 	exit(0);
       }
+    }
 
   if (valid)
     *valid=1;
@@ -1342,6 +1347,7 @@ float EST_String::Float(bool *valid) const
     return 0.0;
 
   if (val > FLT_MAX || val < -FLT_MAX) 
+    {
     if (valid != NULL)
       {
 	*valid=0;
@@ -1353,6 +1359,7 @@ float EST_String::Float(bool *valid) const
 	       val);
 	exit(0);
       }
+    }
 
   return val;
 }
