@@ -50,6 +50,14 @@
 
 #include "spi-listener.h"
 
+static gboolean o_window = FALSE;
+
+static GOptionEntry applet_control_options[] =
+{
+        { "window", 0, 0, G_OPTION_ARG_NONE, &o_window, "Window mode", NULL },
+        { NULL }
+};
+
 typedef struct {
 	PanelApplet        applet;
 
@@ -388,7 +396,7 @@ voice_control_applet_factory (PanelApplet *applet,
 {
 	gboolean retval = FALSE;
 
-	if (!strcmp (iid, "OAFIID:GNOME_VoiceControlApplet"))
+	if (iid == NULL || !strcmp (iid, "OAFIID:GNOME_VoiceControlApplet"))
 		retval = voice_control_applet_fill (VOICE_CONTROL_APPLET (applet));
 
 	return retval;
@@ -530,33 +538,59 @@ int main (int argc, char *argv [])
 {				
 	GnomeProgram *program;	
 	int           retval;
+ 	static GtkWidget *window, *applet;
+ 	GError *error = NULL;
+ 	GOptionContext *context;
 		
 	bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 	textdomain (GETTEXT_PACKAGE);
-	
-	gst_init (&argc, &argv);
 
+ 	g_thread_init (NULL);
+	
 	if (!notify_init("voice-control-applet")) {
 		g_warning("Failed to initialize libnotify\n");
 	}
-	
+
+ 	context = g_option_context_new (_("- voice control applet"));
+ 	g_option_context_add_main_entries (context, applet_control_options, GETTEXT_PACKAGE);
+ 	g_option_context_add_group (context, gst_init_get_option_group());
+
 	program = gnome_program_init ("voice-control-applet", VERSION,
 				      LIBGNOMEUI_MODULE,
 				      argc, argv,
-				      GNOME_CLIENT_PARAM_SM_CONNECT, FALSE,
+				      GNOME_PARAM_GOPTION_CONTEXT, context,
 				      GNOME_PARAM_NONE);
+	gst_init (&argc, &argv);
 
 	gtk_icon_theme_append_search_path (gtk_icon_theme_get_default (),
-						APPNAME_DATA_DIR G_DIR_SEPARATOR_S 
-						"icons");
+					   APPNAME_DATA_DIR G_DIR_SEPARATOR_S 
+		    			   "icons");
 
 	SPI_init ();
+
+	if (o_window) {	
+		window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+		gtk_window_set_title(GTK_WINDOW(window), "Voice Control");
+		g_signal_connect (G_OBJECT (window), "destroy",
+		      G_CALLBACK (gtk_main_quit), NULL);
+
+		applet = g_object_new(voice_control_applet_get_type(), NULL);
+		
+		gtk_widget_set_size_request (GTK_WIDGET (window), 50, 50);
+		
+		retval = voice_control_applet_factory(PANEL_APPLET (applet), NULL, NULL);
 	
-        retval = panel_applet_factory_main ("OAFIID:GNOME_VoiceControlApplet_Factory",
+		gtk_widget_reparent(applet, window);
+
+		gtk_widget_show_all(window);
+		gtk_main();
+	} else {
+        	retval = panel_applet_factory_main ("OAFIID:GNOME_VoiceControlApplet_Factory",
 			     voice_control_applet_get_type (),
 			     voice_control_applet_factory,
-			     NULL);		
+			     NULL);
+	}		
 	g_object_unref (program);
 	SPI_exit ();
 

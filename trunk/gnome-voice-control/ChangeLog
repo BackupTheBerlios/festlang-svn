@@ -1,3 +1,9 @@
+2009-03-30  Alban Browaeys  <prahal@yahoo.com>.
+
+	* src/voice-control.c (voice_control_applet_factory), (main):
+	
+	Added window mode.
+
 2009-02-08  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* src/gstsphinxsink.c (gst_sphinx_sink_render):
