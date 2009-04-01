@@ -1,20 +1,41 @@
 INTRODUCTION
 
-This directory contains clustergen synthesizer voice for Russian Language.
+This directory contains clunits synthetic voice for Russian Language.
 
 INSTALLATION
 
 You need to build latest festival 1.96 and speech-tools 1.96. You
 can checkout them from festlang SVN
 
-Extract files from this archive into 
-
-festival/lib/voices/russian/msu_ru_nsh_cg
-
 Extract CMU dictionaries and default english voice as usual.
+
+Extract files from this archive into
+festival/lib/voices/russian/msu_ru_nsh_clunits, if festival is installed
+system-wide, to /usr/share/festival/voices/russian.
 
 USAGE
 
-Note, that you should select russian voice with (voice_msu_ru_nsh_cg)
-on start and all russian text should have koi8-r encoding.
+Note, that you should select russian voice with (voice_msu_ru_nsh_clunits)
+on start and all russian text should have utf-8 encoding.
 
+To use the voice from KTTS, select the voice as the first in the list
+in kttsmgr settings, then turn on kttsd
+
+To use it from command line you can try something like
+
+ [user@computer ~]$ festival
+ Festival Speech Synthesis System 1.96:beta July 2004
+ Copyright (C) University of Edinburgh, 1996-2004. All rights reserved.
+ For details type `(festival_warranty)'
+ festival> (voice_msu_ru_nsh_clunits )
+ msu_ru_nsh_clunits
+ festival> (SayText "Привет")
+ #<Utterance 0xb7df66f8>
+ festival>
+                
+You can also use a converter of text file (UTF-8 encoding) to a sound file
+                
+text2wave -o result.wav -eval "(voice_msu_ru_nsh_clunits)" text.txt
+
+To make this voice the default, edit your .festivalrc in your home folder
+or system-wide siteinit.scm
