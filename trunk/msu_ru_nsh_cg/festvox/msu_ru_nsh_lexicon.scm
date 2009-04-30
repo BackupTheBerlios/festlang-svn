@@ -169,7 +169,6 @@ Basic lexicon should (must ?) have basic letters, symbols and punctuation."
   ( [ "?" ] = в о п р о с )
   ( [ "=" ] = р а в н о )
   ( [ "&" ] = и )
-  ( [ "@" ] = с о б а к а )
   ( [ "<" ] = - )
   ( [ ">" ] = - )  
  
