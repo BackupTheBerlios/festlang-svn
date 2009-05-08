@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+DEB_FINALDIR := $(CURDIR)/debian/festvox-ru
+VOICES_FINALDIR := $(DEB_FINALDIR)/usr/share/festival/voices/russian/msu_ru_nsh_clunits
+CONTENT := dict etc festival festvox lab lib mcep wav
+
+install/festvox-ru::
+	mkdir -p $(VOICES_FINALDIR)
+	cp -r $(CONTENT) $(VOICES_FINALDIR)
+

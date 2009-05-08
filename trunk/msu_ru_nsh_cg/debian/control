@@ -1,0 +1,27 @@
+Source: festival-ru
+Section: sound
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Homepage: http://festlang.berlios.de
+Maintainer: Sergey Udaltsov <sergey.udaltsov@gmail.com>
+XSBC-Original-Maintainer: Nickolay Shmyrev <nshmyrev@yandex.ru>
+Standards-Version: 3.8.0
+
+Package: festival-ru
+Architecture: all
+Depends: ${misc:Depends}, festival (>= 1.96), festvox-ru
+Description: festival text to speech synthesizer for Russian language
+ This package provides the modules required to synthesize speech in Russian (ru)
+ language using the Festival text-to-speech synthesizer. Given text represented
+ in Unicode (UTF-8 encoding), it uses the festival synthesizer to generate
+ speech in Russian.
+
+Package: festvox-ru
+Architecture: all
+Depends: ${misc:Depends}
+Recommends: festival-ru
+Provides: festival-voice
+Description: Russian male speaker for festival
+ This is a database to be used with Russian Festival. It provides a male
+ speaker for synthesizing Russian speech. The package consists of a speech
+ database along with the voice definition.
