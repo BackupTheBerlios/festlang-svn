@@ -556,11 +556,11 @@ int main (int argc, char *argv [])
  	g_option_context_add_main_entries (context, applet_control_options, GETTEXT_PACKAGE);
  	g_option_context_add_group (context, gst_init_get_option_group());
 
-	program = gnome_program_init ("voice-control-applet", VERSION,
-				      LIBGNOMEUI_MODULE,
-				      argc, argv,
-				      GNOME_PARAM_GOPTION_CONTEXT, context,
-				      GNOME_PARAM_NONE);
+	gtk_init (&argc, &argv);						
+	if (!bonobo_init (&argc, argv)) {					
+		g_printerr ("Cannot initialize bonobo.n");			
+		return 1;							
+	}									
 	gst_init (&argc, &argv);
 
 	gtk_icon_theme_append_search_path (gtk_icon_theme_get_default (),
