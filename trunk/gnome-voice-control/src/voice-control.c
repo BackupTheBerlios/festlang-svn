@@ -536,7 +536,6 @@ voice_control_applet_class_init (VoiceControlAppletClass *klass)
 
 int main (int argc, char *argv [])
 {				
-	GnomeProgram *program;	
 	int           retval;
  	static GtkWidget *window, *applet;
  	GError *error = NULL;
@@ -558,7 +557,8 @@ int main (int argc, char *argv [])
 
 	gtk_init (&argc, &argv);						
 	if (!bonobo_init (&argc, argv)) {					
-		g_printerr ("Cannot initialize bonobo.n");			
+		g_printerr ("Cannot initialize bonobo.n");
+		g_option_context_free (context);
 		return 1;							
 	}									
 	gst_init (&argc, &argv);
@@ -591,10 +591,10 @@ int main (int argc, char *argv [])
 			     voice_control_applet_factory,
 			     NULL);
 	}		
-	g_object_unref (program);
 	SPI_exit ();
 
 	notify_uninit();
+	g_option_context_free (context);
 
 	return retval;
 }
