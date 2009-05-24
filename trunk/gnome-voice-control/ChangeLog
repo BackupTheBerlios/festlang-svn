@@ -1,3 +1,9 @@
+2009-05-25  Martin Weinelt  <mweinelt@gmail.com>
+
+	* lang/desktop-control-de.dic:
+	
+	Updated to fix crashes.
+
 2009-03-30  Alban Browaeys  <prahal@yahoo.com>.
 
 	* src/voice-control.c (voice_control_applet_factory), (main):
