@@ -7,7 +7,7 @@ AM_MAINTAINER_MODE
 AC_PROG_CC
 AM_PROG_LIBTOOL
 
-PKG_CHECK_MODULES(GNOME_PANEL, libpanelapplet-2.0 gtk+-2.0 libgnomeui-2.0 gstreamer-0.10 gstreamer-base-0.10 gdk-2.0 libwnck-1.0 cspi-1.0 libnotify)
+PKG_CHECK_MODULES(GNOME_PANEL, libpanelapplet-2.0 gtk+-2.0 libgnomeui-2.0 gstreamer-0.10 gstreamer-base-0.10 gdk-2.0 libwnck-1.0 cspi-1.0)
 AC_SUBST(GNOME_PANEL_CFLAGS)
 AC_SUBST(GNOME_PANEL_LIBS)
 

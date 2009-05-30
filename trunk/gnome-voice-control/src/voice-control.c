@@ -33,8 +33,6 @@
 #include <gst/gstelement.h>
 #include <gst/gstplugin.h>
 
-#include <libnotify/notify.h>
-
 #include "gstsphinxsink.h"
 #include "action.h"
 
@@ -68,7 +66,7 @@ typedef struct {
 	GtkWidget*         state_label;
 	
 	GtkTooltips* 	   tooltips;
-	NotifyNotification *notif;
+	guint 		   ready_timeout;
 	
 	GstElement*        pipeline;	
 	GstElement* 	   sink;
@@ -187,12 +185,14 @@ on_sink_listening (VoiceControlApplet *voice_control)
 	voice_control_set_text (voice_control, _("Listening"), _("Processing speech"));
 }
 
-static void
-on_sink_ready (VoiceControlApplet *voice_control)
+static gboolean
+on_sink_ready (gpointer data)
 {
-
+	VoiceControlApplet * voice_control = VOICE_CONTROL_APPLET (data);
 	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_YES, GTK_ICON_SIZE_MENU);
 	voice_control_set_text (voice_control, _("Ready"), _("Ready for input"));
+
+	return FALSE;
 }
 
 static gboolean 
@@ -217,23 +217,6 @@ process_action (VoiceControlApplet *voice_control, const gchar *message)
 	return FALSE;
 }
 
-static gboolean
-show_notification(VoiceControlApplet *voice_control, const gchar *message)
-{
-	GError *err = NULL;
-
-	notify_notification_update(voice_control->notif,
-				   "Speech Input",
-				   message, NULL);
-	notify_notification_set_timeout(voice_control->notif,
-					NOTIFY_EXPIRES_DEFAULT);
-	notify_notification_show(voice_control->notif, &err);
-	if (err) {
-		g_warning("Failed to show notifcation: %s\n", err->message);
-		g_error_free(err);
-	}
-}
-
 /**  
  * Handle messages
  *
@@ -248,13 +231,11 @@ show_notification(VoiceControlApplet *voice_control, const gchar *message)
 static void
 on_sink_message (VoiceControlApplet *voice_control, const gchar *message)
 {
-	g_message ("Got result %s", message);
-	
-//	show_notification (voice_control, g_strdup (message));
-	
+	gtk_label_set_text (GTK_LABEL (voice_control->state_label), message);
+
 	if (voice_control_action_process_result (message))
 		return;
-
+	
 	process_action (voice_control, message);
 	
 	return;
@@ -354,12 +335,17 @@ static void
 setup_voice_control_widget (VoiceControlApplet *voice_control)
 {
 	GtkWidget *widget = (GtkWidget *) voice_control;
+	GtkWidget *hbox = gtk_hbox_new (FALSE, 6);
+
+	gtk_container_add (GTK_CONTAINER (widget), hbox);
 
 	voice_control->frame = gtk_image_new_from_stock(GTK_STOCK_NO, GTK_ICON_SIZE_MENU);
 
-	gtk_container_add (GTK_CONTAINER (widget), voice_control->frame);
+	gtk_container_add (GTK_CONTAINER (hbox), voice_control->frame);
 	
 	voice_control->state_label = gtk_label_new ("");
+
+	gtk_container_add (GTK_CONTAINER (hbox), voice_control->state_label);
 
 	voice_control_set_text (voice_control, _("Idle"), _("Choose Start Control to start"));
 
@@ -429,14 +415,16 @@ voice_control_pipeline_bus_callback (GstBus *bus,
 				     gpointer data)
 {
 	VoiceControlApplet *voice_control = (VoiceControlApplet *) data;
-	g_print ("Got %s message\n", GST_MESSAGE_TYPE_NAME (message));
 
 	switch (GST_MESSAGE_TYPE (message)) {
 		case GST_MESSAGE_ELEMENT: {
 		    const GstStructure *str = gst_message_get_structure (message);
 		    const gchar *name = gst_structure_get_name (str);
-		    
-		    g_message ("Got structure %s", name);
+
+		    if (voice_control->ready_timeout > 0) {
+			    g_source_remove (voice_control->ready_timeout);
+			    voice_control->ready_timeout = 0;
+		    }
 		    
 		    if (strcmp (name, "initialization") == 0) {
 			    on_sink_initialization (voice_control);
@@ -450,6 +438,7 @@ voice_control_pipeline_bus_callback (GstBus *bus,
 			    on_sink_ready (voice_control);
 		    } else if (strcmp (name, "message") == 0) {
 			    on_sink_message (voice_control, gst_structure_get_string (str, "text"));
+			    voice_control->ready_timeout = g_timeout_add_seconds (5, on_sink_ready, voice_control);
 		    }
 		}
 	}
@@ -502,11 +491,6 @@ voice_control_applet_init (VoiceControlApplet      *voice_control)
 	g_signal_connect_object (voice_control->spi_listener, "changed", 
 				 G_CALLBACK (voice_control_ui_changed), voice_control, 0);
 
-	voice_control->notif = notify_notification_new("Speech Input",
-						       NULL,
-						       NULL,
-						       GTK_WIDGET(voice_control));
-
 }
 
 static gboolean
@@ -547,10 +531,6 @@ int main (int argc, char *argv [])
 
  	g_thread_init (NULL);
 	
-	if (!notify_init("voice-control-applet")) {
-		g_warning("Failed to initialize libnotify\n");
-	}
-
  	context = g_option_context_new (_("- voice control applet"));
  	g_option_context_add_main_entries (context, applet_control_options, GETTEXT_PACKAGE);
  	g_option_context_add_group (context, gst_init_get_option_group());
@@ -593,7 +573,6 @@ int main (int argc, char *argv [])
 	}		
 	SPI_exit ();
 
-	notify_uninit();
 	g_option_context_free (context);
 
 	return retval;

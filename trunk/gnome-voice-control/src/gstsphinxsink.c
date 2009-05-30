@@ -273,9 +273,10 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
   
 	      ps_end_utt (sphinxsink->decoder);
    	      if ((hyp = ps_get_hyp (sphinxsink->decoder, &score, NULL)) == NULL) {
-		      g_warning ("uttproc_result failed");
+	    	
+	    	      gst_sphinx_sink_send_message (sphinxsink, "message", "");
+	      
 	      } else {
-	    	      g_message ("Recognized hyp %s", hyp);
 	    	      stripped_hyp = 
 		           g_malloc (strlen (hyp) + 1);
 	    	      for (i=0, j=0; hyp[i] != 0; i++) {
@@ -290,7 +291,6 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
 
 	      sphinxsink->last_ts = 0;
 	      sphinxsink->ad.listening = 0;
-    	      gst_sphinx_sink_send_message (sphinxsink, "ready", NULL);
 
 	} else if (k != 0) {
 	     if (sphinxsink->ad.listening == 0) {
@@ -367,7 +367,6 @@ gst_sphinx_construct_fsg (GstSphinxSink *sink, GSList *phrases)
 		int wid, from_state, to_state, next;
 		for (j = 0; words[j] != NULL; j++, i++) {
     	    		wid = fsg_model_word_add(fsg, words[j]);
-			g_message ("Word %s with wid %d", words[j], wid);
     	    		from_state = (j == 0) ? 0 : i + 1;
 			to_state = (words[j+1] == NULL) ? n_states - 1 : i + 2;
 			fsg_model_trans_add (fsg, from_state, to_state, 0, wid);

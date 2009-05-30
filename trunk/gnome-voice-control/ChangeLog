@@ -1,3 +1,22 @@
+2009-05-31  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
+
+	* configure.ac:
+	* src/gstsphinxsink.c (gst_sphinx_sink_process_chunk),
+	(gst_sphinx_construct_fsg):
+	* src/spi-listener.c (control_spi_set_voice_control_pipeline):
+	* src/voice-control.c (on_sink_ready), (on_sink_message),
+	(setup_voice_control_widget),
+	(voice_control_pipeline_bus_callback), (voice_control_applet_init),
+	(main):
+	
+	Reworked notification to use applet's space. Fixes bug #583604.
+
+2009-05-25  Martin Weinelt  <mweinelt@gmail.com>
+
+	* lang/desktop-control-de.dic:
+	
+	Updated to fix crashes.
+
 2009-05-25  Martin Weinelt  <mweinelt@gmail.com>
 
 	* lang/desktop-control-de.dic:

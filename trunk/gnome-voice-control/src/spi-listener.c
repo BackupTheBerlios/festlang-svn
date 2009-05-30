@@ -278,7 +278,8 @@ control_spi_listener_showing_listener_cb (const AccessibleEvent *event,
     		listener->idle_id = g_idle_add (control_spi_listener_process_event, listener);
 }
 
-control_spi_set_voice_control_pipeline( GstElement *pipeline ){
+control_spi_set_voice_control_pipeline (GstElement *pipeline)
+{
 
 	voice_control_pipeline = pipeline;
 	is_keypressed = FALSE;
