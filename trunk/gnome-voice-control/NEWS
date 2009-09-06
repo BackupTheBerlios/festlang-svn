@@ -1,4 +1,23 @@
 -------------------------
+gnome-voice-control 0.4.0
+-------------------------
+
+Bug Fixes and Updates
+
+    * A lot of fixes related to multithreading
+    * Updated to new pocketsphinx API
+    * Window mode added for debugging
+    * Action order comparision fixed
+    * Spanish and German dictionaries
+
+Thanks:
+
+    Alban Browaeys
+    Andrés Estévez Costas
+    Martin Weinelt
+    Mauricio Henriquez
+
+-------------------------
 gnome-voice-control 0.3.0
 -------------------------
 

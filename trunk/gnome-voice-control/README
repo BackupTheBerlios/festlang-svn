@@ -19,17 +19,13 @@ GNOME build system: libtool gnome-common intltool
 
  http://gnome.org
 
-Libnotify
-
- http://www.galago-project.org/news/index.php
-
 Ubuntu users can run this command:
 
-  sudo apt-get install libpanel-applet2-0 libgnomeui32 libgstreamer0.10-0 libwnck22 libnotify-bin subversion 
+  sudo apt-get install libpanel-applet2-0 libgnomeui32 libgstreamer0.10-0 libwnck22 subversion 
 
   sudo apt-get install libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev libwnck-dev \
     libatspi-dev libpanel-applet2-dev  libstartup-notification0-dev libtool
-    gnome-common intltool libnotify-dev python-all-dev
+    gnome-common intltool python-all-dev
 
 sphinxbase
 
