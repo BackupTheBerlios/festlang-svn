@@ -38,29 +38,39 @@
  ##                                                                       ##
  ###########################################################################
 
+
 ###########################################################################
 ## About this directory
 
 ## The name of this directory
-DIRNAME=src/modules/hts_engine
+DIRNAME=src/modules/hts_engine/lib
 
 ## A path from this directory to the top of the speech_tools tree,
-TOP=../../..
+TOP=../../../..
 
 ###########################################################################
 ## The code in this directory
 
 ## The include files in this directory
-#H =
+H = HTS_hidden.h mlsa_resynthesis.h
 
 ## The C++ sources which contain template instantiation code.
-#TSRCS = 
+#TSRCS = foo.cc
 
 ## All C++ sources.
-#CPPSRCS = 
+CPPSRCS = HTS_audio.cc \
+	HTS_engine.cc \
+	HTS_gstream.cc \
+	HTS_label.cc \
+	HTS_misc.cc \
+	HTS_model.cc \
+	HTS_pstream.cc \
+	HTS_sstream.cc \
+	HTS_vocoder.cc \
+	mlsa_resynthesis.cc
 
 ## Ansi C sources
-#CSRCS = 
+CSRCS=
 
 ## All sources
 SRCS = $(CPPSRCS) $(CSRCS)
@@ -72,16 +82,16 @@ OBJS = $(CPPSRCS:.cc=.o) $(CSRCS:.c=.o)
 ## Everything in this directory
 
 ## All files in this directory.
-FILES = Makefile $(SRCS) $(H) AUTHORS ChangeLog COPYING INSTALL NEWS README
+FILES = Makefile $(SRCS) $(H)
 
 ## Sub directories which need to be compiled when the library is rebuilt
-LIB_BUILD_DIRS=lib
+LIB_BUILD_DIRS=
 
 ## Sub directories which need to be built in a full rebuild
-BUILD_DIRS=$(LIB_BUILD_DIRS) bin
+BUILD_DIRS=$(LIB_BUILD_DIRS)
 
 ## All sub directories
-ALL_DIRS=$(BUILD_DIRS) include
+ALL_DIRS=$(BUILD_DIRS)
 
 
 ###########################################################################
@@ -96,4 +106,6 @@ include $(TOP)/config/common_make_rules
 
 ###########################################################################
 ## Any directory specific compilation rules would go here.
+
+LOCAL_DEFINES += -I../include
 
