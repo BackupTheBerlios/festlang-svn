@@ -96,6 +96,16 @@ Set up language parameters for Castillian Spanish."
   (Parameter.set 'Language 'spanish)
 )
 
+(define (language_catalan)
+"(language_catalan)
+Set up language parameters for Catalan."
+
+  (set! female1 voice_upc_ca_ona_hts)
+  (set! male1   voice_upc_ca_pau_hts)
+  (female1)
+  (Parameter.set 'Language 'catalan)
+)
+
 (define (select_language language)
   (cond
    ((or (equal? language 'britishenglish)
@@ -109,6 +119,8 @@ Set up language parameters for Castillian Spanish."
     (language_welsh))
    ((equal? language 'spanish)
     (language_castillian_spanish))
+   ((equal? language 'catalan)
+    (language_catalan))
    ((equal? language 'klingon)
     (language_klingon))
    (t
