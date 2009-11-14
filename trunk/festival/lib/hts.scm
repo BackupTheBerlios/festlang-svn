@@ -108,7 +108,7 @@
   (format ofd "+%s" (if (string-equal "0" (item.feat s "n.name"))
 			"x" (item.feat s "n.name")))
 ;  nn.name
-  (format ofd "+%s" (if (string-equal "0" (item.feat s "n.n.name"))
+  (format ofd "=%s" (if (string-equal "0" (item.feat s "n.n.name"))
 			"x" (item.feat s "n.n.name")))
 
 ;  position in syllable (segment)
@@ -299,7 +299,7 @@
 	      (item.feat s "R:SylStructure.parent.parent.R:Word.content_words_out")))
 
 ;  distance from content word in phrase
-  (format ofd ";%s" 
+  (format ofd "#%s" 
 	  (if (string-equal "pau" (item.feat s "name"))
 	      "x"
 	      (item.feat s "R:SylStructure.parent.parent.R:Word.lisp_distance_to_p_content")))
@@ -377,7 +377,7 @@
 	      (item.feat s "R:SylStructure.parent.parent.R:Phrase.parent.n.lisp_num_syls_in_phrase")))
 
 ;  length of next phrase (word)
-  (format ofd "=:%s" 
+  (format ofd "=%s" 
 	  (if (string-equal "pau" (item.feat s "name"))
 	      (item.feat s "n.R:SylStructure.parent.parent.R:Phrase.parent.lisp_num_words_in_phrase")
 	      (item.feat s "R:SylStructure.parent.parent.R:Phrase.parent.n.lisp_num_words_in_phrase")))

@@ -43,6 +43,9 @@
 #include "festival.h"
 #include "festivalP.h"
 
+using std::cerr;
+using std::endl;
+
 #ifdef NO_SPOOLER
 void audsp_play_wave(EST_Wave *w) { cerr << "no spooler available\n"; }
 LISP l_audio_mode(LISP mode) { return NIL; }

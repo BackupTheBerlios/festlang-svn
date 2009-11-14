@@ -44,6 +44,9 @@ using namespace std;
 
 #include "festival.h"
 
+using std::cerr;
+using std::endl;
+
 static void festival_main(int argc, char **argv);
 static int festival_check_script_mode(int argc, char **argv);
 static void festival_script_mode(int argc, char **argv);
@@ -103,7 +106,7 @@ static void festival_main(int argc, char **argv)
 	"              are printed (default if stdin not a tty)\n"+
 	"--language <string>\n"+
         "              Run in named language, default is\n"+
-	"              english, spanish and welsh are available\n"+
+	"              english, spanish, russian and welsh are available\n"+
 	"--server      Run in server mode waiting for clients\n"+
 	"              of server_port (1314)\n"+
 	"--script <ifile>\n"+
@@ -233,7 +236,7 @@ static void festival_script_mode(int argc, char **argv)
 
     if (argc < 2)
     {   
-	cerr << "festival: script_mode has no file to interpret" << endl;
+	std::cerr << "festival: script_mode has no file to interpret" << std::endl;
 	return;
     }
 
