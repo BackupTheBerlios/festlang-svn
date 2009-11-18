@@ -59,7 +59,7 @@ static EST_Item *next_token(EST_TokenStream &ts, EST_Relation &ps,
 				   EST_Item *s);
 static void append_token(EST_Relation &ps, const EST_Token &s);
 static void output_find(const EST_String &filename,
-			EST_Item *s,LISP v,LISP tfeats, FILE* fd);
+			EST_Item *s,LISP tfeats, FILE* fd);
 
 LISP extract_tokens(LISP file, LISP tokens, LISP ofile)
 {
@@ -77,7 +77,7 @@ static void search_file(const EST_String &filename, LISP tokens, LISP ofile)
     EST_TokenStream ts;
     EST_Relation ps;
     EST_Item *s = 0;
-    LISP l,v;
+    LISP l;
     FILE *ofd;
 
     if (ts.open(filename) == -1)
@@ -101,12 +101,10 @@ static void search_file(const EST_String &filename, LISP tokens, LISP ofile)
     for (s = next_token(ts,ps,s); s != 0; s=next_token(ts,ps,s))
     {
 	for (l=tokens; l != NIL; l=cdr(l))
-//	    if (s->name().matches(make_regex(get_c_string(car(car(l))))))
-	{
-	    v = leval(cons(car(car(l)),cons(siod(s),NIL)),NIL);
-	    if (v != NIL)
-		output_find(filename,s,v,car(l),ofd);
-	}
+	    if (s->name().matches(make_regex(get_c_string(car(car(l))))))
+	    {
+		output_find(filename,s,car(cdr(car(l))),ofd);
+	    }
     }
 
     ts.close();
@@ -116,13 +114,12 @@ static void search_file(const EST_String &filename, LISP tokens, LISP ofile)
 }
 
 static void output_find(const EST_String &filename,
-			EST_Item *s,LISP v,LISP tfeats, FILE* fd)
+			EST_Item *s,LISP tfeats, FILE* fd)
 {
     // Found a match so output info
     LISP t;
     
-    fprintf(fd,"%s %s ",get_c_string(v),
-	    (const char *)filename);
+    fprintf(fd,"%s ",(const char *)filename);
     for (t=cdr(tfeats); t != NIL; t=cdr(t))
 	fprintf(fd,"%s ",(const char *)
 		ffeature(s,get_c_string(car(t))).string());
