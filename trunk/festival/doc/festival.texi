@@ -1,6 +1,11 @@
 \input texinfo @c -*-texinfo-*-
 @c %**start of header
-@setfilename festival.info
+@dircategory Sound
+@dircategory Development
+@direntry
+* Festival: (festival).           Speech synthesis system.
+@end direntry
+@c c@setfilename festival.info
 @settitle Festival Speech Synthesis System
 @finalout
 @setchapternewpage odd
@@ -5778,7 +5783,7 @@ Some earlier (and smaller machines) only have 8bit audio even though
 they include a @file{/dev/dsp} (Soundblaster PRO for example).  This was
 not dealt with properly in earlier versions of the system but now the
 support automatically checks to see the sample width supported and uses
-it accordingly.  8 bit at higher frequencies that 8K sounds better than
+it accordingly.  8 bit at higher frequencies than 8K sounds better than
 straight 8k ulaw so this feature is useful.
 
 @cindex Windows NT audio

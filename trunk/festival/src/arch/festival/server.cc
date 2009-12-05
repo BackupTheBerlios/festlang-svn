@@ -243,7 +243,8 @@ static int client_access_check(int fd,int client)
     if ((client_access == TRUE) && (passwd != NULL))
     {
 	char *client_passwd = walloc(char,strlen(get_c_string(passwd))+1);
-	read(fd,client_passwd,strlen(get_c_string(passwd)));
+	if (read(fd,client_passwd,strlen(get_c_string(passwd)))!= (signed int) strlen(get_c_string(passwd)))
+		cerr << "Error reading client password" << endl;
 	client_passwd[strlen(get_c_string(passwd))] = '\0';
 	if (streq(get_c_string(passwd),client_passwd))
 	    client_access = TRUE;

@@ -1,5 +1,5 @@
 #!/bin/sh
-"true" ; exec /home/shmyrev/work/festival/bin/festival --script $0 $*
+"true" ; exec festival --script $0 $*
 
 (set_backtrace t)
 

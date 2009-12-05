@@ -489,7 +489,8 @@ static LISP utt_send_wave_client(LISP utt)
 #ifdef WIN32
     send(ft_server_socket,"WV\n",3,0);
 #else
-    write(ft_server_socket,"WV\n",3);
+    if (write(ft_server_socket,"WV\n",3) == -1)
+        cerr << "Write error" << endl;
 #endif
     socket_send_file(ft_server_socket,tmpfile);
     unlink(tmpfile);
@@ -527,7 +528,8 @@ static LISP utt_send_wave_asterisk(LISP utt)
 #ifdef WIN32
     send(ft_server_socket,"WV\n",3,0);
 #else
-    write(ft_server_socket,"WV\n",3);
+    if (write(ft_server_socket,"WV\n",3) == -1)
+        cerr << "Write error" << endl;
 #endif
     socket_send_file(ft_server_socket,tmpfile);
     unlink(tmpfile);
