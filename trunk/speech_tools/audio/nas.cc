@@ -57,7 +57,7 @@ static int nas_playing = 0;
 
 int nas_supported = TRUE;
 
-int endian_int = 1;
+static int endian_int = 1;
 #define NAS_BIG_ENDIAN (((char *)&endian_int)[0] == 0)
 
 static void na_sync_play_cb(AuServer *aud, AuEventHandlerRec *handler, 

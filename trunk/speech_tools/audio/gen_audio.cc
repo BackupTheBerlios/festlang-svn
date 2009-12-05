@@ -205,7 +205,8 @@ static int play_aucomm_wave(EST_Wave &inwave, EST_Option &al)
 
     sprintf(pref,"FILE=%s;SR=%d;",tmpfile,inwave.sample_rate());
 
-    system((EST_String)pref+usrcommand.unquote('"'));
+    if (system((EST_String)pref+usrcommand.unquote('"')) != 0)
+        cerr << "It seems that the command provided failed." << endl;
 
     unlink(tmpfile);  // so we don't fill up /tmp
 
