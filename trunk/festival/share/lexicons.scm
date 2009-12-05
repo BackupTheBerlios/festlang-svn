@@ -42,8 +42,8 @@
 ;;;  you should set lexdir in sitevars.scm
 
 (defvar lexdir 
-  (if (probe_file (path-append libdir "dicts"))
-      (path-append libdir "dicts/")
+  (if (probe_file (path-append datadir "dicts"))
+      (path-append datadir "dicts/")
       ;; else we'll guess we're in the CSTR filespace
       (path-as-directory "/projects/festival/lib/dicts/"))
   "lexdir
@@ -122,8 +122,7 @@ of speech information for homographs."
   (if (not (member_string "moby" (lex.list)))
       (begin
 	(lex.create "moby")
-	;  (lex.set.compile.file (path-append lexdir "mobylex.out"))
-	(lex.set.compile.file "/home/awb/src/mobypron/mobylex.out")
+	(lex.set.compile.file (path-append lexdir "mobylex.out"))
 	(lex.set.phoneset "mrpa")
 	(lex.set.lts.method 'lts_rules)
 	(lex.set.lts.ruleset 'nrl)

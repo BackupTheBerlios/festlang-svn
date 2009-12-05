@@ -113,6 +113,13 @@ PROJECT_JAVA_ROOT=$(TOP)/src/modules/java
 DOCXX_DIRS = $(TOP)/src 
 MODULE_TO_DOCXX = perl $(TOP)/src/modules/utilities/extract_module_doc++.prl
 
+#Architecture dependent files:
 FTLIBDIR = $(FESTIVAL_HOME)/lib 
+#Architecture independent files: 
+FTDATADIR = $(FESTIVAL_HOME)/share 
+#System config files:
+FTETCDIR = $(FESTIVAL_HOME)/etc  
+#Examples directory:
+FTEXAMPLESDIR = $(FESTIVAL_HOME)/examples  
 
 

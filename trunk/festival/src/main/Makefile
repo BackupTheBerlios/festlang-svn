@@ -38,7 +38,7 @@ OBJS = $(SRCS:.cc=.o)
 FILES=Makefile $(SRCS)
 LOCAL_CLEAN = $(ETCDIR)/audsp $(ETCDIR)/.made
 
-ETCDIR=$(TOP)/lib/etc/$(SYSTEM_TYPE)
+ETCDIR=$(TOP)/lib/$(SYSTEM_TYPE)
 
 ALL_EXECS = festival  festival_client
 
@@ -47,7 +47,7 @@ ALL = $(ALL_EXECS) make_audiosp
 include $(TOP)/config/common_make_rules
 include $(EST)/config/rules/bin_process.mak
 
-ETCDIR=$(TOP)/lib/etc/$(SYSTEM_TYPE)
+ETCDIR=$(TOP)/lib/
 
 festival: festival_main.o $(LIBDEPS)
 	$(LINK_COMMAND) -o festival festival_main.o $(LIBS)

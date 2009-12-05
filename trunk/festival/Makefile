@@ -39,7 +39,7 @@
 ###########################################################################
 TOP=.
 DIRNAME=.
-BUILD_DIRS = src lib examples bin doc
+BUILD_DIRS = src lib share examples bin doc
 ALL_DIRS=config $(BUILD_DIRS) testsuite
 CONFIG=configure configure.in config.sub config.guess \
        missing install-sh mkinstalldirs

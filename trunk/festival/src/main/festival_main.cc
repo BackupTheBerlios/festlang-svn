@@ -91,6 +91,8 @@ static void festival_main(int argc, char **argv)
         "In evaluation mode \"filenames\" starting with ( are evaluated inline\n"+
 	"Festival Speech Synthesis System: "+ festival_version +"\n"+
 	"-q            Load no default setup files\n"+
+	"--datadir <string>\n"+
+	"              Set data directory pathname\n"+
 	"--libdir <string>\n"+
         "              Set library directory pathname\n"+
         "-b            Run in batch mode (no interaction)\n"+
@@ -130,6 +132,12 @@ static void festival_main(int argc, char **argv)
 	festival_libdir = wstrdup(al.val("--libdir"));
     else if (getenv("FESTLIBDIR") != 0)
 	festival_libdir = getenv("FESTLIBDIR");
+
+    if (al.present("--datadir"))
+	festival_datadir = wstrdup(al.val("--datadir"));
+    else if (getenv("FESTDATADIR") != 0)
+	festival_datadir = getenv("FESTDATADIR");
+
     if (al.present("--heap"))
 	heap_size = al.ival("--heap");
 

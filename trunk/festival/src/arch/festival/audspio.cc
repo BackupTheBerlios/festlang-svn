@@ -101,6 +101,8 @@ LISP l_audio_mode(LISP mode)
     // Switch audio mode
     LISP audio=NIL;
     LISP command=NIL;
+	#define AUDSP_BINNAME "/audsp"
+    const char * audsp_path = FTLIBDIR AUDSP_BINNAME;
     
     if (mode == NIL)
     {
@@ -113,7 +115,7 @@ LISP l_audio_mode(LISP mode)
 	{
 	    audio = ft_get_param("Audio_Method");
 	    command = ft_get_param("Audio_Command");
-	    audfds = pipe_open("audsp");
+	    audfds = pipe_open(audsp_path);
 	    if (audio != NIL)
 		audsp_send(EST_String("method ")+get_c_string(audio));
 	    if (command != NIL)

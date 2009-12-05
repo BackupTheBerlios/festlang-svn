@@ -53,30 +53,14 @@ void festival_lisp_vars(void);
 void festival_banner(void);
 void festival_load_default_files(void);
 
-#define _S_S_S(S) #S
-#define STRINGIZE(S) _S_S_S(S)
 
 const char *festival_version =  STRINGIZE(FTVERSION) ":" STRINGIZE(FTSTATE) " " STRINGIZE(FTDATE);
 
-// Allow the path to be passed in without quotes because Windoze command line
-// is stupid
-// Extra level of indirection needed to get an extra macro expansion. Yeuch.
-
-#ifdef FTLIBDIRC
-#    define FTLIBDIR STRINGIZE(FTLIBDIRC)
-#endif
-#ifdef FTOSTYPEC
-#    define FTOSTYPE STRINGIZE(FTOSTYPEC)
-#endif
-
-#ifndef FTLIBDIR
-#define FTLIBDIR "/projects/festival/lib/"
-#endif
-#ifndef FTOSTYPE
-#define FTOSTYPE ""
-#endif
-
 const char *festival_libdir = FTLIBDIR;
+const char *festival_datadir = FTDATADIR;
+const char *festival_etcdir = FTETCDIR;
+const char *festival_examplesdir = FTEXAMPLESDIR;
+
 ostream *cdebug;
 static int festival_server_port = 1314;
 static EST_StrList sub_copyrights;
@@ -301,7 +285,7 @@ void festival_load_default_files(void)
     EST_String userinitfile, home_str, initfile;
 
     // Load library init first
-    initfile = (EST_String)EST_Pathname(festival_libdir).as_directory() + 
+    initfile = (EST_String)EST_Pathname(festival_datadir).as_directory() +
 	"init.scm";
     if (access((const char *)initfile,R_OK) == 0)
 	vload(initfile,FALSE);
@@ -317,6 +301,9 @@ void festival_lisp_vars(void)
     int major,minor,subminor;
     
     siod_set_lval("libdir",strintern(festival_libdir));
+    siod_set_lval("datadir",strintern(festival_datadir));
+    siod_set_lval("etcdir",strintern(festival_etcdir));
+    siod_set_lval("examplesdir",strintern(festival_examplesdir));
     if (!streq(FTOSTYPE,""))
 	siod_set_lval("*ostype*",cintern(FTOSTYPE));
     siod_set_lval("festival_version",
@@ -350,26 +337,6 @@ void festival_lisp_vars(void)
     if (mplayer_supported)
 	proclaim_module("mplayeraudio");
     
-    // Add etc-dir path and machine specific directory etc/$OSTYPE
-    char *etcdir = walloc(char,strlen(festival_libdir)+strlen("etc/")+
-			  strlen(FTOSTYPE)+3);
-    sprintf(etcdir,"%s/etc/%s/",festival_libdir,FTOSTYPE);
-    char *etcdircommon = walloc(char,strlen(festival_libdir)+strlen("etc/")+3);
-    sprintf(etcdircommon,"%s/etc/",festival_libdir);
-    
-    //  Modify my PATH to include these directories
-    siod_set_lval("etc-path",cons(rintern(etcdir),
-				  cons(rintern(etcdircommon),NIL)));
-    const char *path = getenv("PATH");
-    if (path == 0)
-	path = "";
-    char *newpath = walloc(char,1024+strlen(path)+strlen(etcdir)+
-			   strlen(etcdircommon));
-    sprintf(newpath,"PATH=%s:%s:%s",path,etcdir,etcdircommon);
-    putenv(newpath);
-    
-    wfree(etcdir);
-    wfree(etcdircommon);
     return;
 }
 

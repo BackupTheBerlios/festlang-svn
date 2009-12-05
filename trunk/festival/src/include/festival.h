@@ -137,6 +137,8 @@ const EST_String utt_type(EST_Utterance &utt);
 void add_item_features(EST_Item *s,LISP features);
 
 extern const char *festival_libdir;
+extern const char *festival_datadir;
+extern const char *festival_etcdir;
 
 //  Module specific LISP/etc definitions
 void festival_init_modules(void);

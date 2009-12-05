@@ -942,6 +942,7 @@ You can delete these by changing the @code{BASE_DIRS} variable in
 @cindex installation initialization
 @cindex @file{init.scm}
 @cindex @file{siteinit.scm}
+@cindex @file{sitevars.scm}
 Once compiled Festival may be further customized for particular sites.
 At start up time Festival loads the file @file{init.scm} from its
 library directory.  This file further loads other necessary files such
@@ -956,12 +957,12 @@ as @code{lexdir} (the directory where the lexicons are held), and
 @code{voices_dir} (pointing to voice directories) should
 be reset here if necessary.
 
-@cindex change libdir at run-time
+@cindex change libdir or datadir at run-time
 @cindex run-time configuration
 @cindex @code{load-path}
 The default installation will try to find its lexicons and voices
 automatically based on the value of @code{load-path} (this is derived
-from @code{FESTIVAL_HOME} at compilation time or by using the @code{--libdir}
+from @code{FESTIVAL_HOME} at compilation time or by using the @code{--datadir}
 at run-time).  If the voices and lexicons have been unpacked into
 subdirectories of the library directory (the default) then no site
 specific initialization of the above pathnames will be necessary.
@@ -1091,6 +1092,8 @@ Copyright (C) University of Edinburgh, 1996-2003. All rights reserved.
 For details type `(festival_warranty)'
 festival> libdir
 "/projects/festival/lib/"
+festival> datadir
+"/projects/festival/share/"
 festival> ^D
 @end example
 This should show the pathname you set in your @file{config/config}.
@@ -1111,7 +1114,7 @@ Can't access NAS server
 You have selected NAS as the audio output but have no server running on
 that machine or your @code{DISPLAY} or @code{AUDIOSERVER} environment
 variable is not set properly for your output device.  Either set these
-properly or change the audio output device in @file{lib/siteinit.scm} as
+properly or change the audio output device in @file{etc/siteinit.scm} as
 described above.
 
 Ensure your audio device actually works the way you think it does.  On
@@ -1141,7 +1144,7 @@ about which voices are installed.  It assumes that
 @code{voice_rab_diphone} (@file{festvox_rabxxxx.tar.gz}) is the default
 voice and that @code{voice_ked_diphone} and @code{voice_don_diphone}
 (@file{festvox_kedxxxx.tar.gz} and @file{festvox_don.tar.gz}) are
-installed.  Also local settings in your @file{festival/lib/siteinit.scm}
+installed.  Also local settings in your @file{festival/etc/siteinit.scm}
 may affect these tests.  However, after installation it may
 be worth trying
 @example

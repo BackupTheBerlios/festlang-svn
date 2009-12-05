@@ -58,5 +58,47 @@ EST_Wave *get_utt_wave(EST_Utterance *u);
 
 LISP lisp_parse_url(LISP url);
 
+#define _S_S_S(S) #S
+#define STRINGIZE(S) _S_S_S(S)
+
+// Allow the path to be passed in without quotes because Windoze command line
+// is stupid
+// Extra level of indirection needed to get an extra macro expansion. Yeuch.
+
+
+#ifdef FTLIBDIRC
+#    define FTLIBDIR STRINGIZE(FTLIBDIRC)
+#endif
+#ifndef FTLIBDIR
+#define FTLIBDIR "/projects/festival/lib/"
+#endif
+
+#ifdef FTDATADIRC
+#    define FTDATADIR STRINGIZE(FTDATADIRC)
+#endif
+#ifndef FTDATADIR
+#define FTDATADIR "/projects/festival/share/"
+#endif
+
+#ifdef FTETCDIRC
+#    define FTETCDIR STRINGIZE(FTETCDIRC)
+#endif
+#ifndef FTETCDIR
+#define FTETCDIR "/projects/festival/etc/"
+#endif
+#ifdef FTEXAMPLESDIRC
+#    define FTEXAMPLESDIR STRINGIZE(FTEXAMPLESDIRC)
+#endif
+#ifndef FTEXAMPLESDIR
+#define FTEXAMPLESDIR "/projects/festival/examples/"
+#endif
+#ifdef FTOSTYPEC
+#    define FTOSTYPE STRINGIZE(FTOSTYPEC)
+#endif
+
+#ifndef FTOSTYPE
+#define FTOSTYPE ""
+#endif
+
 
 #endif /* __FESTIVALP_H__ */

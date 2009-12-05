@@ -45,7 +45,7 @@
 (defvar system-voice-path '( )
   "system-voice-path
    Additional directory not near the load path where voices can be
-   found, this can be redefined in lib/sitevars.scm if desired.")
+   found, this can be redefined in etc/sitevars.scm if desired.")
 
 (defvar system-voice-path-multisyn '( )
   "system-voice-path-multisyn
@@ -76,7 +76,7 @@
 
 
 ;; Declaration of voices. When we declare a voice we record the
-;; directory and set up an autoload for the vocie-selecting function
+;; directory and set up an autoload for the voice-selecting function
 
 (defvar voice-locations ()
   "voice-locations

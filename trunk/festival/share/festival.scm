@@ -552,13 +552,13 @@ Doing stuff
 (define (intro)
 "(intro)
  Synthesize an introduction to the Festival Speech Synthesis System."
-  (tts (path-append libdir "../examples/intro.text") nil))
+  (tts (path-append examplesdir "intro.text") nil))
 
 (define (intro-spanish)
 "(intro-spanish)
  Synthesize an introduction to the Festival Speech Synthesis System
  in spanish.  Spanish voice must already be selected for this."
-  (tts (path-append libdir "../examples/spintro.text") nil))
+  (tts (path-append examplesdir "spintro.text") nil))
 
 (define (na_play FILENAME)
 "(play_wave FILENAME)

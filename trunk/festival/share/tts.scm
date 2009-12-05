@@ -151,7 +151,7 @@ Functions to apply to each token.")
   "xxml_elements
 List of Scheme actions to perform on finding xxML tags.")
 
-(defvar xml_dtd_dir libdir
+(defvar xml_dtd_dir (string-append datadir "/sgml")
   "xml_dtd_dir
 The directory holding standard DTD form the xml parser.")
 

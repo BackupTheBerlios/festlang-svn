@@ -551,7 +551,8 @@ static LISP send_sexpr_to_client(LISP l)
 #ifdef WIN32
     send(ft_server_socket,"LP\n",3,0);
 #else
-    write(ft_server_socket,"LP\n",3);
+    if (write(ft_server_socket,"LP\n",3) == -1)
+        cerr << "Write error" << endl;
 #endif
     socket_send_file(ft_server_socket,tmpfile);
     unlink(tmpfile);
