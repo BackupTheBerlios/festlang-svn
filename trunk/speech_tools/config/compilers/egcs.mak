@@ -54,7 +54,7 @@ CC=$(EGCS_CC)
 CXX=$(EGCS_CXX)
 
 ifndef EGCS_MAKE_SHARED_LIB
-    MAKE_SHARED_LIB = gcc -shared -fno-shared-data -o XXX -Xlinker -h -Xlinker XXX
+    MAKE_SHARED_LIB = gcc -shared -fno-shared-data -o XXX -Wl,-soname -Wl,YYY
 else
     MAKE_SHARED_LIB = $(GCC_MAKE_SHARED_LIB)
 endif
