@@ -51,7 +51,7 @@ SOLEML mode token specific analysis."
 (define (voice_soleml)
 "(soleml_voice)
 Speaker specific initialisation for SOLE museum data."
-  (voice_rab_diphone)
+  (voice_nitech_us_slt_arctic_hts)
   ;; Utterances only come at end of file
   (set! eou_tree '((0)))
 )

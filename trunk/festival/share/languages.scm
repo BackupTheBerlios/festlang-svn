@@ -72,11 +72,12 @@ Set up language parameters for Italian."
 
 (define (language_american_english)
 "(language_american_english)
-Set up language parameters for Aemerican English."
+Set up language parameters for American English."
 
-  (if (symbol-bound? 'voice_kal_diphone)
-      (set! female1 (lambda () (voice_kal_diphone))))
-  (set! male1 (lambda () (voice_ked_diphone)))
+  (if (symbol-bound? 'voice_nitech_us_slt_arctic_hts)
+      (set! female1 (lambda () (voice_nitech_us_slt_arctic_hts))))
+  (if (symbol-bound? 'voice_nitech_us_bdl_arctic_hts)
+      (set! male1 (lambda () (voice_nitech_us_bdl_arctic_hts))))
 
   (male1)
   (Parameter.set 'Language 'americanenglish)

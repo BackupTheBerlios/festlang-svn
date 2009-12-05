@@ -508,7 +508,11 @@ Doing stuff
   (tts FILENAME nil)  Say contexts of file, FILENAME should be 
                       surrounded by double quotes
   (voice_rab_diphone) Select voice (Britsh Male)
-  (voice_ked_diphone) Select voice (American Male)
+  (voice_rab_diphone) Select voice (British Male)
+  (voice_nitech_us_bdl_arctic_hts)
+                      Select voice (American Male)
+  (voice_nitech_us_slt_arctic_hts)
+                      Select voice (American Female)
 ")
 
 (define (festival_warranty)

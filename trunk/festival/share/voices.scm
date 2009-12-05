@@ -323,24 +323,16 @@ A variable whose value is a function name that is called on start up to
 the default voice. [see Site initialization]")
 
 (defvar default-voice-priority-list 
-  '(kal_diphone
-    cmu_us_bdl_arctic_hts
-    cmu_us_jmk_arctic_hts
-    cmu_us_slt_arctic_hts
-    cmu_us_awb_arctic_hts
-;    cstr_rpx_nina_multisyn       ; restricted license (lexicon)
-;    cstr_rpx_jon_multisyn       ; restricted license (lexicon)
-;    cstr_edi_awb_arctic_multisyn ; restricted license (lexicon)
-;    cstr_us_awb_arctic_multisyn
+  '(nitech_us_slt_arctic_hts
+    nitech_us_awb_arctic_hts
+    nitech_us_bdl_arctic_hts
+    nitech_us_clb_arctic_hts
+    nitech_us_jmk_arctic_hts
+    nitech_us_rms_arctic_hts
+    kal_diphone
     ked_diphone
-    don_diphone
-    rab_diphone
-    en1_mbrola
-    us1_mbrola
-    us2_mbrola
-    us3_mbrola
-    gsw_diphone  ;; not publically distributed
-    el_diphone
+    cstr_us_awb_arctic_multisyn
+    cstr_us_jmk_arctic_multisyn
     )
   "default-voice-priority-list
    List of voice names. The first of them available becomes the default voice.")

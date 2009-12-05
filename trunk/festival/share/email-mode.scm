@@ -40,7 +40,7 @@
 (define (email_init_func)
  "(email_init_func)
 Called on starting email text mode."
- (voice_rab_diphone)
+ (voice_nitech_us_slt_arctic_hts)
  (set! email_previous_t2w_func token_to_words)
  (set! english_token_to_words email_token_to_words)
  (set! token_to_words english_token_to_words)
@@ -67,13 +67,13 @@ Email spcific token to word rules."
    ((and (string-matches name ">")
          (string-matches (item.feat token "whitespace") 
 			 "[ \t\n]*\n *"))
-    (voice_don_diphone)
+    (voice_nitech_us_bdl_arctic_hts)
     nil ;; return nothing to say
    )
    (t  ;; for all other cases
      (if (string-matches (item.feat token "whitespace") 
 			 ".*\n[ \n]*")
-	 (voice_rab_diphone))
+	 (voice_nitech_us_slt_arctic_hts))
      (email_previous_t2w_func token name))))
 
 (set! tts_text_modes
