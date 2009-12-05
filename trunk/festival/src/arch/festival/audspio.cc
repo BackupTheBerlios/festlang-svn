@@ -89,9 +89,9 @@ static void audsp_send(const char *c)
 	festival_error();
     }
 	
-    if (write(audfds[0],c,strlen(c))!= -1)
+    if (write(audfds[0],c,strlen(c))== -1)
 		cerr << "Could not write to audfds" << endl;
-    if (write(audfds[0],"\n",1) != -1 )
+    if (write(audfds[0],"\n",1) == -1 )
 		cerr << "Could not write to audfds" << endl;
     //read(audfds[1],reply,3);  /* confirmation */
 }
