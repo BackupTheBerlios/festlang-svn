@@ -41,6 +41,11 @@
   * available as methods. Different implementations are provided for 
   * different systems.
   */
+
+class EST_Pathname;
+EST_Pathname operator + (const EST_Pathname p, const EST_Pathname addition);
+EST_Pathname operator + (const char *p, const EST_Pathname addition);
+
 class EST_Pathname : public EST_String {
 
 private:

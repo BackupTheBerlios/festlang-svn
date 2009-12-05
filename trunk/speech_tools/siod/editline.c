@@ -238,7 +238,8 @@ void TTYflush()
 {
     if (ScreenCount) {
 	if (el_no_echo == 0)
-	    (void)write(1, Screen, ScreenCount);
+	    if (write(1, Screen, ScreenCount) ==-1)
+	       fprintf(stderr, "Error flushing tty");
 	ScreenCount = 0;
     }
 }

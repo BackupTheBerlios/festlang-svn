@@ -79,6 +79,9 @@ use we envisage.  Traversal of the items ....
 
 */
 
+class EST_Item;
+int same_item(const EST_Item *l1,const EST_Item *l2);
+
 class EST_Item 
 {
   private:

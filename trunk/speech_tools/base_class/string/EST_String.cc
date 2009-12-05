@@ -996,8 +996,7 @@ EST_String::freq(const char *s) const
   return n;
 }
 
-int
-EST_String::freq(EST_Regex &ex) const
+int EST_String::freq(EST_Regex &ex) const
 {
   int pos=0;
   int n=0;

@@ -87,6 +87,8 @@ using namespace std;
 
 #endif
 
+class EST_ChunkPtr;
+
  /************************************************************************/
  /*                                                                      */
  /* EST_Chunk is a use-counted chunk of memory. You shouldn't be able    */
@@ -99,6 +101,15 @@ using namespace std;
  /* SHRT_MAX references to it is probably permanent.                     */
  /*                                                                      */
  /************************************************************************/
+
+typedef  int EST_chunk_size;
+
+EST_ChunkPtr chunk_allocate(int bytes);
+EST_ChunkPtr chunk_allocate(int bytes, const char *initial, int initial_len);
+EST_ChunkPtr chunk_allocate(int bytes, const EST_ChunkPtr &initial, int initial_start, int initial_len);
+
+void make_updatable(EST_ChunkPtr &shared, EST_chunk_size inuse);
+void make_updatable(EST_ChunkPtr &shared);
 
 class EST_ChunkPtr;
 

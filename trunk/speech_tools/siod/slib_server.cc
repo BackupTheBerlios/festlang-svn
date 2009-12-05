@@ -40,7 +40,8 @@ LISP siod_send_lisp_to_client(LISP x)
 #ifdef WIN32
 	send(siod_server_socket,"LP\n",3,0);
 #else
-	write(siod_server_socket,"LP\n",3);
+	if (write(siod_server_socket,"LP\n",3)==-1)
+		cerr << "Write Error" << endl;
 #endif
 	socket_send_file(siod_server_socket,tmpfile);
 	unlink(tmpfile);
@@ -58,7 +59,8 @@ void sock_acknowledge_error()
 #ifdef WIN32
 	send(siod_server_socket,"ER\n",3,0);
 #else
-	write(siod_server_socket,"ER\n",3);
+	if (write(siod_server_socket,"ER\n",3) == -1 )
+		cerr << "Write Error" << endl;
 #endif
 
 }
@@ -70,7 +72,8 @@ static void acknowledge_sock_print(LISP x)
 #ifdef WIN32
     send(siod_server_socket,"OK\n",3,0);
 #else
-    write(siod_server_socket,"OK\n",3);
+    if (write(siod_server_socket,"OK\n",3) == -1)
+   		cerr << "Write Error" << endl;
 #endif
 }
 

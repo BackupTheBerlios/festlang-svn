@@ -106,6 +106,7 @@ void EST_TSimpleMatrix<T>::resize(int new_rows,
 	  int i,j;
 	  
 	  if (new_rows > copy_r)
+	  {
 	    if (*this->def_val == 0)
 	      {
 		memset((void *)(this->p_memory + copy_r*this->p_row_step),
@@ -118,6 +119,7 @@ void EST_TSimpleMatrix<T>::resize(int new_rows,
 		  for(i=copy_r; i<new_rows; i++)
 		    this->a_no_check(i,j) = *this->def_val;
 	      }
+	  }
 	}
       else if (!this->p_sub_matrix)
 	{
@@ -140,6 +142,7 @@ void EST_TSimpleMatrix<T>::resize(int new_rows,
 	      this->a_no_check(i,j) =  *this->def_val;
 	  
 	  if (new_rows > copy_r)
+	  {
 	    if (*this->def_val == 0)
 	      {
 		memset((void *)(this->p_memory + copy_r*this->p_row_step),
@@ -152,6 +155,7 @@ void EST_TSimpleMatrix<T>::resize(int new_rows,
 		  for(i=copy_r; i<new_rows; i++)
 		    this->a_no_check(i,j) = *this->def_val;
 	      }
+	  }
 	}
       else
 	EST_TMatrix<T>::resize(new_rows, new_cols, 1);

@@ -33,7 +33,9 @@ static LISP lsetenv(LISP name,LISP value)
 
 static LISP lsystem(LISP name)
 {
-    system(get_c_string(name));
+	const char* instruction = get_c_string(name);
+    if(system(instruction)!=0)
+		cerr << "Error executing \"" << instruction << "\"." << endl;
     return NIL;
 }
 
@@ -49,17 +51,22 @@ static LISP lpwd(void)
 static LISP lchdir(LISP args, LISP env)
 {
     (void)env;
-    char *home;
+    const char *directory;
     
     if (siod_llength(args) == 0)
     {
-	home = getenv("HOME");
-	chdir(home);
-	return rintern(home);
+	directory = getenv("HOME");
+	if (chdir(directory)!=0)
+		cerr << "Error changing directory to \"" << 
+			directory << "\"." << endl;
+	return rintern(directory);
     }
     else
     {
-	chdir(get_c_string(leval(car(args),env)));
+	directory = get_c_string(leval(car(args),env));
+	if (chdir(directory)!=0)
+		cerr << "Error changing directory to \"" << 
+			directory << "\"." << endl;
 	return (car(args));
     }
 }
