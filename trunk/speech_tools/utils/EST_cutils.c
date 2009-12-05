@@ -59,7 +59,15 @@ const char * const est_name = STRINGIZE(ESTNAME);
 #define ESTLIBDIR "/usr/local/lib/speech_tools"
 #endif
 
+#ifdef ESTDATADIRC
+#    define ESTDATADIR STRINGIZE(ESTDATADIRC)
+#endif
+#ifndef ESTDATADIR
+#define ESTDATADIR "/usr/local/share/speech_tools"
+#endif
+
 const char * const est_libdir = ESTLIBDIR;
+const char * const est_datadir = ESTDATADIR;
 
 const char * const est_ostype = STRINGIZE(ESTOSTYPE);
 

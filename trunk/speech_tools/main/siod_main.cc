@@ -180,7 +180,7 @@ static void siod_load_default_files(void)
     EST_Pathname initfile;
 
     // Load library init first
-    initfile = EST_Pathname(est_libdir).as_directory();
+    initfile = EST_Pathname(est_datadir).as_directory();
     initfile += "siod";
     initfile += "init.scm";
 
@@ -201,6 +201,10 @@ static void siod_lisp_vars(void)
     lib += "siod";
     
     siod_set_lval("libdir",strintern(lib));
+
+    lib = EST_Pathname(est_datadir).as_directory();
+    lib += "siod";
+    siod_set_lval("datadir",strintern(lib));
 
     if (!strcmp(est_ostype,""))
       siod_set_lval("*ostype*",rintern(est_ostype));

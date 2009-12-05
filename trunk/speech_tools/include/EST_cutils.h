@@ -48,6 +48,7 @@ extern "C" {
 extern const char * const est_tools_version;
 extern const char * const est_name;
 extern const char * const est_libdir;
+extern const char * const est_datadir;
 extern const char * const est_ostype;
 
 #include "EST_walloc.h"

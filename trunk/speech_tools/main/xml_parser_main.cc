@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
 		       al.sval("-sysdir") + "/\\1");
 
   pclass.register_id("//CSTR//EST \\(.*\\)",
-		     EST_String::cat(est_libdir, "/\\1.dtd"));
+		     EST_String::cat(est_datadir, "/\\1.dtd"));
 
   /* An individual parser runs over a single source.
     */
