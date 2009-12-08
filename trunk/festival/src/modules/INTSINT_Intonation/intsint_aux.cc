@@ -422,7 +422,7 @@ void optimise(Intsint *is, float mid, float range, float *min_error2,
 
 float octave(float t)
 {
-    return log(t)/log(2);
+    return log(t)/log((float)2);
 }
 
 float linear(float t)

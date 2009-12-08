@@ -220,9 +220,9 @@ TCData *EST_FlatTargetCost::flatpack(EST_Item *seg) const
 
   // seg word feature
   if((word=tc_get_word(seg)) != NULL)
-    (*f)[WORD]=simple_id(word->S("id"));
+    (*f)[MY_WORD]=simple_id(word->S("id"));
   else
-    (*f)[WORD]=0;
+    (*f)[MY_WORD]=0;
   
 
   // Next seg word features
@@ -239,9 +239,9 @@ TCData *EST_FlatTargetCost::flatpack(EST_Item *seg) const
 
   // Prev seg word feature
     if(seg->prev() && (word=tc_get_word(seg->prev())))
-      (*f)[PWORD]=simple_id(word->S("id"));
+      (*f)[MY_PWORD]=simple_id(word->S("id"));
     else
-      (*f)[PWORD]=0;
+      (*f)[MY_PWORD]=0;
 
 
   // segs sylpos
@@ -255,9 +255,9 @@ TCData *EST_FlatTargetCost::flatpack(EST_Item *seg) const
 
   // segs wordpos
   (*f)[WORDPOS]=0; // medial
-  if( f->a_no_check(WORD)!= f->a_no_check(NWORD) )
+  if( f->a_no_check(MY_WORD)!= f->a_no_check(NWORD) )
     (*f)[WORDPOS]=1;  // inter
-  else if( f->a_no_check(WORD)!= f->a_no_check(PWORD) )
+  else if( f->a_no_check(MY_WORD)!= f->a_no_check(MY_PWORD) )
     (*f)[WORDPOS]=2; // initial
   else if( f->a_no_check(NWORD) != f->a_no_check(NNWORD) )
     (*f)[WORDPOS]=3; // final
@@ -331,9 +331,9 @@ float EST_FlatTargetCost::stress_cost() const
 float EST_FlatTargetCost::position_in_phrase_cost() const
 {
   
-  if ( !t->a_no_check(WORD) && !c->a_no_check(WORD) )
+  if ( !t->a_no_check(MY_WORD) && !c->a_no_check(MY_WORD) )
     return 0;
-  if ( !t->a_no_check(WORD) || !c->a_no_check(WORD) )
+  if ( !t->a_no_check(MY_WORD) || !c->a_no_check(MY_WORD) )
     return 1;
 
   return ( t->a_no_check(PBREAK) == c->a_no_check(PBREAK) ) ? 0 : 1;
@@ -344,11 +344,11 @@ float EST_FlatTargetCost::punctuation_cost() const
 
   float score = 0.0;
 
-  if ( (t->a_no_check(WORD) && !c->a_no_check(WORD)) 
-       || (!t->a_no_check(WORD) && c->a_no_check(WORD)) )
+  if ( (t->a_no_check(MY_WORD) && !c->a_no_check(MY_WORD)) 
+       || (!t->a_no_check(MY_WORD) && c->a_no_check(MY_WORD)) )
     score += 0.5;
   else
-    if (t->a_no_check(WORD) && c->a_no_check(WORD))
+    if (t->a_no_check(MY_WORD) && c->a_no_check(MY_WORD))
       if ( t->a_no_check(PUNC) != c->a_no_check(PUNC) )
 	score += 0.5;
   
@@ -368,9 +368,9 @@ float EST_FlatTargetCost::punctuation_cost() const
 float EST_FlatTargetCost::partofspeech_cost() const
 {
   // Compare left phone half of diphone
-  if(!t->a_no_check(WORD) && !c->a_no_check(WORD))
+  if(!t->a_no_check(MY_WORD) && !c->a_no_check(MY_WORD))
     return 0;
-  if(!t->a_no_check(WORD) || !c->a_no_check(WORD))
+  if(!t->a_no_check(MY_WORD) || !c->a_no_check(MY_WORD))
     return 1;
   if( t->a_no_check(POS) != c->a_no_check(POS) )
     return 1;

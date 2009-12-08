@@ -83,19 +83,22 @@ BUILD_DIRS=$(LIB_BUILD_DIRS)
 ## All sub directories
 ALL_DIRS=$(BUILD_DIRS)
 
+## Module to be added to the festival library:
+INLIB = $(TOP)/src/lib/libFestival.a
+
+###########################################################################
+## Any directory specific compilation rules would go here.
+
+LOCAL_INCLUDES += -I../lib -I../include
 
 ###########################################################################
 ## What we need to do to build this directory
 
-ALL = .buildlibs
+ALL = .buildlib
 
 ###########################################################################
 ## Include the common speech_tools compilation rules
 
 include $(TOP)/config/common_make_rules
 
-###########################################################################
-## Any directory specific compilation rules would go here.
 
-LOCAL_DEFINES += -I../include
-LOCAL_INCLUDES += -I../lib

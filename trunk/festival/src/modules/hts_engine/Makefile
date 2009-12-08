@@ -87,7 +87,7 @@ ALL_DIRS=$(BUILD_DIRS) include
 ###########################################################################
 ## What we need to do to build this directory
 
-ALL = .buildlibs
+ALL = .buildlib
 
 ###########################################################################
 ## Include the common speech_tools compilation rules
