@@ -441,7 +441,8 @@ static void client_accept_waveform(SERVER_FD fd)
 	char *command = walloc(char,1024+tmpfile2.length()+aucommand.length());
 	sprintf(command,"FILE=\"%s\"; %s",(const char *)tmpfile2,
 		(const char *)aucommand);
-	system(command);
+	if (system(command) != EXIT_SUCCESS)
+		cerr << "Error running command: \"" << command << "\"" << endl;
 	unlink(tmpfile2);
     }
     else if (output_filename == "")

@@ -30,35 +30,66 @@
 /*  THIS SOFTWARE.                                                       */
 /*                                                                       */
 /*************************************************************************/
-/*                     Author :  Alan W Black                            */
-/*                     Date   :  April 1996                              */
+/*                     Author :  Sergio Oller                            */
+/*                     Date   :  December 2009                           */
 /*-----------------------------------------------------------------------*/
 /*                                                                       */
-/*                   Festival Private functions                          */
+/*                   Festival Path definitions                           */
 /*                                                                       */
 /*=======================================================================*/
-#ifndef __FESTIVALP_H__
-#define __FESTIVALP_H__
 
-/* Set up LISP access functions for various subsystems */
-void festival_utterance_init(void);
-void festival_wave_init(void);
-void festival_Phone_init(void);
-void festival_features_init(void);
-void festival_tcl_init(void);
-void festival_ngram_init();
-void festival_wfst_init();
-void festival_fringe_init(void);
-
-extern std::ostream *cslog; 
-
-LISP l_audio_mode(LISP mode);
-void audsp_play_wave(EST_Wave *w);
-EST_Wave *get_utt_wave(EST_Utterance *u);
-
-LISP lisp_parse_url(LISP url);
-
-#include "festivalPpath.h"
+#ifndef __FESTIVALPath_H__
+#define __FESTIVALPath_H__
 
 
-#endif /* __FESTIVALP_H__ */
+#define _S_S_S(S) #S
+#define STRINGIZE(S) _S_S_S(S)
+
+// Allow the path to be passed in without quotes because Windoze command line
+// is stupid
+// Extra level of indirection needed to get an extra macro expansion. Yeuch.
+
+#ifdef FTLIBDIRC
+#    define FTLIBDIR STRINGIZE(FTLIBDIRC)
+#endif
+#ifndef FTLIBDIR
+
+#define FTLIBDIR "/projects/festival/lib/"
+#endif
+
+#ifdef FTDATADIRC
+#    define FTDATADIR STRINGIZE(FTDATADIRC)
+#endif
+#ifndef FTDATADIR
+#define FTDATADIR "/projects/festival/share/"
+#endif
+
+#ifdef FTETCDIRC
+#    define FTETCDIR STRINGIZE(FTETCDIRC)
+#endif
+#ifndef FTETCDIR
+#define FTETCDIR "/projects/festival/etc/"
+#endif
+#ifdef FTEXAMPLESDIRC
+#    define FTEXAMPLESDIR STRINGIZE(FTEXAMPLESDIRC)
+#endif
+#ifndef FTEXAMPLESDIR
+#define FTEXAMPLESDIR "/projects/festival/examples/"
+#endif
+
+#ifdef FTDOCDIRC
+#    define FTDOCDIR STRINGIZE(FTDOCDIRC)
+#endif
+#ifndef FTDOCDIR
+#define FTDOCDIR "/projects/festival/doc/"
+#endif
+
+#ifdef FTOSTYPEC
+#    define FTOSTYPE STRINGIZE(FTOSTYPEC)
+#endif
+
+#ifndef FTOSTYPE
+#define FTOSTYPE ""
+#endif
+
+#endif /* __FESTIVALPath_H__ */

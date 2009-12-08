@@ -94,8 +94,8 @@ static void festival_main(int argc, char **argv)
 	"--datadir <string>\n"+
 	"              Set data directory pathname\n"+
 	"--libdir <string>\n"+
-        "              Set library directory pathname\n"+
-        "-b            Run in batch mode (no interaction)\n"+
+    "              Set library directory pathname\n"+
+    "-b            Run in batch mode (no interaction)\n"+
 	"--batch       Run in batch mode (no interaction)\n"+
 	"--tts         Synthesize text in files as speech\n"+
 	"              no files means read from stdin\n"+
@@ -114,7 +114,7 @@ static void festival_main(int argc, char **argv)
 	"--script <ifile>\n"+
         "              Used in #! scripts, runs in batch mode on\n"+
 	"              file and passes all other args to Scheme\n"+
-	"--heap <int> {1000000}\n"+
+	"--heap <int> {1500000}\n"+
         "              Set size of Lisp heap, should not normally need\n"+
         "              to be changed from its default\n"+
 	"-v            Display version number and exit\n"+
@@ -137,7 +137,7 @@ static void festival_main(int argc, char **argv)
 	festival_datadir = wstrdup(al.val("--datadir"));
     else if (getenv("FESTDATADIR") != 0)
 	festival_datadir = getenv("FESTDATADIR");
-
+	
     if (al.present("--heap"))
 	heap_size = al.ival("--heap");
 

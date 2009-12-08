@@ -57,7 +57,7 @@ using namespace std;
 struct ModuleDescription;
 
 /* An iostream for outputing debug messages, switchable    */
-/* to /dev/null or cerr                                    */
+/* to /dev/null (NUL in Windows) or cerr                   */
 extern std::ostream *cdebug;
 #define cwarn cout
 extern "C" FILE* stddebug;
@@ -139,6 +139,8 @@ void add_item_features(EST_Item *s,LISP features);
 extern const char *festival_libdir;
 extern const char *festival_datadir;
 extern const char *festival_etcdir;
+extern const char *festival_examplesdir;
+extern const char *festival_docdir;
 
 //  Module specific LISP/etc definitions
 void festival_init_modules(void);
@@ -163,6 +165,6 @@ LISP ft_get_param(const EST_String &pname);
 
 class UnitDatabase *get_c_unitdatabase(LISP x);
 
-#define FESTIVAL_HEAP_SIZE 1000000
+#define FESTIVAL_HEAP_SIZE 1500000
 
 #endif

@@ -121,5 +121,6 @@ FTDATADIR = $(FESTIVAL_HOME)/share
 FTETCDIR = $(FESTIVAL_HOME)/etc  
 #Examples directory:
 FTEXAMPLESDIR = $(FESTIVAL_HOME)/examples  
-
+#Documentation directory:
+FTDOCDIR = $(FESTIVAL_HOME)/doc  
 

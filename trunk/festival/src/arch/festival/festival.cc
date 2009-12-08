@@ -46,6 +46,12 @@
 #include "siod.h"
 #include "ModuleDescription.h"
 
+#ifdef _WIN32
+#define FTDEVNULL "nul"
+#else
+#define FTDEVNULL "/dev/null"
+#endif
+
 using namespace std;
 
 void festival_lisp_funcs(void);
@@ -55,11 +61,12 @@ void festival_load_default_files(void);
 
 
 const char *festival_version =  STRINGIZE(FTVERSION) ":" STRINGIZE(FTSTATE) " " STRINGIZE(FTDATE);
-
 const char *festival_libdir = FTLIBDIR;
 const char *festival_datadir = FTDATADIR;
 const char *festival_etcdir = FTETCDIR;
 const char *festival_examplesdir = FTEXAMPLESDIR;
+const char *festival_docdir = FTDOCDIR;
+
 
 ostream *cdebug;
 static int festival_server_port = 1314;
@@ -75,6 +82,7 @@ static int festival_initialized = 0;
 void festival_initialize(int load_init_files,int heap_size)
 {
     // all initialisation
+    
 
     if (! festival_initialized )
     {
@@ -83,8 +91,8 @@ void festival_initialize(int load_init_files,int heap_size)
 	siod_fringe_init();		// and for talking to fringe.
 	
 	siod_prog_name = "festival";
-	cdebug = new ofstream("/dev/null");  // This wont work on Win/NT
-	stddebug = fopen("/dev/null","w");
+	cdebug = new ofstream(FTDEVNULL);  
+	stddebug = fopen(FTDEVNULL,"w");
 	
 	festival_lisp_vars();
 	festival_lisp_funcs();
@@ -265,9 +273,9 @@ static LISP lisp_debug_output(LISP arg)
 	fclose(stddebug);
 
     if (arg == NIL)
-    {   // this might be a problem on non-Unix machines
-	cdebug = new ofstream("/dev/null");
-	stddebug = fopen("/dev/null","w");
+    {   
+	cdebug = new ofstream(FTDEVNULL);
+	stddebug = fopen(FTDEVNULL,"w");
     }
     else
     {
@@ -304,6 +312,7 @@ void festival_lisp_vars(void)
     siod_set_lval("datadir",strintern(festival_datadir));
     siod_set_lval("etcdir",strintern(festival_etcdir));
     siod_set_lval("examplesdir",strintern(festival_examplesdir));
+    siod_set_lval("docdir",strintern(festival_docdir));
     if (!streq(FTOSTYPE,""))
 	siod_set_lval("*ostype*",cintern(FTOSTYPE));
     siod_set_lval("festival_version",
