@@ -537,7 +537,7 @@ Add trajectory to daughters of state, interpolating as necessary."
 
     (set! t_start (item.feat (car mceps) "frame_number"))
     (set! t_frames (length mceps))
-    (set! m (/ s_frames t_frames))
+    (set! m (/ (- s_frames 1) t_frames))
     (set! f 0)
 
     (while (< i t_frames)
