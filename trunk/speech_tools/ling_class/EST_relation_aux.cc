@@ -113,7 +113,8 @@ int edit_labels(EST_Relation &a, EST_String sedfile)
     strcat(command, file2);
 
     printf("command: %s\n", command);
-    system(command);
+    if (system(command)!=0)
+		fprintf(stderr,"It seems that an error occurred executing last command");
 
     fp = fopen(file2, "rb");
     if (fp == NULL)
@@ -124,7 +125,8 @@ int edit_labels(EST_Relation &a, EST_String sedfile)
     }
     for (a_ptr = a.head(); a_ptr != 0; a_ptr = next(a_ptr))
     {
-	fscanf(fp, "%s", newname);
+	if (fscanf(fp, "%s", newname) == 0)
+		fprintf(stderr,"Cannot read from %s", (const char*) file2);
 //	cout << "oldname: " << a_ptr->name() << " newname: " << newname << endl;
 	a_ptr->set_name(newname);
     }
