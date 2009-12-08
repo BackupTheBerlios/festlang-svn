@@ -42,7 +42,9 @@
 #include <cstring>
 #include <cstdlib>
 #include <cctype>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #include <sstream>
 #include <sys/stat.h>
 #include "EST_Wave.h"

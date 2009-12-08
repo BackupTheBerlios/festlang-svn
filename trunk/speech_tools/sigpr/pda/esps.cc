@@ -113,6 +113,11 @@
 
 #define BIGSORD 100
 
+/* PI definition */
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 typedef struct cross_rec { /* for storing the crosscorrelation information */
 	float	rms;	/* rms energy in the reference window */
 	float	maxval;	/* max in the crosscorr. fun. q15 */
