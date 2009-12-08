@@ -4,8 +4,8 @@
 (defvar sp_threshold 0.060) ; was 0.050 for utts 5, was 0.02 for 5b
 (defvar sp_closure_threshold 0.100)
 
-(defvar multisyn_lib_dir (path-append libdir "multisyn/"))
-(if (not (member_string multisyn_lib_dir libdir))
+(defvar multisyn_lib_dir (path-append datadir "multisyn/"))
+(if (not (member_string multisyn_lib_dir datadir))
     (set! load-path (cons multisyn_lib_dir load-path)))
 (set! load-path (cons "festvox/" load-path))
 

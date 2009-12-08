@@ -39,7 +39,7 @@
 ;;; load the initfiles: init.scm and user's .festivalrc
 (if (not (symbol-bound? 'caar))
     (begin
-      (load (path-append libdir "init.scm"))
+      (load (path-append datadir "init.scm"))
       (if (probe_file (format nil "%s/.festivalrc" (getenv "HOME")))
 	  (load (format nil "%s/.festivalrc" (getenv "HOME"))))))
 

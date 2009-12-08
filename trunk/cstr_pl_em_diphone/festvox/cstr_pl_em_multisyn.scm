@@ -14,10 +14,10 @@
 ;;;  Add the directory contains general voice stuff to load-path
 (set! load-path (cons (path-append pl_multisyn_dir "festvox/") load-path))
 
-(defvar multisyn_lib_dir (path-append libdir "multisyn/"))
+(defvar multisyn_lib_dir (path-append datadir "multisyn/"))
 
 ;; These may or may not be already loaded.
-(if (not (member_string multisyn_lib_dir libdir))
+(if (not (member_string multisyn_lib_dir datadir))
     (set! load-path (cons multisyn_lib_dir load-path)))
 
 ;; REQUIRES
