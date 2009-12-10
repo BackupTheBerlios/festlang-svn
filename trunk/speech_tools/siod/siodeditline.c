@@ -164,8 +164,11 @@ void siod_el_init(void)
 {
     /* Various initialization completion, history etc */
     char *home;
-
+    #ifdef _WIN32
+	home = getenv("APPDATA");
+	#else
     home = getenv("HOME");
+	#endif
     if (home==NULL)
       home="";
     full_history_file = 
