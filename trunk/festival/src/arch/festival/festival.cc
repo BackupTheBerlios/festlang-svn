@@ -50,11 +50,10 @@
 #ifdef _WIN32
 //Handle /dev/null  in Windows
 #define FTDEVNULL "nul"
-#else
-#define FTDEVNULL "/dev/null"
-
 #include <cstring> //Some path manipulation
 #include "windows.h" //MAX_PATH and GetModuleFileName
+#else
+#define FTDEVNULL "/dev/null"
 #endif
 
 using namespace std;

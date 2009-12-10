@@ -108,7 +108,7 @@
 	      (durmeanstd_error "no file of utts names file specified"))
           (set! files 
                 (append
-                 (load (car (cdr o)) t) files))
+                 (reverse (load (car (cdr o)) t)) files))
 	  (set! o (cdr o)))
 	 ((string-equal "-eval" (car o))
 	  (if (not (cdr o))

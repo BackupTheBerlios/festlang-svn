@@ -233,6 +233,13 @@ static void find_unit_distances(LISP units, const EST_String &fname)
 	{
 	    EST_Item *si = get_c_item(car(u));
 	    EST_Track *a=acost_get_coefficients(si);
+            if (a->num_channels() != weights.length())
+            {
+                cerr << "ACOST: number of weights " <<
+                    weights.length() << " does not match mcep param width "
+                     << a->num_channels() << endl;
+                festival_error();
+            }
 	    cumulate_ss_frames(a,ss_frames);
 	}
     }

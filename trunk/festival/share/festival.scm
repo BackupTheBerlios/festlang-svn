@@ -629,5 +629,8 @@ Compile all the scheme files in the library directory."
      "mrpa_durs.scm" "klatt_durs.scm" "gswdurtreeZ.scm"
      "tobi.scm" "f2bf0lr.scm"))
   t)
+;;; For mlsa resynthesizer
+(defvar mlsa_alpha_param 0.42)
+(defvar mlsa_beta_param 0.0)
 
 (provide 'festival)

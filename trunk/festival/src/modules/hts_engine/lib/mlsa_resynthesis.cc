@@ -106,6 +106,8 @@ LISP mlsa_resynthesis(LISP ltrack)
     int sr = 16000;
     int i,j;
     double shift;
+    double ALPHA = 0.42;
+    double BETA = 0.0;
 
     if ((ltrack == NULL) ||
         (TYPEP(ltrack,tc_string) &&
@@ -129,7 +131,12 @@ LISP mlsa_resynthesis(LISP ltrack)
     else
         shift = 5.0;
 
-    w = synthesis_body(mcep,f0v,NULL,sr,shift);
+    ALPHA = FLONM(siod_get_lval("mlsa_alpha_param",
+                                  "mlsa: mlsa_alpha_param not set"));
+    BETA = FLONM(siod_get_lval("mlsa_beta_param",
+                                 "mlsa: mlsa_beta_param not set"));
+
+    w = synthesis_body(mcep,f0v,NULL,sr,shift,ALPHA,BETA);
 
     wave = new EST_Wave(w->length,1,sr);
     
@@ -148,7 +155,9 @@ DVECTOR synthesis_body(DMATRIX mcep,	// input mel-cep sequence
 		       DVECTOR f0v,	// input F0 sequence
 		       DVECTOR dpow,	// input diff-pow sequence
 		       double fs,	// sampling frequency (Hz)
-		       double framem)	// FFT length
+		       double framem,	// FFT length
+                       double alpha,
+                       double beta)
 {
     long t, pos;
     int framel;
@@ -166,11 +175,11 @@ DVECTOR synthesis_body(DMATRIX mcep,	// input mel-cep sequence
 	if (t >= f0v->length) f0 = 0.0;
 	else f0 = f0v->data[t];
 	if (dpow == NODATA)
-	    vocoder(f0, mcep->data[t], mcep->col - 1, ALPHA, 0.0, &vs,
+	    vocoder(f0, mcep->data[t], mcep->col - 1, alpha, beta, &vs,
 		    xd->data, &pos);
 	else
-	    vocoder(f0, mcep->data[t], dpow->data[t], mcep->col - 1, ALPHA,
-		    0.0, &vs, xd->data, &pos);
+	    vocoder(f0, mcep->data[t], dpow->data[t], mcep->col - 1, alpha,
+		    beta, &vs, xd->data, &pos);
     }
     syn = xdvcut(xd, 0, pos);
 

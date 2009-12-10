@@ -47,8 +47,6 @@
 #ifndef __MLSA_RESYNTHESIS_H
 #define __MLSA_RESYNTHESIS_H
 
-#define ALPHA 0.42
-
 typedef struct DVECTOR_STRUCT {
     long length;
     double *data;
@@ -73,7 +71,8 @@ typedef struct DMATRIX_STRUCT {
 
 
 DVECTOR synthesis_body(DMATRIX mcep, DVECTOR f0v, DVECTOR dpow,
-                       double fs, double framem);
+                       double fs, double framem,
+                       double alpha, double beta);
 
 
 #define RANDMAX 32767 
