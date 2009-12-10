@@ -382,7 +382,7 @@ WImpurity::WImpurity(const WVectorVector &ds)
     {
 	if (wgn_count_field == -1)
 	    cumulate((*(ds(i)))[wgn_predictee],1);
-	else
+    else
 	    cumulate((*(ds(i)))[wgn_predictee],
 		     (*(ds(i)))[wgn_count_field]);
     }
