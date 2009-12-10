@@ -42,7 +42,12 @@
 #include <cstdlib>
 #include "festival.h"
 #include "festivalP.h"
+#include "festivalPpath.h"
 
+#ifdef _WIN32
+#include "windows.h" //MAX_PATH
+#include <cstring> //Some path manipulation
+#endif
 using std::cerr;
 using std::endl;
 
@@ -101,9 +106,16 @@ LISP l_audio_mode(LISP mode)
     // Switch audio mode
     LISP audio=NIL;
     LISP command=NIL;
+	
+    #ifndef _WIN32
 	#define AUDSP_BINNAME "/audsp"
-    const char * audsp_path = FTLIBDIR AUDSP_BINNAME;
-    
+	const char * audsp_path = FTLIBDIR AUDSP_BINNAME;
+    #else
+	const char audsp_path[MAX_PATH];
+	strncpy(audsp_path,festival_libdir, MAX_PATH-strlen("\\audsp"));
+	strcpy(festival_libdir+strlen(strExePath), '\\audsp');
+	#endif
+	
     if (mode == NIL)
     {
 	cerr << "audio_mode: nil is not a valid mode\n";

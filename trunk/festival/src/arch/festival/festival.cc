@@ -43,13 +43,18 @@
 #include <cstdlib>
 #include "festival.h"
 #include "festivalP.h"
+#include "festivalPpath.h"
 #include "siod.h"
 #include "ModuleDescription.h"
 
 #ifdef _WIN32
+//Handle /dev/null  in Windows
 #define FTDEVNULL "nul"
 #else
 #define FTDEVNULL "/dev/null"
+
+#include <cstring> //Some path manipulation
+#include "windows.h" //MAX_PATH and GetModuleFileName
 #endif
 
 using namespace std;
@@ -61,12 +66,26 @@ void festival_load_default_files(void);
 
 
 const char *festival_version =  STRINGIZE(FTVERSION) ":" STRINGIZE(FTSTATE) " " STRINGIZE(FTDATE);
+
+#ifndef _WIN32
 const char *festival_libdir = FTLIBDIR;
 const char *festival_datadir = FTDATADIR;
 const char *festival_etcdir = FTETCDIR;
 const char *festival_examplesdir = FTEXAMPLESDIR;
 const char *festival_docdir = FTDOCDIR;
-
+#else
+char festival_currentlibdir[MAX_PATH];
+char festival_currentdatadir[MAX_PATH];
+char festival_currentetcdir[MAX_PATH];
+char festival_currentexamplesdir[MAX_PATH];
+char festival_currentdocdir[MAX_PATH];
+char strExePath [MAX_PATH];
+const char *festival_libdir = festival_currentlibdir;
+const char *festival_datadir = festival_currentdatadir;
+const char *festival_etcdir = festival_currentetcdir;
+const char *festival_examplesdir = festival_currentexamplesdir;
+const char *festival_docdir = festival_currentdocdir;
+#endif
 
 ostream *cdebug;
 static int festival_server_port = 1314;
@@ -83,7 +102,23 @@ void festival_initialize(int load_init_files,int heap_size)
 {
     // all initialisation
     
-
+	#ifdef _WIN32
+    //In windows, we determine current festival.exe path: FIXME: For now, avoid special chars, multibyte chars are not implemented.
+	//It should be done in a nicer way.
+	GetModuleFileName (NULL, strExePath, MAX_PATH);
+	*(strrchr(strExePath,'\\')+sizeof(char)) = '\0'; //strExePath has the path to the exe.
+	strncpy(festival_currentlibdir, strExePath, MAX_PATH-strlen("examples"));
+	strcpy(festival_currentlibdir+strlen(strExePath), "lib");
+	strncpy(festival_currentdatadir, strExePath, MAX_PATH-strlen("examples"));
+	strcpy(festival_currentdatadir+strlen(strExePath), "share");
+	strncpy(festival_currentdocdir, strExePath, MAX_PATH-strlen("examples"));
+	strcpy(festival_currentdocdir+strlen(strExePath), "doc");
+	strncpy(festival_currentexamplesdir, strExePath, MAX_PATH-strlen("examples"));
+	strcpy(festival_currentexamplesdir+strlen(strExePath), "examples");
+	strncpy(festival_currentetcdir, strExePath, MAX_PATH-strlen("examples"));
+	strcpy(festival_currentetcdir+strlen(strExePath), "etc");
+    #endif
+	
     if (! festival_initialized )
     {
 	siod_init(heap_size);

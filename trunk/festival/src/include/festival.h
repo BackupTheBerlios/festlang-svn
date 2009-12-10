@@ -142,6 +142,16 @@ extern const char *festival_etcdir;
 extern const char *festival_examplesdir;
 extern const char *festival_docdir;
 
+#ifdef _WIN32
+extern char festival_currentlibdir[MAX_PATH];
+extern char festival_currentdatadir[MAX_PATH];
+extern char festival_currentetcdir[MAX_PATH];
+extern char festival_currentexamplesdir[MAX_PATH];
+extern char festival_currentdocdir[MAX_PATH];
+extern char strExePath [MAX_PATH];
+#endif
+
+
 //  Module specific LISP/etc definitions
 void festival_init_modules(void);
 
