@@ -1,6 +1,6 @@
 
               The Festival Speech Synthesis System
-                  version 2.0 RELEASE August 2006
+                  version 2.0 RELEASE July 2004
  
 This directory contains the Festival Speech Synthesis System,
 developed at CSTR, University of Edinburgh. The project was originally
@@ -48,8 +48,7 @@ or the US site
    http://festvox.org/festival/
 
 New in Festival 2.0
-   Three new synthesis engines.
-     Clustergen - statistical parametric synthesis
+   Two new synthesis engines.
      Multisyn - a general purpose unit selection engine.
      HTS - a compact HMM-based engine
    Various new gcc's support

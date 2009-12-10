@@ -105,7 +105,7 @@
   (format ofd "-%s" (if (string-equal "0" (item.feat s "name"))
 			"x" (item.feat s "name")))
 ;  n.name
-  (format ofd "+%s" (if (string-equal "0" (item.feat s "n.name"))
+  (format ofd "=%s" (if (string-equal "0" (item.feat s "n.name"))
 			"x" (item.feat s "n.name")))
 ;  nn.name
   (format ofd "=%s" (if (string-equal "0" (item.feat s "n.n.name"))
