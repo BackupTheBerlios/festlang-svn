@@ -505,6 +505,9 @@ Getting Help
 Doing stuff
   (SayText TEXT)      Synthesize text, text should be surrounded by
                       double quotes
+  (SaveWave TEXT WAVFILE)
+                      Synthesize text, text should be surrounded by
+                      double quotes and saves it as a wav file.
   (tts FILENAME nil)  Say contexts of file, FILENAME should be 
                       surrounded by double quotes
   (voice_rab_diphone) Select voice (Britsh Male)

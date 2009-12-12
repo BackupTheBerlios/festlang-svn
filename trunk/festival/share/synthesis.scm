@@ -403,6 +403,13 @@ FP_duration and fixed monotone duration (FP_F0) are used to generate
 prosody."
    (utt.play (utt.synth (eval (list 'Utterance 'Phones phones)))))
 
+(define (SaveWave text wavfile)
+"(SaveWave TEXT WAVFILE)
+TEXT, a string syrrounded by \"\", is rendered as speech.
+WAVFILE is the wav file name.
+This command synthesizes the text given and stores the result as a wav file."
+    (utt.save.wave (utt.synth (eval (list 'Utterance 'Text text))) wavfile))
+
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  ;;                                                                       ;;
  ;; This is the standard synthesis function.  The Wave Synthesis may be   ;;
