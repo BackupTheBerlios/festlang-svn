@@ -488,20 +488,18 @@ static double find_b_prob(EST_VTPath *p,int n,int *state)
 
 static double find_b_faprob(EST_VTPath *p,int n,int *state)
 {
-    int oldstate=0;
+    int oldstate;
     int i,j;
     EST_VTPath *d;
     double prob;
-    double atime, wtime, wstddev=0, z;
+    double atime, wtime, wstddev=0, z=0;
     static int ATOTH_BREAK=2;
     static int ATOTH_NBREAK=1;
 
     if (p == 0)
-    {
-	oldstate = 0;
-    }
+    	{ oldstate = 0; }
     else
-	oldstate = p->state;
+    	{ oldstate = p->state; }
 
 /*    if (streq("of",
 	      ( p && p->c && p->c->s ? (const char *)ffeature(p->c->s,"name").String() : "null")))

@@ -508,10 +508,10 @@ int DiphoneVoiceModule::getCandidateList( const EST_Item& target,
 { 
   int nfound = 0;
   const EST_Item *target_ph1 = item(target.f("ph1"));
-
   int found = 0;
   const ItemList *candidateItemList = catalogue->val( target.S("name"), found );
-  if( found != 0 ){
+  
+  if( found != 0 ) {
     nfound = candidateItemList->length();
     
     ItemList::Entries it = ItemList::Entries(*candidateItemList);
