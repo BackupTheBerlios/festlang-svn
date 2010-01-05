@@ -79,12 +79,12 @@
 (cond
  ((member 'nas *modules*)
   (Parameter.def 'Audio_Method 'netaudio))
- ((member 'esd *modules*)
-  (Parameter.def 'Audio_Method 'esdaudio))
  ((member 'sun16audio *modules*)
   (Parameter.def 'Audio_Method 'sun16audio))
  ((member 'freebsd16audio *modules*)
   (Parameter.def 'Audio_Method 'freebsd16audio))
+ ((member 'pulseaudio *modules*)
+  (Parameter.def 'Audio_Method 'pulseaudio))
  ((member 'linux16audio *modules*)
   (Parameter.def 'Audio_Method 'linux16audio))
  ((member 'irixaudio *modules*)
@@ -97,6 +97,8 @@
   (Parameter.def 'Audio_Method 'os2audio))
  ((member 'mplayeraudio *modules*)
   (Parameter.def 'Audio_Method 'mplayeraudio))
+ ((member 'esd *modules*)
+  (Parameter.def 'Audio_Method 'esdaudio))
  (t  ;; can't find direct support so guess that /dev/audio for 8k ulaw exists
   (Parameter.def 'Audio_Method 'sunaudio)))
 ;;;  If you have an external program to play audio add its definition
@@ -127,7 +129,7 @@
 (require 'postlex)
 
 ;;; Different voices
-(require 'voices)  ;; sets voice_default
+(require 'voices) 
 (require 'languages)
 
 ;;; Some higher level functions
@@ -149,7 +151,10 @@
     (load (path-append home-directory ".festivalrc")))
 
 ;;; Default voice (have to do something cute so autoloads still work)
+(if (eq? voice_default 'no_voice_error)
+    (eval (language.select language_default)) ; sets voice_default if has not been set in personal customizations
 (eval (list voice_default))
+)
 
 (provide 'init)
 

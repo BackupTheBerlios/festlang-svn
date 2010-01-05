@@ -31,7 +31,7 @@
 ;;;                                                                       ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
-;;; Preapre to access voices. Searches down a path of places.
+;;; Prepare to access voices. Searches down a path of places.
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -253,10 +253,27 @@ voice.describe."
 	 (set! voice (path-basename voicedir))
 	 (if (string-matches voicedir ".*\\..*")
 	     nil
-	     (voice-location 
-	      voice 
-	      (path-as-directory (path-append dir language voicedir))
-	      "voice found on path")
+             (begin
+	       ;; Do the voice proclamation: load the voice definition file.
+	       (set! voice-def-file (load (path-append dir language voicedir "festvox" 
+						       (string-append voicedir ".scm")) t))
+	       ;; now find the "proclaim_voice" lines and register these voices.
+	       (mapcar
+		(lambda (line)
+		  (if (string-matches (car line) "proclaim_voice")
+                    (begin
+		      (voice-location (intern (cadr (cadr line))) (path-as-directory (path-append dir language voicedir)) "registered voice")
+                      (eval line)
+                    )
+                  )
+                )
+		voice-def-file)
+             	
+;;	     (voice-location 
+;;	      voice 
+;;	      (path-as-directory (path-append dir language voicedir))
+;;	      "voice found on path")
+             )
 	     )
 	 (set! voices (cdr voices))
 	 )
@@ -297,7 +314,12 @@ voice.describe."
 	       (mapcar
 		(lambda (line)
 		  (if (string-matches (car line) "proclaim_voice")
-		      (voice-location-multisyn (intern (cadr (cadr line)))  voicedir (path-append dir language voicedir) "registerd multisyn voice")))
+                    (begin
+		      (voice-location-multisyn (intern (cadr (cadr line)))  voicedir (path-append dir language voicedir) "registerd multisyn voice")
+                      (eval line)
+                    )
+                  )
+                )
 		voice-def-file)
 	     ))
 	 (set! voices (cdr voices)))
@@ -337,16 +359,57 @@ the default voice. [see Site initialization]")
   "default-voice-priority-list
    List of voice names. The first of them available becomes the default voice.")
 
-(let ((voices default-voice-priority-list)
-      voice)
-  (while (and voices (eq voice_default 'no_voice_error))
+(define (set_voice_default voices)
+ "set_voice_default VOICES sets as voice_default the first voice available from VOICES list"
+  (let ( (finish nil)
+         (voice nil)
+       )
+       (while (and voices (not finish))
 	 (set! voice (car voices))
 	 (if (assoc voice voice-locations)
+            (begin 
 	     (set! voice_default (intern (string-append "voice_" voice)))
+               (set! finish t)
+            )
 	     )
 	 (set! voices (cdr voices))
 	 )
+       (if (eq finish nil)
+         (begin 
+            (print "Could not find any of these voices")
+            (print voices)
+         )
+       )
+  finish
+  )
   )
 
+(define (voice.find parameters)
+"(voice.find PARAMETERS)
+List of the (potential) voices in the system that match the PARAMETERS described
+in the proclaim_voice description fields"
+  (let ((voices (eval (list voice.list)))
+        (validvoices nil)
+        (voice nil)
+       )
+       (while parameters
 
+             (while voices
+               (set! voice (car voices))
+               (if (equal? (list (cadr (assoc (caar parameters) (cadr (assoc voice Voice_descriptions))))) (cdar parameters))
+                  (begin
+                     (set! validvoices (append (list voice) validvoices))
+                  )
+               )
+               (set! voices (cdr voices))
+             )
+       (set! voices validvoices)
+       (set! validvoices nil)
+       (set! parameters (cdr parameters))
+       )
+voices
+  )
+)
+
+(set_voice_default  default-voice-priority-list)
 (provide 'voices)

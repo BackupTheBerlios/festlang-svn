@@ -97,7 +97,7 @@ use "-" to make input and output files stdin/out
 -pc <string>  Combine given tracks in parallel.  If option 
      is longest, pad shorter tracks to longest, else if 
      first pad/cut to match first input track 
-AvailablE track file formats:
+Available track file formats:
         none         unknown track file type
         esps         entropic sps file
         est          Edinburgh Speech Tools track file

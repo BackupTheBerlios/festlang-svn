@@ -79,6 +79,9 @@ OPTIMISE_sigpr = 3
 ## NCD's network audio system, This is recommended.
 # INCLUDE_MODULES += NAS_AUDIO
 
+## PulseAudio sound server
+# INCLUDE_MODULES += PULSE_AUDIO
+
 ## Elightenment Sound Demon, for KDE etc.
 # INCLUDE_MODULES += ESD_AUDIO
 

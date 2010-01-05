@@ -45,7 +45,7 @@
   (if (probe_file (path-append datadir "dicts"))
       (path-append datadir "dicts/")
       ;; else we'll guess we're in the CSTR filespace
-      (path-as-directory "/projects/festival/lib/dicts/"))
+      (path-as-directory "/usr/share/festival/dicts/"))
   "lexdir
   The directory where the lexicon(s) are, by default.")
 
