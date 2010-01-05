@@ -35,7 +35,7 @@
 #                                                                         #
 ###########################################################################
 TOP=../..
-DIRNAME=lib/multisyn
+DIRNAME=share/multisyn
 
 PHONESETS = radio_phones_multisyn.scm
 GENERAL =  multisyn.scm multisyn_pauses.scm target_cost.scm 

@@ -497,7 +497,9 @@ static double find_b_faprob(EST_VTPath *p,int n,int *state)
     static int ATOTH_NBREAK=1;
 
     if (p == 0)
-    	{ oldstate = 0; }
+    {
+	oldstate = 0;
+    }
     else
     	{ oldstate = p->state; }
 

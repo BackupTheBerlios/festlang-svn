@@ -255,7 +255,7 @@ DiphoneVoiceModule::~DiphoneVoiceModule()
 
 void DiphoneVoiceModule::addToCatalogue( const EST_Utterance *utt, int *num_ignored, bool ignore_bad )
 {
-  EST_Item *item;
+  EST_Item *item, *next_item;
   ItemList *diphoneList;
   const EST_String *ph1, *ph2;
   int found=0;
@@ -268,18 +268,30 @@ void DiphoneVoiceModule::addToCatalogue( const EST_Utterance *utt, int *num_igno
     
     while( (item=item->prev()) != 0 ){
 
+      next_item = item->next();
+
+      // You'd think we need to check both item->f_present(bad_str) and 
+      // next_item->f_present(bad_str) like this:
+      //if((item->f_present(bad_str) || next_item->f_present(bad_str)) && ignore_bad == true){
+      // But experiment showed that then each time one diphone too many would be
+      // ignored.  This was partly compensated by a bug pesent up to r1.14     
+      // (a iteration within "if(item=item->prev()!=0)" just before the "continue")
+      // which caused the leftmost bad phone in a row of bad phones NOT to be ignored
+      // when the length of the row was even (or when it was odd and ended in the 
+      // utterance-final phone, which is never checked for badness).
       if( item->f_present( bad_str ) && ignore_bad == true ){
 
 	(*num_ignored)++;
 
-// 	EST_warning( "Ignoring phone \"%s\" (%s, %fs, bad flag \"%s\")", 
-// 		     item->S("name").str(), 
-// 		     utt->f.S("fileid").str(), 
-// 		     item->F("end"),
-// 		     item->S("bad").str() );
+ 	EST_warning( "Ignoring diphone \"%s_%s\" (LEFT %s in %s at %fs, bad flag \"%s\")", 
+ 		     item->S("name").str(), 
+ 		     next_item->S("name").str(), 
+ 		     item->S("name").str(), 
+ 		     utt->f.S("fileid").str(), 
+ 		     item->F("end"),
+ 		     item->S("bad").str() );
 	
-	if( (item=item->prev()) != 0 ){ //skip 2 diphones with this bad phone
-	  ph2 = &(item->features().val("name").String());
+	if(item->prev() != 0){
 	  continue;
 	}
 	else 
@@ -287,6 +299,13 @@ void DiphoneVoiceModule::addToCatalogue( const EST_Utterance *utt, int *num_igno
       }
       
       ph1 = &(item->features().val("name").String());
+
+//    EST_warning( "Adding phone \"%s\" (%s, %f) to diphoneList %s_%s",
+// 		     item->S("name").str(), 
+// 		     utt->f.S("fileid").str(), 
+// 		     item->F("end"),
+//                item->S("name").str(),
+//                next_item->S("name").str());
       
       diphoneList = catalogue->val(EST_String::cat(*ph1,"_",*ph2), found);
       
@@ -508,6 +527,7 @@ int DiphoneVoiceModule::getCandidateList( const EST_Item& target,
 { 
   int nfound = 0;
   const EST_Item *target_ph1 = item(target.f("ph1"));
+
   int found = 0;
   const ItemList *candidateItemList = catalogue->val( target.S("name"), found );
   

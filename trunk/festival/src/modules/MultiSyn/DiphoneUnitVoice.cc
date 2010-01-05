@@ -498,9 +498,9 @@ void DiphoneUnitVoice::getUnitSequence( EST_Utterance  *utt )
 
 	  cout << "Missing diphone: "<< diphone_name << endl;
 
-	  if((s1 = parent(it,"SylStructure")) == NULL)
+	  if((s1 = parent(it,"SylStructure")) != NULL)
 	    w1= parent(s1,"SylStructure");
-	  if((s2 = parent(it->next(),"SylStructure")) == NULL)
+	  if((s2 = parent(it->next(),"SylStructure")) != NULL)
 	    w2= parent(s2,"SylStructure");
 
 	  if( w1 && w2 && (w1 != w2) )
@@ -557,6 +557,7 @@ void DiphoneUnitVoice::getUnitSequence( EST_Utterance  *utt )
       
       if( !this->unitAvailable( diphone_name ) ){
 	missing_diphones.append( diphone_name );
+	if(units->tail())
 	units->tail()->set( "extendRight", 1 );
 	extendLeftFlag = true; // trigger for next unit to make up second half of missing diphone
       }
