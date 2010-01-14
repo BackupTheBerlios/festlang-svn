@@ -45,10 +45,11 @@ Set up language parameters for Catalan."
   (set! male1   (lambda () (voice_upc_ca_pau_hts)))
   (Param.set 'Language 'catalan)
 
-;; We would like to have as default voice: upc_ca_ona_hts or upc_ca_pau_hts
-;; If neither of them are installed, any catalan voice is fine.
-  (set_voice_default (append (list 'upc_ca_ona_hts) (list 'upc_ca_pau_hts) 
-                             (voice.find (list (list 'language 'catalan)))))
+  (if (boundp 'catalan-default-voices) ;if is defined 'catalan-default-voices
+      nil
+      (set! catalan-default-voices (append (list 'upc_ca_ona_hts) (list 'upc_ca_pau_hts)))
+  )
+  (set_voice_default  (append catalan-default-voices (voice.find (list (list 'language 'catalan)))))
   (eval (list voice_default))
 )
 

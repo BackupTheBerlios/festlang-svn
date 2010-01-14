@@ -516,6 +516,8 @@ LISP HTS_Synthesize_Utt(LISP utt)
 		fclose(durfp);
 	if (tracefp != NULL)
 		fclose(tracefp);
+	if (labfp != NULL)
+		fclose(labfp);
 
 	if (u->relation("Segment")->first())  /* only if there segments */
 		w->load_file(get_param_str("-or",hts_output_params,"tmp.raw"),

@@ -36,7 +36,7 @@
 ##                                                                       ##
 ###########################################################################
 TOP=../..
-DIRNAME=lib/etc
+DIRNAME=share/etc
 
 FILTERS=email_filter
 FILES=Makefile $(FILTERS)
