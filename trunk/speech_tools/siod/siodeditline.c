@@ -165,7 +165,7 @@ void siod_el_init(void)
     /* Various initialization completion, history etc */
     char *home;
     #ifdef _WIN32
-	home = getenv("APPDATA");
+	home = getenv("APPDATA"); //FIXME: There is a better way to do this.
 	#else
     home = getenv("HOME");
 	#endif

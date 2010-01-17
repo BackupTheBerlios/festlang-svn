@@ -55,7 +55,7 @@ static LISP lchdir(LISP args, LISP env)
     
     if (siod_llength(args) == 0)
     {
-	directory = getenv("HOME");
+	directory = getenv("HOME"); //FIXME: This could be improved (system dependent)
 	if (chdir(directory)!=0)
 		cerr << "Error changing directory to \"" << 
 			directory << "\"." << endl;
