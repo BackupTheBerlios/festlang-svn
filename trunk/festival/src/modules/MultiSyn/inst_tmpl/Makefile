@@ -40,7 +40,7 @@
 TOP=../../../..
 DIRNAME=src/modules/MultiSyn/inst_tmpl
 
-LOCAL_INCLUDES = -I$(TOP)/src/modules/MultiSyn
+LOCAL_INCLUDES = -I$(TOP)/src/modules/MultiSyn -I$(EST)/base_class
 
 TSRCS = hash_s_itemlistp_t.cc \
 	hash_itemp_tcdatap_t.cc \

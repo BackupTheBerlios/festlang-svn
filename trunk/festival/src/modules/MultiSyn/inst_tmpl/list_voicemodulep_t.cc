@@ -50,8 +50,8 @@ Declare_TList_T(DiphoneVoiceModule *, DiphoneVoiceModuleP)
 
 #if defined(INSTANTIATE_TEMPLATES)
 
-#include "../base_class/EST_TList.cc"
-#include "../base_class/EST_TSortable.cc"
+#include "EST_TList.cc"
+#include "EST_TSortable.cc"
 
 Instantiate_TList_T_MIN(DiphoneVoiceModule *, DiphoneVoiceModuleP)
 
