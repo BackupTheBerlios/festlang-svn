@@ -102,7 +102,7 @@ void festival_initialize(int load_init_files,int heap_size)
     // all initialisation
     
 	#ifdef _WIN32
-    //In windows, we determine current festival.exe path: FIXME: For now, avoid special chars, multibyte chars are not implemented.
+    //In windows, we determine current festival.exe path
 	//It should be done in a nicer way.
 	GetModuleFileName (NULL, strExePath, MAX_PATH);
 	*(strrchr(strExePath,'\\')+sizeof(char)) = '\0'; //strExePath has the path to the exe.
@@ -397,21 +397,22 @@ LISP l_lr_predict(LISP si, LISP lr_model);
 void festival_unitdb_init(void);
 LISP Gen_Viterbi(LISP utt);
 
-int is_utf8 (const unsigned char *xxx)
+LISP is_utf8 (LISP name)
 {
-    /* returns 1 if utf8 is valid, 0 otherwise */
+    /* returns t if utf8 is valid, nil otherwise */
+   const unsigned char *xxx = (const unsigned char *)get_c_string(name);
     int i=0, l;
 
     for (i=0; xxx[i]; i++)
     {
 		if (xxx[i] < 0x80) /* one byte character */
 			continue;
-		else if (xxx[i] < 0xc2) /* this can only exist as part of a multibyte */
-			return 0;
+		else if (xxx[i] < 0xc2) /* this bytes can't exist on its own*/
+			return NIL;
 		else if (xxx[i] < 0xe0) /* two bytes character */
 		{
 			if ((xxx[i+1] < 0x80) || (xxx[i+1] >= 0xc0)) /* second byte invalid */
-			   return 0;
+			   return NIL;
 			else
 			{
 			    i++;
@@ -423,7 +424,7 @@ int is_utf8 (const unsigned char *xxx)
 			for (l=1;l<3;l++)
 			{
 				if ((xxx[i+l] < 0x80) || (xxx[i+l] >= 0xc0))
-					return 0;
+					return NIL;
 			}
 			i += 2;
 			continue;
@@ -433,15 +434,15 @@ int is_utf8 (const unsigned char *xxx)
 			for (l=1;l<4;l++)
 			{
 				if ((xxx[i+l] < 0x80) || (xxx[i+l] >= 0xc0))
-					return 0;
+					return NIL;
 			}
 			i += 3;
 			continue;
 		}
 		else
-			return 0;
+			return NIL;
 	}
-	return 1;
+	return truth;
 }
 
 
@@ -454,7 +455,7 @@ LISP utf8_explode(LISP name)
     char utf8char[5];
 
     /* Validate string as UTF-8 */
-    if ( is_utf8(xxx) == 1)
+    if ( is_utf8(name) == truth)
     {
 		for (i=0; xxx[i]; i++)
 		{
@@ -529,7 +530,9 @@ void festival_lisp_funcs(void)
     init_subr_1("utf8explode", utf8_explode,
  "(utf8explode utf8string)\n\
   Returns a list of utf-8 characters in given string.");
-  
+    init_subr_1("is_utf8",is_utf8,
+ "(is_utf8 STRING)\n\
+  Returns t if STRING is UTF-8 valid otherwise it returns nil.");
     init_subr_2("wagon",l_wagon,
  "(wagon ITEM TREE)\n\
   Apply the CART tree TREE to ITEM.  This returns the full\n\
@@ -656,4 +659,3 @@ EST_String map_pos(LISP posmap, const EST_String &pos)
 	    return get_c_string(car(cdr(car(l))));
     return pos;
 }
-

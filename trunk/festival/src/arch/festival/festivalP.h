@@ -59,5 +59,4 @@ EST_Wave *get_utt_wave(EST_Utterance *u);
 LISP lisp_parse_url(LISP url);
 
 
-
 #endif /* __FESTIVALP_H__ */
