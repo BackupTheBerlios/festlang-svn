@@ -36,27 +36,10 @@
 ###########################################################################
 TOP=..
 DIRNAME=lib
-BUILD_DIRS=
-ALL_DIRS=$(BUILD_DIRS)
 
-PHONESETS = 
-DURSTATS = 
-INTSTATS = 
-DBS = 
-LTSRULES = 
-BRKMODELS = 
-MODES = 
-GENERAL = 
-OTHERS = 
+FILES=Makefile 
 
-SIOD = 
 
-FILES=Makefile $(PHONESETS) $(DURSTATS) $(INTSTATS) $(DBS) \
-      $(BRKMODELS) $(GENERAL) $(LTSRULES) $(OTHERS) $(MODES)
-
-LOCAL_CLEAN=
-
-ALL=
 include $(TOP)/config/common_make_rules
 
 
