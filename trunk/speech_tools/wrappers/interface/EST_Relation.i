@@ -47,8 +47,6 @@
 %}
 
 %include "EST_typemaps.i"
-%include "EST_rw_status.i"
-
 %import "EST_Item.i"
 
 class EST_Relation
@@ -72,6 +70,11 @@ public:
   
   EST_read_status load( const EST_String &filename,
 		        const EST_String &type="esps" );
+
+  EST_write_status save(const EST_String &filename, 
+			const EST_String &type,
+			bool evaluate_ff = false) const;
+
 
   // Features which belong to the relation rather than its items
   //    EST_Features f;

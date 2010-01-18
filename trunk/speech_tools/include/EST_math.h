@@ -100,8 +100,10 @@ extern "C" {
 
 /* Apple OSX */
 #if defined(__APPLE__)
-#define isnanf(X) isnan(X)
-#define isnan(X) __isnan(X)
+#define isnanf(X) isnan((double)(X))
+/* on some previous versions of OSX we seemed to need the following */
+/* but not on 10.4 */
+/* #define isnan(X) __isnan(X) */
 #endif
 
 /* FreeBSD *and other 4.4 based systems require anything, isnanf is defined */

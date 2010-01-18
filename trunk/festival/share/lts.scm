@@ -74,7 +74,9 @@ Return list of phones related to word using CART trees."
  (let ((utt (make_let_utt (enworden (wordexplode word)))))
     (predict_phones utt rules)
     (cdr (reverse (cdr (reverse ;; remove #'s
-      (mapcar item.name (utt.relation.items utt 'PHONE))))))
+      (mapcar 
+       (lambda (p) (intern (item.name p)))
+       (utt.relation.items utt 'PHONE))))))
     )
 )
 

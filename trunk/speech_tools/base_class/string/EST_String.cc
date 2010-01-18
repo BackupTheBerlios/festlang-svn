@@ -245,7 +245,7 @@ EST_String EST_String::chop_internal(const char *it, int len, int from, EST_chop
 
 EST_String EST_String::chop_internal (EST_Regex &it, int from, EST_chop_direction mode) const
 {
-  int start, end;
+  int start=0, end=0;
   
   if (locate(it, from, start, end))
     switch (mode)
@@ -1000,7 +1000,7 @@ int EST_String::freq(EST_Regex &ex) const
 {
   int pos=0;
   int n=0;
-  int start, end;
+  int start, end=0;
 
   while (locate(ex, pos, start, end))
     {
@@ -1266,7 +1266,8 @@ long EST_String::Long(bool *valid) const
 
   long val = strtol(str(), &end, 10);
 
-  if (end==NULL|| *end != '\0') {
+  if (end==NULL|| *end != '\0') 
+  {
     if (valid != NULL)
       {
 	*valid=0;

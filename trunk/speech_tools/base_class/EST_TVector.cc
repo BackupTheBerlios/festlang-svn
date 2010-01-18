@@ -179,7 +179,7 @@ void EST_TVector<T>::just_resize(int new_cols, T** old_vals)
 	  *old_vals = p_memory;
 	else if (!p_sub_matrix)
 	  delete [] (p_memory-p_offset);
-	  }
+      }
 
       p_memory = new_m;
       //cout << "vr: mem: " << p_memory << " (" << (int)p_memory << ")\n";

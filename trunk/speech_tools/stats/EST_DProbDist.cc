@@ -46,6 +46,39 @@
 #include "EST_TKVL.h"
 #include "EST_simplestats.h"
 
+/* We share ints and pointers for two types of probability distributions */
+/* The know discrete sets can be indexed by ints which is *much* faster  */
+/* the indices pass around a pointers but the lower part contain ints in */
+/* the discrete case                                                     */
+/* On 64bit architectures this is a issue so we need have some macros    */
+/* to help us here.                                                      */
+
+const int est_64to32(void *c)
+{   /* this returns the bottom end of the pointer as an unsigned int */
+    /* I believe this is a safe way to do it, we check the bits in the */
+    /* 64 bit int and multiply them out in the 32 bit one              */
+    /* there might be better ways, but I think you'd need to think about */
+    /* byte order then                                                 */
+    long long l;
+    int d;
+    int i,x;
+
+    l = (long long)c;
+
+    for (i=0,d=0,x=1; i<24; i++)
+    {
+        if (l & 1)
+            d += x;
+        l = l >> 1;
+        x += x;
+    }
+
+    return d;
+}
+/* #define tprob_int(X) ((sizeof(void *) != 8) ? est_64to32(X) : (int)X) */
+#define tprob_int(X) (est_64to32(X))
+
+
 EST_DiscreteProbDistribution::EST_DiscreteProbDistribution(const EST_Discrete *d,
 		 const double n_samples, const EST_DVector &counts)
 {
@@ -109,7 +142,13 @@ void EST_DiscreteProbDistribution::init(const EST_Discrete *d)
 	icounts.a_no_check(i) = 0;
 }
 
-void EST_DiscreteProbDistribution::cumulate(const int i,double count)
+void EST_DiscreteProbDistribution::cumulate(EST_Litem *i,double count)
+{
+    icounts[tprob_int(i)] += count;
+    num_samples += count;
+}
+
+void EST_DiscreteProbDistribution::cumulate(int i,double count)
 {
     icounts[i] += count;
     num_samples += count;
@@ -257,6 +296,21 @@ void EST_DiscreteProbDistribution::set_frequency(int i,double c)
 
 }
 
+void EST_DiscreteProbDistribution::set_frequency(EST_Litem *i,double c)
+{
+    if (type == tprob_discrete)
+    {
+	num_samples -= icounts[tprob_int(i)];
+	num_samples += c;
+	icounts[tprob_int(i)] = c;
+    }
+    else
+    {
+	cerr << "ProbDistribution: can't access string type pd with int\n";
+    }
+
+}
+
 
 void EST_DiscreteProbDistribution::override_frequency(const EST_String &s,double c)
 {
@@ -270,6 +324,14 @@ void EST_DiscreteProbDistribution::override_frequency(int i,double c)
 {
     if (type == tprob_discrete)
 	icounts[i] = c;
+    else
+	cerr << "ProbDistribution: can't access string type pd with int\n";
+}
+
+void EST_DiscreteProbDistribution::override_frequency(EST_Litem *i,double c)
+{
+    if (type == tprob_discrete)
+	icounts[tprob_int(i)] = c;
     else
 	cerr << "ProbDistribution: can't access string type pd with int\n";
 }
@@ -305,55 +367,79 @@ double EST_DiscreteProbDistribution::entropy() const
 }
 
 //  For iterating through members of a probability distribution
-void EST_DiscreteProbDistribution::point_to_first(IPointer &i) const
+EST_Litem *EST_DiscreteProbDistribution::item_start(void) const
 {
     if (type == tprob_discrete)
-	i.idx = 0 ;
+	return NULL;
     else
-	i.item = scounts.list.head();
-    return;
+	return scounts.list.head();
 }
 
-void EST_DiscreteProbDistribution::move_pointer_forwards(IPointer &i) const
+int EST_DiscreteProbDistribution::item_end(EST_Litem *idx) const
 {
     if (type == tprob_discrete)
-	i.idx++;
+	return (tprob_int(idx) >= icounts.length());
     else
-	i.item = next(i.item);
-	return;
+	return (idx == 0);
 }
 
-bool EST_DiscreteProbDistribution::points_to_something(const IPointer &i) const
+EST_Litem *EST_DiscreteProbDistribution::item_next(EST_Litem *idx) const
 {
     if (type == tprob_discrete)
-	return (i.idx < icounts.length());
+	return (EST_Litem *)(((unsigned char *)idx)+1);
     else
-	return (i.item != NULL);
+	return next(idx);
 }
 
+const EST_String &EST_DiscreteProbDistribution::item_name(EST_Litem *idx) const
+{
+    if (type == tprob_discrete)
+	return discrete->name(tprob_int(idx));
+    else
+	return scounts.list(idx).k;
+}
 
-const EST_String &EST_DiscreteProbDistribution::points_at(const IPointer &i) const
+void EST_DiscreteProbDistribution::item_freq(EST_Litem *idx,EST_String &s,double &freq) const
 {
     if (type == tprob_discrete)
     {
-	return discrete->name(i.idx);
+	s = discrete->name(tprob_int(idx));
+	freq = icounts(tprob_int(idx));
     }
+    else
+    {
+	s = scounts.list(idx).k;
+	freq = scounts.list(idx).v;
+    }
+}
 
-    return scounts.list(i.item).k;
+void EST_DiscreteProbDistribution::item_prob(EST_Litem *idx,EST_String &s,double &prob) const
+{
+    if (type == tprob_discrete)
+    {
+	prob = probability(tprob_int(idx));
+	s = discrete->name(tprob_int(idx));
+    }
+    else
+    {
+	s = scounts.list(idx).k;
+	prob = (double)scounts.list(idx).v/num_samples;
+    }
 }
 
 ostream & operator<<(ostream &s, const EST_DiscreteProbDistribution &pd)
 {
     // Output best with probabilities
-    EST_DiscreteProbDistribution::Entries i;
+    EST_Litem *i;
     double prob;
     double sum=0;
+    EST_String name;
  
     s << "(";
-    for (i.begin (pd); i != 0; i++)
-    {	
-	prob = pd.probability (*i);
-	s << "(" << *i << "=" << prob << ") ";
+    for (i=pd.item_start(); !pd.item_end(i); i=pd.item_next(i))
+    {
+	pd.item_prob(i,name,prob);
+	s << "(" << name << "=" << prob << ") ";
 	sum+=prob;
     }
     s << "best=" << pd.most_probable(&prob) << " samples=" 

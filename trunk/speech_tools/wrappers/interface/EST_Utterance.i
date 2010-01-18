@@ -43,7 +43,6 @@
 %module EST_Utterance
 %{
 #include "ling_class/EST_Utterance.h"
-#include "ling_class/EST_Utterance.h"
 %}
 
 %include "EST_typemaps.i"
@@ -51,7 +50,6 @@
 
 %import "EST_Item.i"
 %import "EST_Relation.i"
-%include "EST_rw_status.i"
 
 // List of functions which can throw errors when called (which need to be 
 // caught or the interpreter will bomb out)

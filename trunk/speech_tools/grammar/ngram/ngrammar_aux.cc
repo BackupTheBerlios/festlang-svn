@@ -117,14 +117,17 @@ smooth_ExponentialFit(EST_DVector &N, int first, int last)
 
 void make_f_of_f(EST_BackoffNgrammarState *s,void *params)
 {
-    EST_DiscreteProbDistribution::Entries k;
+    EST_Litem *k;
     double freq;
+    EST_String name;
 
     EST_DVector *ff = (EST_DVector*)params;
     int max = ff->n();
-    for (k.begin(s->pdf_const());k!=0; k++)
+    for (k=s->pdf_const().item_start();
+	 !s->pdf_const().item_end(k);
+	 k = s->pdf_const().item_next(k))
     {
-	freq = s->pdf_const().frequency(*k);
+	s->pdf_const().item_freq(k,name,freq);
 	if(freq+0.5 < max)
 	    (*ff)[(int)(freq+0.5)] += 1;
 	  
@@ -135,34 +138,44 @@ void make_f_of_f(EST_BackoffNgrammarState *s,void *params)
 
 void get_max_f(EST_BackoffNgrammarState *s,void *params)
 {
-    EST_DiscreteProbDistribution::Entries k;
+    EST_Litem *k;
     double freq;
+    EST_String name;
 
     double *max = (double*)params;
-    for (k.begin(s->pdf_const()); k!=0; k++)
+    for (k=s->pdf_const().item_start();
+	 !s->pdf_const().item_end(k);
+	 k = s->pdf_const().item_next(k))
       {
-	  freq = s->pdf_const().frequency(*k);
+	  s->pdf_const().item_freq(k,name,freq);
 	  if(freq > *max)
 	    *max = freq;
+	  
       }
+    
+    
 }
 
 void map_f_of_f(EST_BackoffNgrammarState *s,void *params)
 {
-    EST_DiscreteProbDistribution::Entries k;
+    EST_Litem *k;
     double freq;
+    EST_String name;
 
     //cerr << "map_f_of_f : visited " << *s << endl;
 
     EST_DVector *map = (EST_DVector*)params;
     int max = map->n();
-    for (k.begin(s->pdf_const());k!=0; k++)
+    for (k=s->pdf_const().item_start();
+	 !s->pdf_const().item_end(k);
+	 k = s->pdf_const().item_next(k))
       {
-	  freq = s->pdf_const().frequency(*k);
+	  s->pdf_const().item_freq(k,name,freq);
 	  if (freq+0.5 < max)
 	    {
 		double nfreq = (*map)((int)(freq+0.5));
-		s->pdf().set_frequency(*k,nfreq);
+		s->pdf().set_frequency(name,nfreq);
+
 	    }
 	  
       }
@@ -171,17 +184,20 @@ void map_f_of_f(EST_BackoffNgrammarState *s,void *params)
 
 void zero_small_f(EST_BackoffNgrammarState *s,void *params)
 {
-    EST_DiscreteProbDistribution::Entries k;
+    EST_Litem *k;
     double freq;
+    EST_String name;
 
     double *min = (double*)params;
-    for (k.begin(s->pdf_const()); k!=0; k++)
+    for (k=s->pdf_const().item_start();
+	 !s->pdf_const().item_end(k);
+	 k = s->pdf_const().item_next(k))
       {
-	  freq = s->pdf_const().frequency(*k);
+	  s->pdf_const().item_freq(k,name,freq);
 	  if (freq < *min)
 	  {
 	      //cerr << "zeroing " << freq << " < " << *min << endl;
-	      s->pdf().override_frequency(*k,0.0);
+	      s->pdf().override_frequency(k,0.0);
 	  }
       }
 }
@@ -189,7 +205,7 @@ void zero_small_f(EST_BackoffNgrammarState *s,void *params)
 void frequency_of_frequencies(EST_DVector &ff, EST_Ngrammar &n,int this_order)
 {
   int i,size;
-  EST_DiscreteProbDistribution::Entries k;
+  EST_Litem *k;
   double max=0.0;
 
   // if ff has zero size, do complete frequency of frequencies
@@ -218,10 +234,13 @@ void frequency_of_frequencies(EST_DVector &ff, EST_Ngrammar &n,int this_order)
 	    // Sum the frequencies
 	    for(i=0;i<size;i++)
 	      {
-		  for (k.begin(n.p_states[i].pdf());k!=0;k++)
+		  for (k=n.p_states[i].pdf().item_start();
+		       !n.p_states[i].pdf().item_end(k);
+		       k = n.p_states[i].pdf().item_next(k))
 		    {
+			EST_String name;
 			double freq;
-			freq = n.p_states[i].pdf().frequency(*k);
+			n.p_states[i].pdf().item_freq(k,name,freq);
 			ff[(int)(freq+0.5)] += 1;
 		    }
 	      }
@@ -284,8 +303,8 @@ void frequency_of_frequencies(EST_DVector &ff, EST_Ngrammar &n,int this_order)
 
 void map_frequencies(EST_Ngrammar &n, const EST_DVector &map, const int this_order)
 {
-  int i;
-  EST_DiscreteProbDistribution::Entries k;
+    int i;
+    EST_Litem *k;
 
   switch(n.representation())
     {
@@ -297,12 +316,17 @@ void map_frequencies(EST_Ngrammar &n, const EST_DVector &map, const int this_ord
 	    
 	    for(i=0;i<size;i++)
 	      {
-		  for (k.begin(n.p_states[i].pdf());k!=0; k++)
+		  for (k=n.p_states[i].pdf().item_start();
+		       !n.p_states[i].pdf().item_end(k);
+		       k = n.p_states[i].pdf().item_next(k))
 		    {
+			EST_String name;
 			double freq,nfreq;
-			freq = n.p_states[i].pdf().frequency(*k);
+			n.p_states[i].pdf().item_freq(k,name,freq);
 			nfreq = map((int)(freq+0.5));
-			n.p_states[i].pdf().set_frequency(*k,nfreq);
+			n.p_states[i].pdf().set_frequency(name,nfreq);
+
+
 		    }
 	      }
 	}

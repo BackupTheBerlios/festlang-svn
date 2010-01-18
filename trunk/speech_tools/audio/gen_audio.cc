@@ -123,7 +123,7 @@ int play_wave(EST_Wave &inwave, EST_Option &al)
 	return play_sun16_wave(*toplay,al);
     else if ((upcase(protocol) == "FREEBSD16AUDIO") ||
 	     (upcase(protocol) == "LINUX16AUDIO"))
-	return play_voxware_wave(*toplay,al);
+	return play_linux_wave(*toplay,al);
     else if (upcase(protocol) == "IRIXAUDIO")
 	return play_irix_wave(*toplay,al);
     else if (upcase(protocol) == "MACOSXAUDIO")
@@ -323,7 +323,7 @@ int record_wave(EST_Wave &wave, EST_Option &al)
 	return record_sun16_wave(wave,al);
     else if ((upcase(protocol) == "FREEBSD16AUDIO") ||
 	     (upcase(protocol) == "LINUX16AUDIO"))
-	return record_voxware_wave(wave,al);
+	return record_linux_wave(wave,al);
     else if (upcase(protocol) == "SUNAUDIO")
 	return record_sunau_wave(wave,al);
     else

@@ -23,7 +23,7 @@ LINKFLAGS=$(LINKDEBUGFLAGS)
 
 LIB_DIR=src\lib
 
-FESTLIBS = $(TOP)\src\lib\libfestival.lib $(TOP)\src\lib\hts_engine.lib
+FESTLIBS = $(TOP)\src\lib\libfestival.lib
 
 ESTLIBS = $(EST)\lib\libestools.lib $(EST)\lib\libestbase.lib $(EST)\lib\libeststring.lib 
 

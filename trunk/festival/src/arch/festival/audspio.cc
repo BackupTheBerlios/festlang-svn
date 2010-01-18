@@ -82,7 +82,6 @@ void audsp_play_wave(EST_Wave *w)
 
 static void audsp_send(const char *c)
 {
-    //char reply[4];
     int  pid;
     int statusp;
 
@@ -98,7 +97,6 @@ static void audsp_send(const char *c)
 		cerr << "Could not write to audfds" << endl;
     if (write(audfds[0],"\n",1) == -1 )
 		cerr << "Could not write to audfds" << endl;
-    //read(audfds[1],reply,3);  /* confirmation */
 }
 
 LISP l_audio_mode(LISP mode)

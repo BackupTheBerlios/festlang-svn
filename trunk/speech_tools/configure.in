@@ -83,4 +83,13 @@ AC_TRY_COMPILE([#include <stdio.h>],
                [COMPILERTYPE=gcc28])
 AC_SUBST(COMPILERTYPE)
 
+LINUXAUDIO=none
+AC_TRY_COMPILE([#include <alsa/version.h>],
+               [int j=
+                #if SND_LIB_SUBMINOR >= 11
+                3;
+                #endif],
+              [LINUXAUDIO="alsa"])
+AC_SUBST(LINUXAUDIO)
+
 AC_OUTPUT(config/config)

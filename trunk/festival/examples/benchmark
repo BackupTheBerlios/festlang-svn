@@ -19,7 +19,7 @@ while true
 	esac
 done
 
-text=${1-"/projects/festival/examples/benchmark.text"}
+text=${1-"$HOME/projects/festival/examples/benchmark.text"}
 
 for i in . src/main ../src/main $HOME/projects/festival/src/main /cstr/bin
 	do

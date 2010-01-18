@@ -47,8 +47,7 @@
 #include "EST_DMatrix.h"
 %}
 
-%include "EST_typemaps.i"
-%include "EST_rw_status.i"
+%import EST_typemaps.i
 
 class EST_Ngrammar {
 public:

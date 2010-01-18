@@ -47,6 +47,8 @@
 #include "EST_TKVL.h"
 #include "EST_types.h"
 
+typedef size_t int_iter; 
+
 /** A class for managing mapping string names to integers and back again,
     mainly used for representing alphabets in n-grams and grammars etc.
 
@@ -190,24 +192,22 @@ enum EST_tprob_type {tprob_string, tprob_int, tprob_discrete};
     integers are too restrictive so they are actually represented as
     doubles.
 
-    We provide iterator over the values in a distribution, for example
+    Methods are provided to iterate over the values in a distribution,
+    for example
     \begin{verbatim}
-       EST_DiscreteProbDistribution pdf;
-       EST_DiscreteProbDistribution::Entries i;
-       
-       for (i.begin(pdf); i != 0; i++)
+       EST_DiscreteProbistribution pdf;
+       for (int i=pdf.item_start(); i < pdf.item_end(); i=pdf.item_next(i))
        {
-          cout << *i << ": prob " << pdf.probability (*i) << endl;
+          EST_String name;
+          double prob;
+          item_prob(i,name,prob);
+          cout << name << ": prob " << prob << endl;
        }
     \end{verbatim}
 
     @author Alan W Black (awb@cstr.ed.ac.uk): July 1996
 */
 class EST_DiscreteProbDistribution {
-
-    struct IPointer_s { int idx; EST_UItem *item; };
-    typedef struct IPointer_s IPointer;
-    
 private:
     double num_samples;	   // because frequencies don't have to be integers
     EST_tprob_type type;
@@ -217,16 +217,6 @@ private:
     EST_DVector icounts;	
     /* For unknown vocabularies: tprob_string */
     EST_StrD_KVL scounts;
-
-protected:
-
-    void point_to_first(IPointer &i) const;
-    void move_pointer_forwards(IPointer &i) const;
-    bool points_to_something(const IPointer &i) const;
-    const EST_String &points_at(const IPointer &i) const;
-
-    friend class EST_TIterator< EST_DiscreteProbDistribution, IPointer, EST_String>;
-    
 public:
     EST_DiscreteProbDistribution() : type(tprob_string), discrete(NULL), icounts(0), scounts() {init();}
     /// Create with copying from an existing distribution.
@@ -261,7 +251,8 @@ public:
     /// Add this observation, may specify number of occurrences
     void cumulate(const EST_String &s,double count=1);
     /// Add this observation, i must be with in EST\_Discrete range
-    void cumulate(const int i,double count=1);
+    void cumulate(EST_Litem *i,double count=1);
+    void cumulate(int i,double count=1);
     /// Return the most probable member of the distribution
     const EST_String &most_probable(double *prob = NULL) const;
     /** Return the entropy of the distribution
@@ -276,6 +267,19 @@ public:
     double frequency(const EST_String &s) const; 
     /// 
     double frequency(const int i) const; 
+    /// Used for iterating through members of the distribution
+    EST_Litem *item_start() const;
+    /// Used for iterating through members of the distribution
+    EST_Litem *item_next(EST_Litem *idx) const;
+    /// Used for iterating through members of the distribution
+    int item_end(EST_Litem *idx) const;
+
+    /// During iteration returns name given index 
+    const EST_String &item_name(EST_Litem *idx) const;
+    /// During iteration returns name and frequency given index  
+    void item_freq(EST_Litem *idx,EST_String &s,double &freq) const;
+    /// During iteration returns name and probability given index
+    void item_prob(EST_Litem *idx,EST_String &s,double &prob) const;
 
     /// Returns discrete vocabulary of distribution
     inline const EST_Discrete *const get_discrete() const { return discrete; };
@@ -288,21 +292,20 @@ public:
         accordingly.  This is used when smoothing frequencies.
     */
     void set_frequency(int i,double c); 
+    void set_frequency(EST_Litem *i,double c); 
     
     /// Sets the frequency of named item, without modifying {\tt num\_samples}.
     void override_frequency(const EST_String &s,double c);
     /// Sets the frequency of named item, without modifying {\tt num\_samples}.
     void override_frequency(int i,double c); 
+    void override_frequency(EST_Litem *i,double c); 
     
     /** Sets the number of samples.  Care should be taken on setting this
         as it will affect how probabilities are calculated.
     */
     void set_num_samples(const double c) { num_samples = c;}
-
-    friend class EST_TStructIterator<EST_DiscreteProbDistribution, IPointer, EST_String>;    
-    typedef EST_TStructIterator<EST_DiscreteProbDistribution, IPointer, EST_String> Entries;
     
-    friend ostream & operator <<(ostream &s, const EST_DiscreteProbDistribution &p);
+friend ostream & operator <<(ostream &s, const EST_DiscreteProbDistribution &p);
     EST_DiscreteProbDistribution &operator=(const EST_DiscreteProbDistribution &a);
 };    
 

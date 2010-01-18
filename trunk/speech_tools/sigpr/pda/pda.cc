@@ -44,6 +44,7 @@
 
 int 			read_next_wave_segment (EST_Wave &sig, struct Srpd_Op *paras, 
 						SEGMENT_ *p_seg);
+
 static void 		srpd(EST_Wave &sig, EST_Track &fz, Srpd_Op &srpd_op, int resize);
 static void 		esps(EST_Wave &sig, EST_Track &fz, Srpd_Op &srpd_op, int resize);
 static struct Srpd_Op*  default_srpd_op(struct Srpd_Op *srpd);

@@ -49,7 +49,6 @@
 %}
 
 %include "EST_typemaps.i"
-%include  "EST_rw_status.i"
 
 class EST_Wave
 {
@@ -77,6 +76,9 @@ public:
     
   short a(int i, int channel = 0) const;
   short &a_safe(int i, int channel = 0);
+
+  // set value
+  short set_a(int i, int channel = 0, short val = 0);
 
   // return the time position in seconds of the ith sample
   float t(int i) const;

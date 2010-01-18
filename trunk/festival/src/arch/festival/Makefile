@@ -39,7 +39,7 @@
 ###########################################################################
 TOP=../../..
 DIRNAME=src/arch/festival
-H = festivalP.h
+H = festivalP.h festivalPpath.h
 SRCS =  festival.cc  Phone.cc utterance.cc features.cc \
        wave.cc wagon_interp.cc linreg.cc \
        audspio.cc server.cc client.cc web.cc tcl.cc \

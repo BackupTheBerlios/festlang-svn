@@ -226,12 +226,12 @@ void EST_TMatrix<T>::just_resize(int new_rows,
 	new_m = new T[new_rows*new_cols];
 
 	if (this->p_memory != NULL)
-	{
+        {
 	  if (old_vals != NULL)
 	    *old_vals = this->p_memory;
 	  else  if (!this->p_sub_matrix)
 	    delete [] (this->p_memory-this->p_offset);
-	}
+        }
     
 	p_num_rows = new_rows;
 	this->p_num_columns = new_cols;
@@ -389,7 +389,7 @@ void EST_TMatrix<T>::copy_row(int r, T *buf,
 	r=0;
       else
 	return;
-	}
+    }
 
     for (int j = offset; j < to; j++)
       buf[j-offset] = fast_a_m(r, j);
@@ -402,11 +402,13 @@ void EST_TMatrix<T>::copy_row(int r, EST_TVector<T> &buf,
   int to = num >= 0 ? offset + num : num_columns();
 
   if (!EST_matrix_bounds_check(r, 0, num_rows(), num_columns(), FALSE))
-   { if (num_rows()>0)
+  {
+    if (num_rows()>0)
       r=0;
     else
       return;
-   }
+  }
+  
   buf.resize(to - offset);
   
   for (int j = offset; j < to; j++)
@@ -424,11 +426,13 @@ void EST_TMatrix<T>::copy_column(int c, T *buf,
   int to = num >= 0 ? offset + num : num_rows();
 
   if (!EST_matrix_bounds_check(0, c, num_rows(), num_columns(), FALSE))
-   { if (num_columns()>0)
+  {
+    if (num_columns()>0)
       c=0;
     else
       return;
-   }
+  }
+  
   for (int i = offset; i < to; i++)
     buf[i-offset] = fast_a_m(i, c);
 }
@@ -444,12 +448,12 @@ void EST_TMatrix<T>::copy_column(int c, EST_TVector<T> &buf,
   int to = num >= 0 ? offset + num : num_rows();
 
   if (!EST_matrix_bounds_check(0, c, num_rows(), num_columns(), FALSE))
-    {
-	if( num_columns()>0 )
+  {
+    if( num_columns()>0 )
       c=0;
     else
       return;
-    }
+  }
   
   buf.resize(to - offset);
   
@@ -494,7 +498,7 @@ void  EST_TMatrix<T>::set_row(int r,
 
   if (!EST_matrix_bounds_check(from_r, 0, from.num_rows(), from.num_columns(), FALSE))
   {
-	if (from.num_rows()>0)
+    if (from.num_rows()>0)
       from_r=0;
     else 
       return;
@@ -515,11 +519,12 @@ void  EST_TMatrix<T>::set_column(int c,
     return;
 
   if (!EST_matrix_bounds_check(0, from_c, from.num_rows(), from.num_columns(), FALSE))
-	{ if (from.num_columns()>0)
+  {
+    if (from.num_columns()>0)
       from_c=0;
     else 
       return;
-	}
+  }
 
   for(int i=offset; i<to; i++)
     fast_a_m(i, c) = from.fast_a_m((i-offset)+from_offset, from_c);

@@ -2,7 +2,7 @@
  ##                                                                       ##
  ##                Centre for Speech Technology Research                  ##
  ##                     University of Edinburgh, UK                       ##
- ##                         Copyright (c) 1996                            ##
+ ##                         Copyright (c) 1999                            ##
  ##                        All Rights Reserved.                           ##
  ##                                                                       ##
  ##  Permission is hereby granted, free of charge, to use and distribute  ##
@@ -31,81 +31,27 @@
  ##                                                                       ##
  ###########################################################################
  ##                                                                       ##
- ##                 Author: Richard Caley (rjc@cstr.ed.ac.uk)             ##
- ##                   Date: Thu Oct  2 1997                               ##
+ ##                 Author: Alan W Black (awb@cs.cmu.edu)                 ##
+ ##                   Date: Sun Aug 25 2002                               ##
  ## --------------------------------------------------------------------  ##
- ## Settings for GCC.                                                     ##
+ ## Settings for GCC-4.2                                                 ##
  ##                                                                       ##
  ###########################################################################
 
-CC=gcc-4.2
-CXX=g++-4.2
-ifeq ($(OSTYPE),Darwin)
-CXX=g++
-endif
+include $(EST)/config/compilers/gcc_defaults.mak
 
-COMPILER_DESC=FSF gcc-4.2
-COMPILER_VERSION_COMMAND=$(CXX) -v 2>&1 | tail -1 | sed -e 's/^....//'
+COMPILER_DESC=gcc-4.2
 
-CFLAGS  = $(GCC_SYSTEM_OPTIONS) $(CC_OTHER_FLAGS)
-CXXFLAGS  =  $(GCC_SYSTEM_OPTIONS) $(CC_OTHER_FLAGS)
 
-DEBUG_CCFLAGS   = -g
-DEBUG_CXXFLAGS  = -g
-DEBUG_LINKFLAGS = -g
+CC= gcc-4.2
+CXX = g++-4.2
 
-WARN_CCFLAGS   = -Wall
-WARN_CXXFLAGS  = -Wall
-WARN_LINKFLAGS = -Wall
+WARN_CXXFLAGS  +=  -Wno-non-template-friend
 
-VERBOSE_CCFLAGS   =
-VERBOSE_CXXFLAGS  = 
-VERBOSE_LINKFLAGS =
+STATIC_LINKFLAGS = -Dstatic
 
-OPTIMISE_CCFLAGS   = -O$(OPTIMISE)
-OPTIMISE_CXXFLAGS  = -O$(OPTIMISE)
-OPTIMISE_LINKFLAGS = -O$(OPTIMISE)
+COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lstdc++
 
-PROFILE_DEFAULT = gprof
-
-PROFILE_prof_CCFLAGS   = -p
-PROFILE_prof_CXXFLAGS  = -p
-PROFILE_prof_LINKFLAGS = -p
-
-PROFILE_gprof_CCFLAGS   = -pg
-PROFILE_gprof_CXXFLAGS  = -pg
-PROFILE_gprof_LINKFLAGS = -pg
-
-SHARED_CCFLAGS  = -fPIC
-SHARED_CXXFLAGS  = -fPIC
-SHARED_LINKFLAGS =
-
-ifndef GCC_MAKE_SHARED_LIB
-    MAKE_SHARED_LIB = $(CXX) -shared -o XXX
-else
-    MAKE_SHARED_LIB = $(GCC_MAKE_SHARED_LIB)
-endif
-
-#-shared -R$(MAIN_LIBRARY_DIR)
-
-STATIC_CCFLAGS   = 
-STATIC_CXXFLAGS  = 
-STATIC_LINKFLAGS = -static
-
-TEMPLATE_SPECIFIC = -DINSTANTIATE_TEMPLATES
-TEMPLATE_ARGS = 
-
-## The -lgcc here is redundant - gcc does this anyway - but it
-## helps java know what needs to be loaded.
-
-COMPILERLIBS= $(COMPILER_LIBS_DIR:%=-L%) -lgcc
-
-## special ways of doing things, blank means default
-
-MAKE_DEPEND_C = $(CC) -MM $(INCLUDES) $(TEMPLATES) $(TEMPLATE_SPECIFIC)
-MAKE_DEPEND_CXX = $(CC) -MM $(INCLUDES) $(TEMPLATES) $(TEMPLATE_SPECIFIC)
-BUILD_LIB   = $(AR) cruv
-INDEX_LIB   = $(RANLIB)
 
 
 

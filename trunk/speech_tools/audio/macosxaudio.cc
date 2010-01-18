@@ -40,11 +40,14 @@
 #include "EST_Option.h"
 #include "audioP.h"
 
+/*
+	*** OSX coreaudio is not supported at this time. The code below is out of date ***
+
 #if defined (SUPPORT_MACOSX_AUDIO)
 
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnit.h>
-#include <AudioUnit/AUNTComponent.h>
+//#include <AudioUnit/AUNTComponent.h> //(deprecated)
 #include <AudioToolbox/AudioConverter.h>
 #include <AudioToolbox/DefaultAudioOutput.h>
 
@@ -202,13 +205,15 @@ int play_macosx_wave(EST_Wave &inwave, EST_Option &al)
 }
 #else
 
+*/
+
 int macosx_supported = FALSE;
 
 int play_macosx_wave(EST_Wave &inwave, EST_Option &al)
 {
     (void)inwave;
     (void)al;
-    cerr << "MacOS X audio support not compiled." << endl;
+    cerr << "Native OS X audio in not supported at this time." << endl;
     return -1;
 }
-#endif
+/* #endif */

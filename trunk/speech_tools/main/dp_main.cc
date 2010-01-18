@@ -329,7 +329,8 @@ float local_cost(const EST_Item *s1, const EST_Item *s2)
     //cerr << "lcf " << s1 << "," << s2 << endl;
 
     // otherwise cost is either insertion cost, or cost_matrix value
-    if(distance_measure == "simple") {
+    if(distance_measure == "simple")
+    {
 	if(s1->name() == s2->name())
 	    return 0;
 	else

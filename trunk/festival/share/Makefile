@@ -36,7 +36,7 @@
 ###########################################################################
 TOP=..
 DIRNAME=share
-BUILD_DIRS=etc multisyn
+BUILD_DIRS=etc multisyn languages
 ALL_DIRS=$(BUILD_DIRS)
 
 PHONESETS = mrpa_phones.scm mrpa_allophones.scm radio_phones.scm \

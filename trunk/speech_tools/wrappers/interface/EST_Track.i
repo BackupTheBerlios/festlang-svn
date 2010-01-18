@@ -50,10 +50,8 @@
 
 %include "typemaps.i"
 
+%import "EST_FVector.i"
 %include "EST_typemaps.i"
-%include "EST_rw_status.i"
-
-%import  "EST_FVector.i"
 
 class EST_Track {
   
@@ -180,6 +178,9 @@ public:
 
   // return amplitude of frame i, channel c.
   float a(int i, int c=0) const;
+
+  // return amplitude at frame nearest t, channel c.
+  float a(float t, int c=0) const;
   
   // return time position of frame i
   float  t(int i=0) const;
@@ -210,8 +211,11 @@ public:
   // return time of last value in track
   float end() const;
 
-  EST_read_status load(const EST_String name, float ishift = 0.0, float startt = 0.0);
-  EST_write_status save(const EST_String name, const EST_String EST_filetype = "");
+//  EST_read_status load(const EST_String name, float ishift = 0.0, float startt = 0.0);
+ // EST_write_status save(const EST_String name, const EST_String EST_filetype = "");
+
+  EST_read_status load(const char *name, float ishift = 0.0, float startt = 0.0);
+  EST_write_status save(const char *name, const char* EST_filetype = "");
 
   int empty() const;
   

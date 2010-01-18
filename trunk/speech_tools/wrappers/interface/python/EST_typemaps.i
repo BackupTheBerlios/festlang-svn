@@ -47,11 +47,17 @@
   $1 = &temp;
 }
 
+/* new - need typechecking for overloaded function dispatcher */
+%typemap(typecheck) EST_String& = char *;
+
 %typemap(in) EST_String {
   char *str; int len;
   PyString_AsStringAndSize($input, &str, &len);
   $1 = EST_String( str, len, 0, len );
 }
+/* new - need typechecking for overloaded function dispatcher */
+%typemap(typecheck) EST_String = char *;
+
 
 %typemap(out) EST_String {
    int len = $1.length();
@@ -63,8 +69,6 @@
   $result = len ? PyString_FromStringAndSize($1->str(),len) : Py_BuildValue((char*)"");
 }
 
-%typemap(typecheck) EST_String& = char *;
-%typemap(typecheck) EST_String  = char *;
 
 // for now, just going to convert EST_StrList as a "one off", but
 // maybe in future, the EST_TList class should be wrapped and

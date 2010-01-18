@@ -41,13 +41,13 @@ OBJS = $(CPPSRCS:.cc=.o) $(CSRCS:.c=.o)
 FILES = Makefile $(SRCS) $(H)
 
 ## Sub directories which need to be compiled when the library is rebuilt
-LIB_BUILD_DIRS=
+##LIB_BUILD_DIRS=
 
 ## Sub directories which need to be built in a full rebuild
-BUILD_DIRS=$(LIB_BUILD_DIRS)
+##BUILD_DIRS=$(LIB_BUILD_DIRS)
 
 ## All sub directories
-ALL_DIRS=$(BUILD_DIRS)
+##ALL_DIRS=$(BUILD_DIRS)
 
 LOCAL_INCLUDES = -I../include
 

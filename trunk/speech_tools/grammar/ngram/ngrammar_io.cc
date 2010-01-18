@@ -281,8 +281,8 @@ EST_read_status
 load_ngram_cstr_bin(const EST_String filename, EST_Ngrammar &n)
 {
     EST_TokenStream ts;
-    EST_DiscreteProbDistribution::Entries k;
     int i,j,order;
+    EST_Litem *k;
     int num_entries;
     double approx_num_samples = 0.0;
     long freq_data_start, freq_data_end;
@@ -369,14 +369,14 @@ load_ngram_cstr_bin(const EST_String filename, EST_Ngrammar &n)
 	    fclose(ifd);
 	    return misc_read_error;	
 	}
-	for (k.begin(n.p_states[i].pdf());
-	     k != 0;
-	     k++)
+	for (k=n.p_states[i].pdf().item_start();
+	     (!n.p_states[i].pdf().item_end(k)) && (j < num_entries) ;
+	     k = n.p_states[i].pdf().item_next(k))
 	{
-	    n.p_states[i].pdf().set_frequency(*k,dd[j]);
+	    n.p_states[i].pdf().set_frequency(k,dd[j]);
 	    // Update global info too
 	    approx_num_samples += dd[j]; // probably not right
-	    n.vocab_pdf.cumulate(*k,dd[j]);
+	    n.vocab_pdf.cumulate(k,dd[j]);
 	    
 	    // Number of consecutive occurrences of this frequency as in
 	    // dd[j+1] if its a negative number
@@ -408,7 +408,7 @@ EST_write_status
 save_ngram_htk_ascii_sub(const EST_String &word, ostream *ost, 
 			 EST_Ngrammar &n, double floor)
 {
-    EST_DiscreteProbDistribution::Entries k;
+    EST_Litem *k;
     EST_String name;
     double freq;
     EST_StrVector this_ngram(2); // assumes bigram
@@ -437,10 +437,12 @@ save_ngram_htk_ascii_sub(const EST_String &word, ostream *ost,
     }
     
     // not efficient but who cares ?
-    for (k.begin(this_pdf); k!=0; k++)
+    for (k=this_pdf.item_start();
+	 !this_pdf.item_end(k);
+	 k = this_pdf.item_next(k))
     {
-	freq = this_pdf.frequency(*k);
-	if((*k) != n.p_sentence_start_marker)
+	this_pdf.item_freq(k,name,freq);
+	if(name != n.p_sentence_start_marker)
 	{
 	    total_freq += freq;
 	}
@@ -459,13 +461,15 @@ save_ngram_htk_ascii_sub(const EST_String &word, ostream *ost,
     {
 	lfreq=-1;
 	
-	for (k.begin(this_pdf);k!=0; k++)
+	for (k=this_pdf.item_start();
+	     !this_pdf.item_end(k);
+	     k = this_pdf.item_next(k))
 	{
-	    freq = this_pdf.frequency (*k);
+	    this_pdf.item_freq(k,name,freq);
 	    
-	    if ( (*k == n.p_sentence_start_marker) ||
-		(*k == n.p_sentence_end_marker) ||
-		(*k == OOV_MARKER) )
+	    if ( (name == n.p_sentence_start_marker) ||
+		(name == n.p_sentence_end_marker) ||
+		(name == OOV_MARKER) )
 		continue;
 	    
 	    if (freq == lfreq)
@@ -732,8 +736,8 @@ save_ngram_cstr_ascii(const EST_String filename, EST_Ngrammar &n,
     (void)trace;
     ostream *ost;
     int i;
-    EST_DiscreteProbDistribution::Entries k;
-
+    EST_Litem *k;
+    
     if (filename == "-")
 	ost = &cout;
     else
@@ -762,14 +766,17 @@ save_ngram_cstr_ascii(const EST_String filename, EST_Ngrammar &n,
 	    const EST_StrVector this_ngram = n.make_ngram_from_index(i);
 	    this_pdf = n.prob_dist(this_ngram);
 	    
-	    for (k.begin(this_pdf); k!=0; k++)
+	    for (k=this_pdf.item_start();
+		 !this_pdf.item_end(k);
+		 k = this_pdf.item_next(k))
 	    {
 		double freq;
-		freq = this_pdf.frequency (*k);
+		EST_String name;
+		this_pdf.item_freq(k,name,freq);
 		
 		for (int jj=0; jj < this_ngram.n(); jj++)
 		    *ost << this_ngram(jj) << " ";
-		*ost << *k << " : " << freq << endl;
+		*ost << name << " : " << freq << endl;
 	    }
 	}
     }
@@ -827,7 +834,7 @@ save_ngram_cstr_bin(const EST_String filename, EST_Ngrammar &n,
 	return misc_write_error;
     
     int i;
-    EST_DiscreteProbDistribution::Entries k;
+    EST_Litem *k;
     FILE *ofd;
     double lfreq = -1;
     double count = -1;
@@ -868,10 +875,13 @@ save_ngram_cstr_bin(const EST_String filename, EST_Ngrammar &n,
 	    if ( trace )
 		cerr << "\r" << i*100/n.num_states() << "%";
 	    
-	    for (k.begin(n.p_states[i].pdf()); k!= 0; k++)
+	    for (k=n.p_states[i].pdf().item_start();
+		 !n.p_states[i].pdf().item_end(k);
+		 k = n.p_states[i].pdf().item_next(k))
 	    {
 		double freq;
-		freq = n.p_states[i].pdf().frequency(*k);
+		EST_String name;
+		n.p_states[i].pdf().item_freq(k,name,freq);
 		if (freq == 0.0)
 		    freq = floor;
 		if (freq == lfreq)
@@ -908,11 +918,14 @@ save_ngram_cstr_bin(const EST_String filename, EST_Ngrammar &n,
 	    const EST_StrVector this_ngram = n.make_ngram_from_index(i);
 	    this_pdf = n.prob_dist(this_ngram);
 	    
-	    for (k.begin(this_pdf);k!=0;k++)
+	    for (k=this_pdf.item_start();
+		 !this_pdf.item_end(k);
+		 k = this_pdf.item_next(k))
 	    {
 		
 		double freq;
-		freq = this_pdf.frequency(*k);
+		EST_String name;
+		this_pdf.item_freq(k,name,freq);
 		if (freq == lfreq)
 		    count--;
 		else

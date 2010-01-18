@@ -75,6 +75,7 @@ void fs_build_backoff_ngrams(EST_Ngrammar *backoff_ngrams,
 {
     // Build all the backoff grammars back to uni-grams
     int i,j,l;
+    EST_Litem *k;
 
     for (i=0; i < ngram.order()-1; i++)
 	backoff_ngrams[i].init(i+1,EST_Ngrammar::dense,
@@ -83,17 +84,19 @@ void fs_build_backoff_ngrams(EST_Ngrammar *backoff_ngrams,
     for (i=0; i < ngram.num_states(); i++)
     {
 	const EST_StrVector words = ngram.make_ngram_from_index(i);
-        EST_DiscreteProbDistribution::Entries k;
 
-	for (k.begin(ngram.p_states[i].pdf()); k != 0; k++)
+	for (k=ngram.p_states[i].pdf().item_start();
+	     !ngram.p_states[i].pdf().item_end(k);
+	     k = ngram.p_states[i].pdf().item_next(k))
 	{
 	    double freq;
-	    freq = ngram.p_states[i].pdf().frequency(*k);
+	    EST_String name;
+	    ngram.p_states[i].pdf().item_freq(k,name,freq);
 	    // Build all the sub-ngrams and accumulate them
 	    for (j=0; j < ngram.order()-1; j++)
 	    {
 		EST_StrVector nnn(j+1);
-		nnn[j] = *k;
+		nnn[j] = name;
 		for (l=0; l < j; l++)
 		    nnn[l] = words(ngram.order()-1-j);
 		backoff_ngrams[j].accumulate(nnn,freq);
@@ -109,6 +112,7 @@ int fs_backoff_smooth(EST_Ngrammar *backoff_ngrams,
     // For all ngrams which are too infrequent, adjust their
     // frequencies based on their backoff probabilities
     int i;
+    EST_Litem *j;
     double occurs;
     double backoff_prob;
 
@@ -127,19 +131,21 @@ int fs_backoff_smooth(EST_Ngrammar *backoff_ngrams,
 		occurs = ngram.p_states[i].pdf().samples();
 		EST_StrVector words = ngram.make_ngram_from_index(i);
 		words.resize(words.n()+1);
-	        EST_DiscreteProbDistribution::Entries j;
 		
-		for (j.begin(pdf); j!=0; j++)
+		for (j=pdf.item_start();
+		     ! pdf.item_end(j);
+		     j = pdf.item_next(j))
 		{
+		    EST_String name;
 		    double freq;
-		    freq = pdf.frequency(*j);
-		    words[words.n()-1] = *j;
+		    pdf.item_freq(j,name,freq);
+		    words[words.n()-1] = name;
 		    backoff_prob = 
 			fs_find_backoff_prob(backoff_ngrams,
 					     ngram.order()-1,
 					     words,
 					     smooth_thresh);
-		    pdf.set_frequency(*j,occurs*backoff_prob);
+		    pdf.set_frequency(j,occurs*backoff_prob);
 		}
 	    }
 	}

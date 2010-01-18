@@ -69,12 +69,15 @@ EST_PredictionSuffixTree_tree_node::print_freqs(ostream &os)
     if (p_level == 0)
     {
 	// Base -- print from pd 
-	EST_DiscreteProbDistribution::Entries k;
+	EST_String s;
 	double freq;
-	for (k.begin(pd); k!=0; k++) 
+        EST_Litem *i;
+	for (i = pd.item_start(); 
+	     !pd.item_end(i); 
+	     i=pd.item_next(i))
 	{
-	    freq = pd.frequency(*k);
-	    os << get_path() << " " << *k << " : " << freq << endl;
+	    pd.item_freq(i,s,freq);
+	    os << get_path() << " " << s << " : " << freq << endl;
 	}
     }
     else
@@ -93,11 +96,13 @@ EST_PredictionSuffixTree_tree_node::print_probs(ostream &os)
     if (p_level == 0)
     {
 	// Base -- print from pd 
-        EST_DiscreteProbDistribution::Entries k;
+	EST_String s;
+	double prob;
 	os << get_path() << " :";
-	for (k.begin(pd);k!=0;k++)
+	for (EST_Litem *i = pd.item_start(); !pd.item_end(i) ; i=pd.item_next(i))
 	{
-	    os << " " << *k << " " << pd.probability(*k);
+	    pd.item_prob(i,s,prob);
+	    os << " " << s << " " << prob;
 	}
 	os << endl;
     }

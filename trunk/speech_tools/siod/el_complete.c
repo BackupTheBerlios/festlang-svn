@@ -37,7 +37,7 @@
 /*  awb Dec 30 1998                                                         */
 /*                                                                          */
 /****************************************************************************/
-/*  $Revision: 1.2 $
+/*  $Revision: 1.3 $
 **
 **  History and file completion functions for editline library.
 */

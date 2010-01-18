@@ -44,7 +44,8 @@ COMMON_INTERFACE_FILES = EST_Utterance.i EST_Relation.i EST_Item.i \
 			 EST_pitchmark.i \
 			 EST_TVector.i EST_TSimpleVector.i EST_FVector.i \
                          EST_Ngrammar.i \
-                         EST_error.i
+                         EST_error.i \
+                         EST_rw_status.i
 
 FILES = Makefile $(COMMON_INTERFACE_FILES)
 

@@ -139,7 +139,8 @@ to a files or files specified by outskeleton."
 	(set! fd (fopen outskeleton "w")))
     (mapcar
      (lambda (uttfile)
-       (format stderr "%s\n" uttfile)
+       (if (cdr names)  ;; only output the utt name if there is more than one
+           (format stderr "%s\n" uttfile))
        ;; change fd to new file if in skeleton mode
        (if (string-matches outskeleton ".*%s.*")
 	   (set! fd (fopen (format nil outskeleton

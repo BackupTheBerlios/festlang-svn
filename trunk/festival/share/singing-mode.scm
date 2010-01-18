@@ -27,6 +27,9 @@
 		 (path-append xml_dtd_dir  "sable-latin.ent")
 		 )
 
+;; Set this to t to enable debugging messages:
+(defvar singing-debug nil)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;; XML parsing functions

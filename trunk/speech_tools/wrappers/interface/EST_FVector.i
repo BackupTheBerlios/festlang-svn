@@ -46,9 +46,9 @@
 #include "EST_FMatrix.h"
 %}
 
-%include "EST_TSimpleVector.i"
-%include "EST_rw_status.i"
+%include "EST_typemaps.i"
 
+%include "EST_TSimpleVector.i"
 %template(floatvector) EST_TVector<float>;
 %template(floatsimplevector) EST_TSimpleVector<float>;
 
@@ -92,6 +92,16 @@ public:
     void randomise( float scale ) {
       make_random_vector( *self, scale );
     }
+
+    float sum() const {
+      float sum = 0.0;
+      int a_len = self->length();
+  
+      for( int i=0; i<a_len; ++i )
+	sum += self->a_no_check(i);
+      
+      return sum;
+    }
   }
 };
 
@@ -109,6 +119,20 @@ EST_FVector subtract(const EST_FVector &a,const EST_FVector &b);
     
     for( int i=0; i<a_len; ++i )
       ans->a_no_check(i) = sqrt( a.a_no_check(i) );
+    
+    return ans;
+  }
+%}
+
+%newobject topower;
+%inline %{
+  EST_FVector* topower( const EST_FVector &a, float f ){
+    int a_len = a.length();
+    
+    EST_FVector *ans = new EST_FVector(a_len);
+    
+    for( int i=0; i<a_len; ++i )
+      ans->a_no_check(i) = pow( a.a_no_check(i), f );
     
     return ans;
   }

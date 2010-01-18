@@ -47,6 +47,8 @@ TOP=..
 DIRNAME=bin
 FILES= Makefile VCLocalRules
 
+LOCAL_CLEAN = festival festival_client festival_server festival_server_control text2wave
+
 ALL = .remove_links .link_main .process_scripts text2wave
 
 include $(TOP)/config/common_make_rules

@@ -291,9 +291,9 @@ in a simpler format."
   (mapcar
    (lambda (l) 
      (if (not (string-equal "#" (cdr l)))
-	 (format ofd "%s " (cdr l))))
+	 (format ofd "%l " (cdr l))))
    bp)
-  (format ofd ") %s" pos)
+  (format ofd ") %l" pos)
   (mapcar
    (lambda (l)
      (if (not (string-equal "#" (car l)))
@@ -336,6 +336,7 @@ file contain predicted phone, and letter with 3 preceding and
 	(pn)
 	(sylpos 1))
     (while (not (equal? (set! entry (readfp fd)) (eof-val)))
+;;           (format t "read: %l\n" entry)
 	   (set! lets (append '(0 0 0 0 #) (wordexplode (car entry))
 			      '(# 0 0 0 0)))
 	   (set! phones (cdr (cdr entry)))
@@ -354,7 +355,12 @@ file contain predicted phone, and letter with 3 preceding and
 		      (nth (+ pn 2) lets)
 		      (nth (+ pn 3) lets)
 		      (nth (+ pn 4) lets)
-		      (car (cdr entry)) ;; pos
+                      (cond
+                       ((not (consp (car (cdr entry))))
+                        (car (cdr entry)))
+                       ((not (consp (caar (cdr entry))))
+                        (caar (cdr entry)))
+                       (t nil))
 		      ;; sylpos
 		      ;; numsyls
 		      ;; num2end
@@ -385,9 +391,11 @@ named by name, in filename."
     (set! trees (reverse trees))
     (set! fd (fopen filename "w"))
     (format fd ";; LTS rules \n")
-    (format fd "(set! %s '\n" name)
-    (pprintf trees fd)
-    (format fd ")\n")
+    (format fd "(set! %s '(\n" name)
+    (mapcar
+     (lambda (tree) (pprintf tree fd))
+     trees)
+    (format fd "))\n")
     (fclose fd))
 )
 
@@ -408,12 +416,12 @@ the structure as saved by merge_models."
 		 (phones (enworden (cdr (cdr entry))))
 		 (pphones))
 	     (set! wordcount (+ 1 wordcount))
-;	     (set! pphones (gen_cartlts letters (car (cdr entry)) cartmodels))
-	     (set! pphones 
-                   (or ; unwind-protect
-                    (gen_vilts letters (car (cdr entry))
-                               cartmodels wfstname)
-                    nil))
+	     (set! pphones (gen_cartlts letters (car (cdr entry)) cartmodels))
+;	     (set! pphones 
+;                   (or ; unwind-protect
+;                    (gen_vilts letters (car (cdr entry))
+;                               cartmodels wfstname)
+;                    nil))
 	     (if (equal? (ph-normalize pphones) (ph-normalize phones))
 		 (set! correctwords (+ 1 correctwords))
 		 (or nil
@@ -606,22 +614,23 @@ model, if appropriate)."
          t) ;; not an entry
         ((and (string-matches (car entry) "...*")
               (< clength 14)
+              (not (string-matches (car entry) ".*'.*")) ;; no quotes
               (car (cddr entry))) ;; non-nil pronounciation
          (begin
            (cond
             ((string-equal ltype "utf8")
              (format ofd
-                       "( %l %s ("
+                       "( %l %l ("
                        (utf8explode (car entry))
                        (cadr entry)))
             ((string-equal ltype "asis")
              (format ofd
-                     "( \"%s\" %s ("
+                     "( \"%s\" %l ("
                      (car entry)
                      (cadr entry)))
             (t
              (format ofd
-                     "( \"%s\" %s ("
+                     "( \"%s\" %l ("
                      (downcase (car entry))
                      (cadr entry))))
            (if (consp (car (car (cddr entry))))

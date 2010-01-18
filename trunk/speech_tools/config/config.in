@@ -91,6 +91,10 @@ INCLUDE_MODULES += NATIVE_AUDIO
 ## Special code to run Windows MPLAYER
 # INCLUDE_MODULES += MPLAYER_AUDIO
 
+## Under Linux there may be a choice of audio support
+## This is only used if we are under Linux (or a linux like system)
+LINUXAUDIO = @LINUXAUDIO@
+
 ## USER INTERFACE
 
 ## Command-line editing. This option gives command line editing and history.
@@ -148,7 +152,6 @@ INCLUDE_MODULES += RXP
 ## various high level scripted languages, such as Perl
 
 ## Uncomment following to enable building of wrappers
-## You need to enable shared library build above
 #INCLUDE_MODULES += WRAPPERS
 
 ## Path to Swig.

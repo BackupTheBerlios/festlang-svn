@@ -46,19 +46,24 @@
   $1 = &temp;
 }
 
+/* new - need typechecking for overloaded function dispatcher */
+%typemap(typecheck) EST_String& = char *;
+
+
 %typemap(in) EST_String {
   STRLEN len; const char* str = SvPV($input, len);
   $1 = EST_String( str, len, 0, len );
 }
 
-%typemap(out) EST_String {
-  ST(argvi) = sv_newmortal();
-  sv_setpvn((SV*)ST(argvi++),(char *)$1, $1.length());;
-}
-%typemap(out) EST_String&, EST_String* {
-  ST(argvi) = sv_newmortal();
-  sv_setpvn((SV*)ST(argvi++),(char *)(*$1), $1->length());;
-}
-
+/* new - need typechecking for overloaded function dispatcher */
 %typemap(typecheck) EST_String = char *;
+
+%typemap(out) EST_String
+  "ST(argvi) = sv_newmortal();
+   sv_setpvn((SV*)ST(argvi++),(char *)$1, $1.length());";
+
+%typemap(out) EST_String&, EST_String*
+  "ST(argvi) = sv_newmortal();
+   sv_setpvn((SV*)ST(argvi++),(char *)(*$1), $1->length());";
+
 
