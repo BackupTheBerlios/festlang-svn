@@ -1,0 +1,245 @@
+# Catalan translation
+# Copyright (C) 2007 Free Software Foundation
+# This file is distributed under the same license as the gnome-voice-control package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-voice-control trunk\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-05-03 10:00+0400\n"
+"PO-Revision-Date: 2008-05-01 20:31+0400\n"
+"Last-Translator: Sergio Oller <sergioller@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:1
+msgid "Control your desktop with voice"
+msgstr "Control de l'escriptori per veu"
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:2
+msgid "Factory for creating voice control applets."
+msgstr "Fàbrica per crear l'applet de control per veu"
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:3
+#: ../src/voice-control.c:346
+msgid "VoiceControl"
+msgstr "ControlVeu"
+
+#: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:4
+msgid "VoiceControl Applet Factory"
+msgstr "Fàbrica de l'Applet de ControlVoz"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:1
+msgid "_About"
+msgstr "_Quant a"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:2
+msgid "_Help"
+msgstr "_Ajuda"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:3
+msgid "_Start Control"
+msgstr "_Iniciar Control"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:4
+msgid "_Start Keypress Control"
+msgstr "Iniciar el Control de Tecles (_Hotkey)"
+
+#: ../data/GNOME_VoiceControlApplet.xml.h:5
+msgid "_Stop Control"
+msgstr "_Aturar Control"
+
+#: ../src/voice-control.c:102
+#, c-format
+msgid "There was an error displaying help: %s"
+msgstr "S'ha produït un error al mostrar l'ajuda: %s"
+
+#: ../src/voice-control.c:148 ../src/voice-control.c:395
+msgid "Idle"
+msgstr "En espera"
+
+#: ../src/voice-control.c:148 ../src/voice-control.c:395
+msgid "Choose Start Control to start"
+msgstr "Seleccioni Iniciar Control per començar"
+
+#: ../src/voice-control.c:159
+msgid "Init"
+msgstr "Inicialitzar"
+
+#: ../src/voice-control.c:159
+msgid "Loading acoustic and language model, wait a bit"
+msgstr "Carregant acústiques i models del llenguatge, esperi un moment"
+
+#: ../src/voice-control.c:182
+msgid "Calibration"
+msgstr "Calibrant"
+
+#: ../src/voice-control.c:182
+msgid "Tuning up acoustic parameters"
+msgstr "Afinant paràmetres acústics"
+
+#: ../src/voice-control.c:200
+msgid "Listening"
+msgstr "Escoltant"
+
+#: ../src/voice-control.c:200
+msgid "Processing speech"
+msgstr "Processant parla"
+
+#: ../src/voice-control.c:211
+msgid "Ready"
+msgstr "Preparat"
+
+#: ../src/voice-control.c:211
+msgid "Ready for input"
+msgstr "Preparat per entrades"
+
+#: ../src/voice-control.c:338
+msgid "Nickolay V. Shmyrev <nshmyrev@yandex.ru>"
+msgstr ""
+
+#: ../src/voice-control.c:339
+msgid "Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>"
+msgstr ""
+
+#: ../src/voice-control.c:342
+msgid "Voice Control Applet used to manage desktop with speech"
+msgstr "Applet de control de veu per utilitzar l'escriptori amb la veu"
+
+#: ../src/voice-control.c:352
+msgid "translator-credits"
+msgstr "Sergio Oller <sergioller@gmail.com>"
+
+#: ../src/action.c:98
+msgid "RUN MAIL"
+msgstr "OBRIR CORREU"
+
+#: ../src/action.c:99
+msgid "RUN BROWSER"
+msgstr "OBRIR NAVEGADOR"
+
+#: ../src/action.c:100
+msgid "RUN TEXT EDITOR"
+msgstr "OBRIR EDITOR DE TEXT"
+
+#: ../src/action.c:101
+msgid "RUN TERMINAL"
+msgstr "OBRIR TERMINAL"
+
+#: ../src/action.c:102
+msgid "CLOSE WINDOW"
+msgstr "TANCAR FINESTRA"
+
+#: ../src/action.c:103
+msgid "NEXT WINDOW"
+msgstr "SEGÜENT FINESTRA"
+
+#: ../src/action.c:104
+msgid "PREVIOUS WINDOW"
+msgstr "FINESTRA ANTERIOR"
+
+#: ../src/action.c:105
+msgid "MINIMIZE WINDOW"
+msgstr "MINIMITZAR FINESTRA"
+
+#: ../src/action.c:106
+msgid "MAXIMIZE WINDOW"
+msgstr "MAXIMITZAR FINESTRA"
+
+#: ../src/action.c:107
+msgid "SWITCH WINDOW"
+msgstr "CANVIAR FINESTRA"
+
+#: ../src/action.c:108
+msgid "RIGHT CLICK"
+msgstr "CLICK DRET"
+
+#: ../src/action.c:109
+msgid "CLICK"
+msgstr "CLICK"
+
+#: ../src/action.c:111
+msgid "PAGE UP"
+msgstr "PÀGINA OBERTA"
+
+#: ../src/action.c:112
+msgid "PAGE DOWN"
+msgstr "PÀGINA AVALL"
+
+#: ../src/action.c:113
+msgid "UP"
+msgstr "AMUNT"
+
+#: ../src/action.c:114
+msgid "DOWN"
+msgstr "AVALL"
+
+#: ../src/action.c:115
+msgid "LEFT"
+msgstr "ESQUERRA"
+
+#: ../src/action.c:116
+msgid "RIGHT"
+msgstr "DRETA"
+
+#: ../src/action.c:117
+msgid "ESCAPE"
+msgstr "ESCAPE"
+
+#: ../src/action.c:118
+msgid "BACKSPACE"
+msgstr "BACKSPACE"
+
+#: ../src/action.c:119
+msgid "DELETE"
+msgstr "SUPRIMIR"
+
+#: ../src/action.c:120
+msgid "INSERT"
+msgstr "INSERTAR"
+
+#: ../src/action.c:121
+msgid "HOME"
+msgstr "INICI"
+
+#: ../src/action.c:122
+msgid "END"
+msgstr "FI"
+
+#: ../src/action.c:123
+msgid "ENTER"
+msgstr "ENTER"
+
+#: ../src/action.c:124
+msgid "COPY"
+msgstr "COPIAR"
+
+#: ../src/action.c:125
+msgid "CUT"
+msgstr "TALLAR"
+
+#: ../src/action.c:126
+msgid "PASTE"
+msgstr "ENGANXAR"
+
+#: ../src/action.c:128
+msgid "MOUSE LEFT"
+msgstr "MOUSE ESQUERRE"
+
+#: ../src/action.c:129
+msgid "MOUSE RIGHT"
+msgstr "MOUSE DRET"
+
+#: ../src/action.c:130
+msgid "MOUSE DOWN"
+msgstr "MOUSE AVALL"
+
+#: ../src/action.c:131
+msgid "MOUSE UP"
+msgstr "MOUSE AMUNT"
+
+#: ../src/action.c:134
+msgid "MAIN MENU"
+msgstr "MENU PRINCIPAL"
