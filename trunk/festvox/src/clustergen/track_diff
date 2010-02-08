@@ -39,6 +39,8 @@
 ##  Will do alignment if they aren't the same size                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! "$ESTDIR" ]
 then
    echo "environment variable ESTDIR is unset"
@@ -69,8 +71,9 @@ fi
 CH_TRACK=$ESTDIR/bin/ch_track
 PHONEALIGN=$FESTVOXDIR/src/general/phonealign
 
+ORDER=26
 TRACK1=$1
-TRACK1_CHANNELS=`$ESTDIR/bin/ch_track -info $1 | grep "Number of channels" | awk '{print $NF}'`
+TRACK1_CHANNELS=`$ESTDIR/bin/ch_track -info $1 | grep "Number of channels" | awk '{print $NF/2}'`
 TRACK1_FRAMES=`$ESTDIR/bin/ch_track -info $1 | grep "Number of frames" | awk '{print $NF}'`
 TRACK2=$2
 TRACK2_CHANNELS=`$ESTDIR/bin/ch_track -info $2 | grep "Number of channels" | awk '{print $NF}'`
@@ -99,7 +102,10 @@ then
 fi
 
 ## Calculates differences
-$ESTDIR/bin/ch_track -otype ascii $TRACK1 >actual.mcep
+$ESTDIR/bin/ch_track -otype ascii $TRACK1 |
+awk '{for (i=1; i<= '$ORDER'; i++)
+         printf("%s ",$i);
+      printf("\n");}' >actual.mcep
 $ESTDIR/bin/ch_track -otype ascii $TRACK2 >test.mcep
 paste actual.mcep test.mcep |
 awk '{t=0;

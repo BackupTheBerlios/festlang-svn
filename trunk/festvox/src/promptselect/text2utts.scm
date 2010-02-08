@@ -84,6 +84,7 @@
 (defvar otype "data")
 (defvar raw nil)
 (defvar itype "raw")
+(defvar word_output_hook nil)
 (defvar upto 0)
 
 ;;; Get options
@@ -153,7 +154,9 @@
 	  (if (not (cdr o))
 	      (text2utts_error "no file specified to load"))
 	  (if (string-matches (car (cdr o)) "^(.*")
-	      (eval (read-from-string (car (cdr o))))
+              (begin
+                (format t "%l\n" (car (cdr o)))
+                (eval (read-from-string (car (cdr o)))))
 	      (load (car (cdr o))))
 	  (set! o (cdr o)))
 	 (t
@@ -313,7 +316,6 @@
 	(format ofd "( %s \"" uttname))
     (set! whitespace "")
     (while word
-;	 (format t ">%s<\n" (item.name word))
        (let (punc prepunctuation)
 	 (set! name (item.name word))
 	 (if nopunc
@@ -322,11 +324,15 @@
 	       (set! punc ""))
 	     (begin
 	       (set! punc 
-		     (if (item.next (item.relation word "Token"))
+		     (if (string-equal
+                          (item.feat word "R:Token.parent.id")
+                          (item.feat word "R:Word.n.R:Token.parent.id"))
 			 "0"
 			 (item.feat word "R:Token.parent.punc")))
 	       (set! prepunctuation 
-		     (if (item.prev (item.relation word "Token"))
+		     (if (string-equal
+                          (item.feat word "R:Token.parent.id")
+                          (item.feat word "R:Word.p.R:Token.parent.id"))
 			 "0"
 			 (item.feat word "R:Token.parent.prepunctuation")))
 	       (if (string-equal "0" punc) (set! punc ""))
@@ -336,6 +342,9 @@
 		     (set! prepunctuation (escape_characters prepunctuation))
 		     (set! punc (escape_characters punc))
 		     (set! name (escape_characters name))))))
+         (if (or (string-matches name "[^a-zA-Z0-9']")
+                 (string-equal name "'s"))
+             (set! whitespace ""))
 	 (format ofd "%s%s%s%s"
 		 whitespace
 		 prepunctuation
@@ -345,7 +354,12 @@
 	 )
        (set! word (item.next word)))
     (if (not raw)
-	(format ofd "\" )"))
+	(format ofd "\" "))
+    (if word_output_hook
+        (apply_hooks word_output_hook utt)
+        )
+    (if (not raw)
+	(format ofd " )"))
     (format ofd "\n")))
 
 (define (utt_output_segment utt)

@@ -86,15 +86,15 @@ if [ $# = 1 ]
 then
    PROMPTFILE=$1
 fi
-cat etc/txt.done.data |
+cat $PROMPTFILE |
 awk '{printf("festival/utts/%s.utt\n",$2)}' >uttfile
+
+SIODHEAPSIZE=5000000
+export SIODHEAPSIZE
 
 ## find the means and stddev for durations in database
 echo ";;; Finding mean durations and standard deviation of each phone type"
 $DURMEANSTD -output festival/dur/etc/durs.meanstd -from_file uttfile
-
-SIODHEAPSIZE=5000000
-export SIODHEAPSIZE
 
 ## extract the features
 echo ";;; Extracting features from utterances"
@@ -103,24 +103,30 @@ $DUMPFEATS -relation Segment -eval $VOICESCM -eval $VOICENAME -feats festival/du
 
 ## Save all features in one file removing silence phones
 echo ";;; Collecting features in training and test data"
-find festival/dur/feats -name *.feats -exec cat {} \; |
-awk '{if ($2 != "'$SILENCENAME'") print $0}' >festival/dur/data/dur.data
-bin/traintest festival/dur/data/dur.data
-bin/traintest festival/dur/data/dur.data.train
+cat uttfile |
+while read x
+do
+  fname=`basename $x .utt`
+  cat festival/dur/feats/$fname.feats |
+  awk '{if ($2 != "'$SILENCENAME'") print $0}'
+done >festival/dur/data/dur.data
 
 # Build description file
 echo ";;; Build feature description file"
 $ESTDIR/bin/make_wagon_desc festival/dur/data/dur.data festival/dur/etc/dur.feats festival/dur/etc/dur.desc
-festival -b --heap 2000000 festvox/build_prosody.scm $VOICESCM $VOICENAME '(build_dur_feats_desc)'
+$ESTDIR/../festival/bin/festival -b --heap 2000000 festvox/build_prosody.scm $VOICESCM $VOICENAME '(build_dur_feats_desc)'
 
 # emacs festival/dur/etc/dur.desc
+
+./bin/traintest festival/dur/data/dur.data
+./bin/traintest festival/dur/data/dur.data.train
 
 STOP=25
 PREF=dur
 
 (
 echo ";;; Build the duration model itself"
-$WAGON -data festival/dur/data/dur.data.train.train -desc festival/dur/etc/dur.desc -test festival/dur/data/dur.data.train.test -stop $STOP -output festival/dur/tree/$PREF.S$STOP.tree -stepwise 
+$WAGON -data festival/dur/data/dur.data.train.train -desc festival/dur/etc/dur.desc -test festival/dur/data/dur.data.train.test -stop $STOP -output festival/dur/tree/$PREF.S$STOP.tree
 
 echo ";;; Test the duration model"
 $WAGON_TEST -heap 2000000 -data festival/dur/data/dur.data.test -desc festival/dur/etc/dur.desc -tree festival/dur/tree/$PREF.S$STOP.tree ) |

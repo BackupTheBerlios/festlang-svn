@@ -42,6 +42,7 @@
  #include "header.h"
 #endif
 
+#include <string.h>
 #include "hmmstate.h"
 #include "hmmword.h"
 
@@ -62,8 +63,10 @@ int _nsen;
 
 int _git;
 int _seqF = 0;
+int _ndeF = 0; //non-deterministic ending.... flag
 int _pauID; //17 July 2005
 int _spauID;
+char *_labD; //lab directory...
 
 //Feature Extraction Parameters;
 double _shift = 80;
@@ -81,6 +84,7 @@ void FillWordTrans(double **arcW, int *tar, int ltar, double **trw, int *bI, int
 void FillWordTrans_Seq(double **arcW, int *tar, int ltar, double **trw, int *bI, int *eI, int**& fwM, int**& bwM, int er);
 int Viterbi(double **emt, int r, int c, double **trp, double **alp, double **bet, double *nrmF, int *bI, int *eI, int *path, int **fwM, int **bwM, int *nullI, int **pbuf, int& lastS);
 int Viterbi_Seq(double **emt, int r, int c, double **trp, double **alp, double **bet, double *nrmF, int *bI, int *eI, int *path, int **fwM, int **bwM, int *nullI, int **pbuf, int &lastS);
+int Viterbi_Seq_nde(double **emt, int r, int c, double **trp, double **alp, double **bet, double *nrmF, int *bI, int *eI, int *path, int **fwM, int **bwM, int *nullI, int **pbuf, int &lastS);
 void ReadWordTran(double **trw, int nw, ifstream& fp_md);
 void PostProcess(int *path, int *stMap, int ns, int nt, ofstream& fp_log, char *fnm, int *list, int ltar, int *wrdB); 
 void Get_FrameRate(char *file, double& shft, double& sf, double& size);
@@ -94,8 +98,8 @@ int main(int argc, char *argv[]) {
     char *mstring1;
     char *mstring2;
 
-  if (argc < 8) {
-    cout<<"Usage: ./a.out <ph-list.int> <prompt-file> <seq-flag> <feat-dir> <extn> <settings-file> <mod-dir>\n";
+  if (argc < 10) {
+    cout<<"Usage: ./a.out <ph-list.int> <prompt-file> <seq-flag> <feat-dir> <extn> <settings-file> <mod-dir> <nde-flag> <labD>\n";
     exit(1);
   }
 
@@ -112,7 +116,10 @@ int main(int argc, char *argv[]) {
   phF  = argv[1];
   prmF = argv[2];
   _seqF = atoi(argv[3]);
+  _ndeF = atoi(argv[8]);
+  _labD = argv[9];
   cout<<"Sequential Processing Flag: "<<_seqF<<endl;
+  cout<<"non-deterministic Processing Flag: "<<_ndeF<<endl;
 
   char tF[nmL * 2];
   char *fDir = argv[4];
@@ -202,7 +209,13 @@ int main(int argc, char *argv[]) {
 
 	 if (1 == _seqF) {
            cout<<"ENTERING Viterbi SEQ..."<<endl;		 
-	   nanF = Viterbi_Seq(emt, er, ec, arcW, alp, bet, nrmF, bI, eI, path, fwM, bwM, nullI, pubf, lastS);
+	   if (0 == _ndeF) {
+	      nanF = Viterbi_Seq(emt, er, ec, arcW, alp, bet, nrmF, bI, eI, path, fwM, bwM, nullI, pubf, lastS); 
+	   } else {
+	      nanF = Viterbi_Seq_nde(emt, er, ec, arcW, alp, bet, nrmF, bI, eI, path, fwM, bwM, nullI, pubf, lastS);
+
+	   }
+	   //nde stands for non deterministic end..
 	 } else {
            cout<<"ENTERING Viterbi ERG..."<<endl;		 
 	   nanF = Viterbi(emt, er, ec, arcW, alp, bet, nrmF, bI, eI, path, fwM, bwM, nullI, pubf, lastS);
@@ -306,7 +319,8 @@ void PostProcess(int *path, int *stMap, int ns, int nt, ofstream& fp_log, char *
 
   int uno = 0;
 
-  char labD[] = "lab/";
+  //char labD[] = "lab/";
+  
   char myfile[nmL];
   char stfile[nmL];
 
@@ -317,8 +331,8 @@ void PostProcess(int *path, int *stMap, int ns, int nt, ofstream& fp_log, char *
   ofstream fp_out;
   ofstream fp_st;
 
-  sprintf(myfile, "%s%s.lab", labD,fnm);
-  sprintf(stfile, "%s%s.sl", labD,fnm);
+  sprintf(myfile, "%s/%s.lab", _labD,fnm);
+  sprintf(stfile, "%s/%s.sl", _labD,fnm);
 
   fp_out.open(myfile, ios::out);
   if (fp_out == 0) {
@@ -369,18 +383,16 @@ void PostProcess(int *path, int *stMap, int ns, int nt, ofstream& fp_log, char *
 
   }
 
-      wid = -1;
-      s   = -1;
+  wid = -1;
+  s   = -1;
 
-      if (s != ps) {
-	fp_st<<tim<<" 125 "<<pid<<" "<<pwd<<" "<<ps<<endl;
-	ps = s;
-
-        fp_out<<tim<<" 125 "<<pwd<<endl;
-
-	pid = sid;
-	pwd = wid;
-      }
+  if (s != ps) {
+    fp_st<<tim<<" 125 "<<pid<<" "<<pwd<<" "<<ps<<endl;
+    ps = s;
+    fp_out<<tim<<" 125 "<<pwd<<endl;
+    pid = sid;
+    pwd = wid;
+  }
 
   fp_out.close();
   fp_st.close();
@@ -1056,6 +1068,168 @@ int Viterbi_Seq(double **emt, int r, int c, double **trp, double **alp, double *
   mas = -1;
   maxV = -1.0e+32;
   mas = ns - 1; //Choose the last state...
+  lastS = mas;
+
+  for (int t = nt - 1; t >= 0; t--) {
+    path[t] = mas;	  
+    mas     = pbuf[mas][t];
+  }
+
+  //Delete2d(pbuf, r);
+
+  return nanF;
+
+}
+
+int Viterbi_Seq_nde(double **emt, int r, int c, double **trp, double **alp, double **bet, double *nrmF, int *bI, int *eI, int *path, int **fwM, int **bwM, int *nullI, int **pbuf, int &lastS) {
+
+   int ns;	
+   int nt;
+   int t;
+   int s;
+   int tm1;
+
+   double maxV;
+
+   //int **pbuf;
+   int mas;
+   int pst;
+   double maxCon;
+   double val;
+   int nanF = 0;
+   
+   //Alloc2d(pbuf, r, c);
+   
+
+   ns = r;	
+   nt = c;
+   t = 0;
+   s = 0; 
+   maxV = -1.0e+32;
+
+   int myc, p, n;
+   int tit;
+
+   alp[s][t] = 0; //s = 0; and it is a null state..
+   for (int myc = 0; myc < fwM[s][0]; myc++) {
+       int n = fwM[s][myc + 1];
+       alp[n][t] = emt[n][t] * trp[s][n];
+       //pbuf[n][t] = s;
+       if (maxV < alp[n][t]) {
+          maxV = alp[n][t];
+       }
+   }
+
+   for (s = 0; s < ns; s++) {
+      tit = t;
+      if (1 == nullI[s]) {
+         for (myc = 0; myc < bwM[s][0]; myc++) {
+            p = bwM[s][myc + 1];
+	    val = alp[p][tit] * trp[p][s];
+	    if (alp[s][t] < val) { alp[s][t] = val; 
+	                           //pbuf[s][t] = p;
+	    }		       
+	 }
+
+	 for (myc = 0; myc < fwM[s][0]; myc++) {
+            n = fwM[s][myc + 1];
+	    if (1 == nullI[n] && n < s) {
+               val = alp[s][t] * trp[s][n];
+	       if (alp[n][t] < val) {
+		 alp[n][t] = val;      
+		 //pbuf[n][t] = s;
+	       }	 
+	       if (maxV < alp[n][t]) {     
+		 maxV = alp[n][t];      
+	       }
+	    }
+	 }
+      }
+      if (maxV < alp[s][t]) { maxV = alp[s][t];
+		              }
+   }
+
+  nrmF[t] = maxV; 
+  if (nrmF[t] == 0) {
+     nanF = 1;
+     return(nanF);
+  }
+
+  for (s = 0; s < ns; s++) {
+     alp[s][t] /= nrmF[t];
+  }
+
+  
+  for (t = 1; t < nt; t++) {
+      tm1 = t - 1;
+      maxV = -1.0e+32;
+
+      for (s = 0; s < ns; s++) {
+
+	maxCon = -1.0e+32;
+	pst  = -1;
+
+	if (1 == nullI[s]) {
+	  tit = t;	
+	} else {
+	  tit = tm1;
+	}
+
+	for (myc = 0; myc < bwM[s][0]; myc++) {
+           p = bwM[s][myc+1];
+	   val = alp[p][tit] * trp[p][s];
+	   if (maxCon < val) { maxCon = val; 
+	                       pst = p;
+	   }		       
+	}
+	alp[s][t] = maxCon * emt[s][t];
+	pbuf[s][t] = pst;
+
+	if (1 == nullI[s]) {
+	  for (myc = 0; myc < fwM[s][0]; myc++) {
+             n = fwM[s][myc + 1];
+	     if (1 == nullI[n] && n < s) {
+	       val = alp[s][t] * trp[s][n];	     
+	       if (alp[n][t] < val) {
+		 alp[n][t] = val;      
+		 pbuf[n][t] = s;
+	       }
+	       if (maxV < alp[n][t]) {     
+		 maxV = alp[n][t];      
+	       }
+	     }
+	  }
+        }
+
+	if (maxV < alp[s][t]) { maxV = alp[s][t];
+		              }
+     }
+
+     nrmF[t] = maxV; 
+
+     if (nrmF[t] == 0) {
+       nanF = 1;
+       return(nanF);
+     }
+
+     for (s = 0; s < ns; s++) {
+       alp[s][t] /= nrmF[t];
+     }
+  }
+
+  //Find the max ending state.....
+  
+  t = nt - 1;
+  maxV = alp[0][t];
+  mas = 0;
+  for (s = 1; s < ns; s++) {
+    if (alp[s][t] > maxV) {
+      maxV = alp[s][t];
+      mas = s;
+    }
+  }
+
+  //mas = ns - 1; //Choose the last state...
   lastS = mas;
 
   for (int t = nt - 1; t >= 0; t--) {

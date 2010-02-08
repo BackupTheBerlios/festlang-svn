@@ -1,0 +1,110 @@
+#!/bin/sh
+#####################################################-*-mode:shell-script-*-
+##                                                                       ##
+##                     Carnegie Mellon University                        ##
+##                        Copyright (c) 2007                             ##
+##                        All Rights Reserved.                           ##
+##                                                                       ##
+##  Permission is hereby granted, free of charge, to use and distribute  ##
+##  this software and its documentation without restriction, including   ##
+##  without limitation the rights to use, copy, modify, merge, publish,  ##
+##  distribute, sublicense, and/or sell copies of this work, and to      ##
+##  permit persons to whom this work is furnished to do so, subject to   ##
+##  the following conditions:                                            ##
+##   1. The code must retain the above copyright notice, this list of    ##
+##      conditions and the following disclaimer.                         ##
+##   2. Any modifications must be clearly marked as such.                ##
+##   3. Original authors' names are not deleted.                         ##
+##   4. The authors' names are not used to endorse or promote products   ##
+##      derived from this software without specific prior written        ##
+##      permission.                                                      ##
+##                                                                       ##
+##  CARNEGIE MELLON UNIVERSITY AND THE CONTRIBUTORS TO THIS WORK         ##
+##  DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING      ##
+##  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   ##
+##  SHALL CARNEGIE MELLON UNIVERSITY NOR THE CONTRIBUTORS BE LIABLE      ##
+##  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    ##
+##  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN   ##
+##  AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,          ##
+##  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF       ##
+##  THIS SOFTWARE.                                                       ##
+##                                                                       ##
+###########################################################################
+##                                                                       ##
+###########################################################################
+
+LANG=C; export LANG
+
+if [ ! "$ESTDIR" ]
+then
+   echo "environment variable ESTDIR is unset"
+   echo "set it to your local festvox directory e.g."
+   echo '   bash$ export ESTDIR=/home/awb/projects/speechtools/'
+   echo or
+   echo '   csh% setenv ESTDIR /home/awb/projects/speechtools/'
+   exit 1
+fi 
+
+if [ ! "$FESTVOXDIR" ]
+then
+   echo "environment variable FESTVOXDIR is unset"
+   echo "set it to your local festvox directory e.g."
+   echo '   bash$ export FESTVOXDIR=/home/awb/projects/festvox/'
+   echo or
+   echo '   csh% setenv FESTVOXDIR /home/awb/projects/festvox/'
+   exit 1
+fi
+
+export EHMMDIR=$FESTVOXDIR/src/ehmm
+export ISLICEDIR=$FESTVOXDIR/src/interslice
+
+if [ $# = 0 ]
+then 
+  echo "pass help as argument"
+fi 
+
+if [ "$1" = "help" ]
+then
+   $0 phseq
+   $0 feats
+   $0 align
+   $0 align1
+   exit
+fi
+
+if [ "$1" = "phseq" ]
+then
+    echo "EHMM extract phone sequences and base hmm state numbers"
+    $ESTDIR/../festival/bin/festival -b $ISLICEDIR/bin/phseq.scm '(genutt "islice/temp/blkf.pmt" "islice/temp/blkf.utt")'
+    $ESTDIR/../festival/bin/festival -b $ISLICEDIR/bin/phseq.scm '(phseq "islice/temp/blkf.pmt" "islice/etc/txt.phseq.data")'
+    perl $ISLICEDIR/bin/prmp2int.pl islice/etc/txt.phseq.data islice/etc/ph_list.int
+    perl $ISLICEDIR/bin/getwavlist.pl islice/etc/txt.phseq.data islice/etc/mywavelist
+fi
+
+if [ "$1" = "feats" ]
+then
+    echo "EHMM feature extraction and normalization"
+    $EHMMDIR/bin/FeatureExtraction islice/etc/mysp_settings islice/etc/mywavelist
+    perl $ISLICEDIR/bin/comp_dcep.pl islice/etc/mywavelist islice/feat mfcc ft 0 0
+          # (0, 0):  delta-cepstrals and delta-delta-cepstrals
+    perl $ISLICEDIR/bin/scale_feat.pl islice/etc/mywavelist islice/feat islice/mod ft 4
+          # (4): Scaling factor 
+fi
+
+if [ "$1" = "align" ]
+then
+    echo "EHMM align"
+    $EHMMDIR/bin/edec islice/etc/ph_list.int islice/etc/txt.phseq.data.int 1 islice/feat ft islice/etc/mysp_settings islice/mod 0 islice/tlab
+           # (1): Sequential Flag.. 0 - for nde Flag..
+    perl $ISLICEDIR/bin/sym2nm.pl islice/tlab islice/etc/ph_list.int  #Earlier it was .map
+    mv islice/tlab/* ./lab/
+fi
+
+if [ "$1" = "align1" ]
+then
+    echo "EHMM align"
+    $EHMMDIR/bin/edec islice/etc/ph_list.int islice/etc/txt.phseq.data.int 1 islice/feat ft islice/etc/mysp_settings islice/mod 1 islice/tlab
+           # (1): Sequential Flag.. 1 - ndeFlag....
+    perl $ISLICEDIR/bin/sym2nm.pl islice/tlab islice/etc/ph_list.int  #Earlier it was .map
+    mv islice/tlab/* ./lab/
+fi

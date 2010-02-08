@@ -61,6 +61,15 @@ set list_dir = ./list
 set src_dir  = $FESTVOXDIR/src/vc/src
 set csh_dir  = $FESTVOXDIR/src/vc/scripts/GMMMAP
 ###########################################################
+if ( $1 == "train_cg") then
+set SYNORG = 2  # source is from CG voice
+set EXPAR = 1	# Parameter Extraction
+set F0STS = 1	# Calculation of Statistics of F0
+set TRSPC = 1	# Training of Spectral Conversion Function
+set GVSTS = 1	# Calculation of Statistics of Global Variance
+set CPPAR = 1	# Copy Parameter Files
+set CVWAV = 0	# Test of Voice Conversion
+endif
 if ( $1 == "train") then
 set EXPAR = 1	# Parameter Extraction
 set F0STS = 1	# Calculation of Statistics of F0
@@ -101,6 +110,9 @@ if ($EXPAR == 1) then
 			$src_dir \
 			$olist
 	else
+            if ($SYNORG == 2) then
+                true; # do nothing
+            else
 		# F0 extraction
 		echo "# F0 extraction for source speech ..."
 		csh $csh_dir/get_f0.csh \
@@ -113,6 +125,7 @@ if ($EXPAR == 1) then
 			$work_dir \
 			$src_dir \
 			$olist
+            endif
 	endif
 
 	# F0 extraction

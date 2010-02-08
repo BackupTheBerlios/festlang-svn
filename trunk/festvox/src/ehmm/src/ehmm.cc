@@ -42,6 +42,7 @@
  #include "header.h"
 #endif
 
+#include <string.h>
 #include "hmmstate.h"
 #include "hmmword.h"
 
@@ -235,7 +236,7 @@ int main(int argc, char *argv[])
   StoreWordTran(trw, _now, mF);
 
   cout<<"Total Prompts: "<<_nsen<<endl;
-  while ((diff > _eps || _sitr < 4) && it < _maxIT) {
+  while ((diff > _eps || _sitr < 8) && it < _maxIT) {
 
       double avglh = 0;
       int acpT = 0;
@@ -1203,7 +1204,7 @@ void FillWordTrans_Seq(double **arcW, int *tar, int ltar, double **trw, int *bI,
 	  cn++;
        }	  
     }
-    if (cn == 0 & i != er - 1) {
+    if (cn == 0 && i != er - 1) {
       cout<<"State number is "<<i<<" : It does not seem to have any connections from it.. "<<endl;
       cout<<"Max states are: "<<er<<endl;
       exit(1);
@@ -1232,7 +1233,7 @@ void FillWordTrans_Seq(double **arcW, int *tar, int ltar, double **trw, int *bI,
 
      //if (j == 4) { cout<<" COUNT: "<<cn<<endl; }
      
-     if (cn == 0 & j != 0) {
+     if (cn == 0 && j != 0) {
       cout<<"State number is "<<j<<" : It does not seem to have any connections to it.. "<<endl;
       cout<<"Max states are: "<<er<<endl;
       exit(1);
@@ -1275,6 +1276,8 @@ double AlphaBetas_Seq(double **emt, int r, int c, double ** trp, double **alp, d
    
    int p, myc, n;
    int tit;
+
+   cout<<"NS x NT: "<<ns<<" x "<<nt<<endl;
 
    alp[s][t] = 0; //s = 0; and it is a null state..
    for (int myc = 0; myc < fwM[s][0]; myc++) {
@@ -1364,26 +1367,36 @@ double AlphaBetas_Seq(double **emt, int r, int c, double ** trp, double **alp, d
   t = nt - 1;
   s = ns - 1;
   bet[s][t] = 1;
-  for (myc = 0; myc < bwM[s][0]; myc++) {
+  bet[ns-2][t] = 1; //added 10 Mar 2007
+
+  //commented on 10 Mar 2007
+  /* for (myc = 0; myc < bwM[s][0]; myc++) {
      p = bwM[s][myc + 1];
      bet[p][t] = 1;
-  }
+  } */
 
   for (t = nt - 2; t >=0; t--) {
      tp1 = t + 1;
      
      for (s = ns - 1; s >= 0; s--) {
         bet[s][t] = 0;
-	tit = tp1;
 	for (myc = 0; myc < fwM[s][0]; myc++) {
 	   n = fwM[s][myc+1];	
-	   if (1 != nullI[n]) {	
+	   if (0 == nullI[n]) {
+	     tit = tp1;
              bet[s][t] += bet[n][tit] * trp[s][n] * emt[n][tit];
-	   }  
+	   } else if (1 == nullI[n]) {	
+	     tit = t;
+             bet[s][t] += bet[n][tit] * trp[s][n] * emt[n][tit];
+	   } else {
+             cout<<"The nullI should be 0 / 1 "<<endl;
+	     exit(1);
+	   }
 	} 
      }
 
-     for (s = ns - 1; s >=0; s--) {
+     //saving the below for-loop computation on Mar 10 2007.
+     /* for (s = ns - 1; s >=0; s--) {
         tit = t;
 	for (myc = 0; myc < fwM[s][0]; myc++) {
 	   n = fwM[s][myc+1];	
@@ -1392,7 +1405,7 @@ double AlphaBetas_Seq(double **emt, int r, int c, double ** trp, double **alp, d
            }
         }		
         /////bet[s][t] /= nrmF[tp1];
-     }
+     } */
      
      //cout<<"Beta: "<<t<<endl;
      for (s = ns - 1; s >= 0; s--) {

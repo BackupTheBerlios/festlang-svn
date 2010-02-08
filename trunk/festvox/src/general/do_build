@@ -73,6 +73,16 @@ then
    exit 0
 fi
 
+if [ "$PROMPTFILE" = "" ]
+then
+   if [ $# = 2 ]
+   then
+      export PROMPTFILE=$2
+   else
+      export PROMPTFILE=etc/txt.done.data
+   fi
+fi
+
 if [ "$1" = "setup" ]
 then
    shift
@@ -88,7 +98,14 @@ fi
 
 if [ "$1" = "build_prompts" ]
 then
-   $ESTDIR/../festival/bin/festival --heap 10000000 -b festvox/build_clunits.scm '(build_prompts "etc/txt.done.data")'
+   $ESTDIR/../festival/bin/festival --heap 10000000 -b festvox/build_clunits.scm '(build_prompts "'$PROMPTFILE'")'
+
+   exit 0
+fi
+
+if [ "$1" = "build_prompts_waves" ]
+then
+   $ESTDIR/../festival/bin/festival --heap 10000000 -b festvox/build_clunits.scm '(build_prompts_waves "'$PROMPTFILE'")'
 
    exit 0
 fi
@@ -96,7 +113,7 @@ fi
 if [ "$1" = "record" ]
 then
    # I doubt anyone will run this from here
-   ./bin/prompt_them etc/txt.done.data
+   ./bin/prompt_them $PROMPTFILE
    exit 0
 fi
 
@@ -120,32 +137,39 @@ fi
 
 if [ "$1" = "build_utts" ]
 then
-    $ESTDIR/../festival/bin/festival --heap 10000000 -b festvox/build_clunits.scm '(build_utts "etc/txt.done.data")'
+    $ESTDIR/../festival/bin/festival --heap 10000000 -b festvox/build_clunits.scm '(build_utts "'$PROMPTFILE'")'
    exit 0
 fi
 
 if [ "$1" = "do_pm" ]
 then
-    ./bin/make_pm_wave etc/txt.done.data
+    ./bin/make_pm_wave $PROMPTFILE
    exit 0
 fi
 
 if [ "$1" = "do_mcep" ]
 then
-    ./bin/make_mcep etc/txt.done.data
+    ./bin/make_mcep $PROMPTFILE
+   exit 0
+fi
+
+if [ "$1" = "do_lpc" ]
+then
+    ./bin/make_lpc $PROMPTFILE
    exit 0
 fi
 
 if [ "$1" = "build_clunits" ]
 then
-    $ESTDIR/../festival/bin/festival --heap 10000000 -b festvox/build_clunits.scm '(build_clunits "etc/txt.done.data")'
+    $ESTDIR/../festival/bin/festival --heap 10000000 -b festvox/build_clunits.scm '(build_clunits "'$PROMPTFILE'")'
    exit 0
 fi
 
 if [ "$1" = "do_dur" ]
 then
-    ./bin/make_dur_model &&
-    cp -p festvox/$FV_VOICENAME"_dur.scm" festvox/$FV_VOICENAME"_durdara.scm"
+   . etc/voice.defs
+   ./bin/make_dur_model $PROMPTFILE &&
+   cp -p festvox/$FV_VOICENAME"_dur.scm" festvox/$FV_VOICENAME"_durdata.scm"
    exit 0
 fi
 

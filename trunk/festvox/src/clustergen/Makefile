@@ -2,7 +2,7 @@
 ##                                                                       ##
 ##                   Language Technologies Institute                     ##
 ##                     Carnegie Mellon University                        ##
-##                       Copyright (c) 2005-2006                         ##
+##                       Copyright (c) 2005-2008                         ##
 ##                        All Rights Reserved.                           ##
 ##                                                                       ##
 ##  Permission is hereby granted, free of charge, to use and distribute  ##
@@ -40,7 +40,7 @@
 ###                                                                      ##
 ###  Was originally started as a better integration of HTS into FestVox  ##
 ###  but superceded the base part of HTS (called cgp here) and grew to   ##
-###  to include trajectory modeling.  This is also langueg independent   ##
+###  to include trajectory modeling.  This is also language independent  ##
 ###                                                                      ##
 ###########################################################################
 TOP=../..
@@ -48,12 +48,13 @@ DIRNAME=src/clustergen
 SCHEMEFILES = CLUSTERGEN_cg.scm CLUSTERGEN_statenames.scm \
               clustergen.scm clustergen_build.scm 
 SCRIPTS = setup_cg make_dur_model_mcep do_clustergen cg_resynth \
-          d2a.pl a2d.pl \
+          d2a.pl a2d.pl a2l.pl \
           cg_get_feats cg_get_f0_feats cg_get_track \
           cg_get_feats_all cg_get_feats_all_traj \
           cg_test track_diff track_diff_nof0 track_diff_f0 track_diff_mcd \
-	  cg_mco
-OTHERS = mcep.desc mceptraj.desc statedur.feats HOWTO
+	  track_diff_n cg_mco cg_mlpg make_voicing \
+          do_move_label
+OTHERS = mcep.desc mceptraj.desc statedur.feats statedur.feats_flite HOWTO
 MAINS = cg_lpc_resynth_main.c
 
 CGA = do_cga 

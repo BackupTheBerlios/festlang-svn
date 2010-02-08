@@ -51,7 +51,8 @@ SCRIPTS = find_unknowns.sh make_dirs make_lpc make_pm \
           align_phones make_pm_fix simple_powernormalize traintest \
           find_powercontours contour_powernormalize \
           make_dist guess_voice_defs make_cmn do_build \
-          make_samples reduce_prompts synthfile
+          make_samples reduce_prompts synthfile find_db_duration \
+          prune_silence
 FILES = Makefile $(SCRIPTS) $(EMUTPL) $(SRCS) 
 
 ALL = find_unknowns phonealign fix_pm smooth_f0 powcont_norm cmn

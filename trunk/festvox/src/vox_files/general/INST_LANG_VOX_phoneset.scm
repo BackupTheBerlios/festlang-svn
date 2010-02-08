@@ -56,10 +56,10 @@
    ;; lip rounding
    (vrnd + - 0)
    ;; consonant type: stop fricative affricative nasal liquid
-   (ctype s f a n l 0)
+   (ctype s f a n l r 0)
    ;; place of articulation: labial alveolar palatal labio-dental
    ;;                         dental velar
-   (cplace l a p b d v 0)
+   (cplace l a p b d v g 0)
    ;; consonant voicing
    (cvox + - 0)
    )

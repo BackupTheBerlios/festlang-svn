@@ -35,6 +35,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! "$ESTDIR" ]
 then
    echo "environment variable ESTDIR is unset"
@@ -130,6 +132,7 @@ echo "FV_FULLVOICENAME=\$FV_VOICENAME\"_\"\$FV_TYPE" >>etc/voice.defs
 
 cp -p $CLUSTERGENDIR/do_clustergen bin
 cp -p $CLUSTERGENDIR/make_dur_model_mcep bin
+cp -p $CLUSTERGENDIR/make_voicing bin
 cp -p $CLUSTERGENDIR/statedur.feats festival/dur/etc
 if [ -f $FESTVOXTEMPLATEDIR/$FV_LANG/statedur.feats ]
 then
@@ -151,6 +154,7 @@ do
    sed 's%VOX%'$FV_VOX'%g' |
    sed 's%CURRENTDIR%'"$CURRENTDIR"'%g' >festvox/$fname
 done
+
 
 echo "(set! $FV_INST"_"$FV_LANG"_"$FV_VOX::zdur_tree nil)" >festvox/$FV_INST"_"$FV_LANG"_"$FV_VOX"_durdata_cg.scm"
 echo "(set! $FV_INST"_"$FV_LANG"_"$FV_VOX::phone_durs nil)" >>festvox/$FV_INST"_"$FV_LANG"_"$FV_VOX"_durdata_cg.scm"

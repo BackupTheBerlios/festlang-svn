@@ -123,6 +123,8 @@ cp -p $FESTVOXDIR/src/general/emu_hier.tpl etc/emu_hier.tpl
 cp -p $FESTVOXDIR/src/general/make_samples bin
 cp -p $FESTVOXDIR/src/general/reduce_prompts bin
 cp -p $FESTVOXDIR/src/general/synthfile bin
+cp -p $FESTVOXDIR/src/general/find_db_duration bin
+cp -p $FESTVOXDIR/src/general/prune_silence bin
 cp -p $FESTVOXDIR/src/st/sphinxtrain bin
 cp -p $FESTVOXDIR/src/st/sphinx_lab bin
 cp -p $FESTVOXDIR/src/st/build_st.scm festvox

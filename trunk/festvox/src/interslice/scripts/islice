@@ -1,0 +1,167 @@
+#!/bin/sh
+#####################################################-*-mode:shell-script-*-
+##                                                                       ##
+##                     Carnegie Mellon University                        ##
+##                        Copyright (c) 2007                             ##
+##                        All Rights Reserved.                           ##
+##                                                                       ##
+##  Permission is hereby granted, free of charge, to use and distribute  ##
+##  this software and its documentation without restriction, including   ##
+##  without limitation the rights to use, copy, modify, merge, publish,  ##
+##  distribute, sublicense, and/or sell copies of this work, and to      ##
+##  permit persons to whom this work is furnished to do so, subject to   ##
+##  the following conditions:                                            ##
+##   1. The code must retain the above copyright notice, this list of    ##
+##      conditions and the following disclaimer.                         ##
+##   2. Any modifications must be clearly marked as such.                ##
+##   3. Original authors' names are not deleted.                         ##
+##   4. The authors' names are not used to endorse or promote products   ##
+##      derived from this software without specific prior written        ##
+##      permission.                                                      ##
+##                                                                       ##
+##  CARNEGIE MELLON UNIVERSITY AND THE CONTRIBUTORS TO THIS WORK         ##
+##  DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING      ##
+##  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   ##
+##  SHALL CARNEGIE MELLON UNIVERSITY NOR THE CONTRIBUTORS BE LIABLE      ##
+##  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    ##
+##  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN   ##
+##  AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,          ##
+##  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF       ##
+##  THIS SOFTWARE.                                                       ##
+##                                                                       ##
+###########################################################################
+##                                                                       ##
+###########################################################################
+
+LANG=C; export LANG
+
+if [ ! "$FESTVOXDIR" ]
+then
+  echo "environment variable FESTVOXDIR is unset"
+  echo "set it to your local festvox directory e.g."
+  echo '   bash$ export FESTVOXDIR=/home/awb/projects/festvox/'
+  echo or
+  echo '   csh% setenv FESTVOXDIR /home/awb/projects/festvox/'
+  exit 1
+fi
+
+if [ ! "$ESTDIR" ]
+then
+  echo "environment variable ESTDIR is unset"
+  echo "set it to your local festvox directory e.g."
+  echo '   bash$ export ESTDIR=/home/awb/projects/speechtools/'
+  echo or
+  echo '   csh% setenv ESTDIR /home/awb/projects/speechtools/'
+  exit 1
+fi
+
+export EHMMDIR=$FESTVOXDIR/src/ehmm
+export ISLICEDIR=$FESTVOXDIR/src/interslice
+
+prefix=$4
+pau_dur=$5
+if [ $# = 3 ]
+then
+   prefix="data_"
+   pau_dur=0.15
+fi
+if [ $# = 4 ]
+then
+   pau_dur=0.15
+fi
+
+if [ $# = 0 ]
+then
+  $0 help
+  exit
+fi
+
+if [ "$1" = "help" ]
+then
+  echo "$FESTVOXDIR/src/interslice/bin/islice mp3 [mp3file] [txtfile] [prefix-id] [pau_dur]"
+  echo "$FESTVOXDIR/src/interslice/bin/islice wav [wavfile] [txtfile] [prefix-id] [pau_dur]"
+  exit
+fi
+
+if [ "$1" = "setup" ]
+then
+   mkdir islice
+   mkdir islice/wav
+   mkdir islice/etc
+   mkdir islice/tlab
+   mkdir islice/temp
+   mkdir islice/mod
+   mkdir islice/feat
+   cp -p $ISLICEDIR/model/ph_list.int islice/etc
+   cp -p $ISLICEDIR/model/global_mn_vr.txt islice/mod
+   cp -p $ISLICEDIR/model/log101.txt islice/mod
+   cp -p $ISLICEDIR/model/model101.txt islice/mod
+   if [ ! -d etc ]
+   then
+      mkdir etc
+   fi
+   if [ ! -d lab ]
+   then
+      mkdir lab
+   fi
+   if [ ! -d wav ]
+   then
+      mkdir wav
+   fi
+
+   exit 0
+fi
+
+if [ "$1" = "mp3" ]
+then
+
+  if [ ! -d islice ]
+  then
+     $0 setup
+  fi
+  echo "mp3 to wav conversion.."
+  echo "ASSUMING  mpg123 available at command prompt"
+  mpg123 -w tmp1.wav $2  
+
+  if [ ! -f tmp1.wav ]
+  then
+     echo "mpg123 did not expand mp3 file"
+     exit 1
+  fi
+  $ESTDIR/bin/ch_wave -c 0 -F 16000 -otype riff -o islice/wav/tmp.wav -itype riff tmp1.wav
+
+  $0 wav islice/wav/tmp.wav $3 $prefix $pau_dur
+
+  exit 0
+
+fi
+
+if [ "$1" = "wav" ]
+then
+  if [ ! -d islice ]
+  then
+     $0 setup
+  fi
+  echo "start slicing..."
+
+  $FESTVOXDIR/src/promptselect/text2utts -all -level Word -otype raw -o islice/etc/${prefix}.txt $3
+  $FESTVOXDIR/src/promptselect/text2utts -all -level Word -dbname ${prefix} -otype data -o islice/etc/${prefix}.data $3
+  perl $ISLICEDIR/bin/process_txt.pl islice/etc/$prefix.txt islice/etc/txt.raw.txt
+
+  $ISLICEDIR/bin/interslice $2 islice/etc/txt.raw.txt $prefix $pau_dur
+
+  cat etc/${prefix}_tim.seg.data | 
+  awk '{printf("( %s )\n",$0)}' >etc/${prefix}_tim.seg.times
+  $ESTDIR/../festival/bin/festival -b $ISLICEDIR/bin/islice.scm '(find_utt_boundaries "'islice/etc/$prefix.data'" "'etc/${prefix}_txt.seg.data'" "'etc/${prefix}_tim.seg.times'" "'etc/${prefix}.data'")'
+
+  $ISLICEDIR/bin/slice_wav $2 wav etc/${prefix}.data
+
+  exit 0
+fi
+
+echo $0: unknown option $1
+exit 1
+
+
+
+

@@ -58,10 +58,17 @@ then
    exit 1
 fi
 
-for i in $*
+PROMPTFILE=etc/txt.done.data
+if [ $# = 1 ]
+then
+   PROMPTFILE=$1
+fi
+
+awk '{print $2}' $PROMPTFILE |
+while read i
 do
-   fname=`basename $i .wav`
-   echo $i LPC
+   fname=$i
+   echo $fname LPC
 
    # Potentially normalise the power (if powfact is there)
    if [ -f etc/powfacts ]
@@ -71,9 +78,9 @@ do
        then
            powfact=1.0
        fi
-       $ESTDIR/bin/ch_wave -scale $powfact $i -o /tmp/tmp$$.wav
+       $ESTDIR/bin/ch_wave -scale $powfact wav/$fname.wav -o /tmp/tmp$$.wav
    else
-       cat $i >/tmp/tmp$$.wav    
+       cat wav/$fname.wav >/tmp/tmp$$.wav    
    fi
    # Change the overall volume too, of the normalised file
    # $ESTDIR/bin/ch_wave -scaleN 0.65 -o /tmp/tmp$$.wav /tmp/tmp$$.wav

@@ -63,7 +63,8 @@ then
    $0 feats
    $0 bw
    $0 align
-   exit
+   $0 standardize_statenames
+   exit 0
 fi
 
 if [ "$1" = "help" ]
@@ -73,7 +74,8 @@ then
    echo "feats"
    echo "bw"
    echo "align"
-   exit
+   echo "standardize_statenames"
+   exit 0
 fi
 
 
@@ -85,6 +87,7 @@ then
     mkdir ehmm/etc
     mkdir ehmm/mod
     cp -p $EHMMDIR/etc/mysp_settings ehmm/etc
+    exit 0
 fi
 
 if [ "$1" = "phseq" ]
@@ -93,6 +96,7 @@ then
     $ESTDIR/../festival/bin/festival -b $EHMMDIR/bin/phseq.scm '(phseq "'$PROMPTFILE'" "ehmm/etc/txt.phseq.data")'
     perl $EHMMDIR/bin/phfromutt.pl ehmm/etc/txt.phseq.data ehmm/etc/ph_list 5
     perl $EHMMDIR/bin/getwavlist.pl ehmm/etc/txt.phseq.data ehmm/etc/mywavelist
+    exit 0
 fi
 
 if [ "$1" = "feats" ]
@@ -105,6 +109,7 @@ then
           # (4): Scaling factor 
     perl $EHMMDIR/bin/seqproc.pl ehmm/etc/txt.phseq.data ehmm/etc/ph_list 2 2 13
           #Last params: no.gaussains, no. of connections, feature_dimension
+    exit 0
 fi
 
 if [ "$1" = "bw" ]
@@ -113,13 +118,15 @@ then
     $EHMMDIR/bin/ehmm ehmm/etc/ph_list.int ehmm/etc/txt.phseq.data.int 1 0 ehmm/feat ft ehmm/mod 0 0 0
             #Numbers (1, 0): Sequential Flag, Retrain Flag
             #Numbers (0, 0, 0): Fully-Connected Flag, Perturbation Flag, Skip-Flag
+   exit 0
 fi
 
 if [ "$1" = "align" ]
 then
     echo "EHMM align"
-    $EHMMDIR/bin/edec ehmm/etc/ph_list.int ehmm/etc/txt.phseq.data.int 1 ehmm/feat ft ehmm/etc/mysp_settings ehmm/mod
+    $EHMMDIR/bin/edec ehmm/etc/ph_list.int ehmm/etc/txt.phseq.data.int 1 ehmm/feat ft ehmm/etc/mysp_settings ehmm/mod 0 lab
            # (1): Sequential Flag..
+	   # (0): nde flag if 1 uses Viterbi_NDE
     perl $EHMMDIR/bin/sym2nm.pl lab ehmm/etc/ph_list.int  #Earlier it was .map
     ###perl $EHMMDIR/bin/check_lab.pl lab ehmm/etc/txt.phseq.data  #commented due to use of short pause..
     if [ ! -f etc/silence ]
@@ -136,6 +143,7 @@ then
              printf("\n");
           }}' |
     sed 's/ ssil/ '$SILENCE'/g' >etc/statenames
+    exit 0
 fi
 
 if [ "$1" = "standardize_statenames" ]
@@ -173,15 +181,17 @@ then
               printf("  else\n");
               printf("     printf(\"%%s 125 %%d %%s\\n\",$1,statenamemap[$3],statename[$3])\n");
               printf("}\n");}' >etc/mapstatenames.awk
-   cat etc/txt.done.data |
+   cat ${PROMPTFILE} |
    awk '{print $2}' |
    while read x
    do
       mv lab/$x.sl lab/$x.slehmm
       awk -f etc/mapstatenames.awk lab/$x.slehmm >lab/$x.sl
    done
+   exit 0
 fi
 
-exit
+echo do_ehmm: unknown option $1
+exit 1
 
 

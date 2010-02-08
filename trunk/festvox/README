@@ -16,18 +16,21 @@ system for that matter) are still nowhere near perfect quality.
 This distribution includes
     Support for designing, recording and autolabelling diphone databases
     Support for designing, recording and autolabelling unit selection dbs
+    Support for designing, recording and autolabelling statistical parametric
+        synthesis voices
     Building simple limited domain synthesis engines
     Support for building rule driven and data driven prosody models
        (duration, intonation and phrasing)
     Support for building rule driven and data driven text analysis
     Lexicon and building Letter to Sound rule support
     Predefined scripts for building new US (and UK) English voices
+    Scripts for designing and selecting prompts to record in
+       arbitrary languages
 
-New in 2.1
-    Voice transformation support
-    An HMM-based labeling system (better tuned for labeling synthesis dbs)
-    Letter to sound rule build code and examples
-    F0 unit selection for F0 modeling
+New in 2.3
+    
+    Support for cygwin tools under Windows
+    Substantially improved CLUSTERGEN support with mlpg and mlsb
 
 WARNING
 
@@ -79,9 +82,9 @@ INSTALLATION
 You must have the Edinburgh Speech Tools and Festival instllation
 before you can build the tools in the festvox distribution.
 
-Unpack festvox-2.1-release.tar.gz
+Unpack festvox-2.4-release.tar.gz
 
-    tar zxvf festvox-2.1-release.tar.gz
+    tar zxvf festvox-2.4-release.tar.gz
     cd festvox
     ./configure
     make

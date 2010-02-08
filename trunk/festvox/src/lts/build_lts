@@ -85,6 +85,21 @@ then
    exit 0
 fi
 
+if [ "$1" = "make_allowables_smt" ]
+then
+   # Automatic build of allowables
+   if [ -f allowables.scm ]
+   then
+      cp -p allowables.scm allowables.scm-old
+   fi
+
+   $FESTIVAL -b "(require 'lts_build)" '(dump-lets-phones "lts_scratch/lex_entries.out")'
+
+   $FESTVOXDIR/src/lts/make_allows-smt >allowables.scm
+
+   exit 0
+fi
+
 if [ "$1" = "cummulate" ]
 then
 

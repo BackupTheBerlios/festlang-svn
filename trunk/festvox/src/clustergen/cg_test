@@ -39,6 +39,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! "$ESTDIR" ]
 then
    echo "environment variable ESTDIR is unset"
@@ -64,15 +66,21 @@ then
     CLUSTERGENDIR=$FESTVOXDIR/src/clustergen
 fi
 
-if [ "$PROMPTFILE" = "" ]
+if [ $# = 3 ]
 then
-   PROMPTFILE=etc/txt.done.data
+   TESTFILE=$3
+else
+   TESTFILE=etc/txt.done.data.test
 fi
 
 if [ ! -d test ]
 then
    mkdir test
 fi
+
+SIODHEAPSIZE=20000000
+HEAPSIZE=$SIODHEAPSIZE
+export SIODHEAPSIZE
 
 EXPERIMENT=$2
 
@@ -85,24 +93,48 @@ fi
 
 if [ $1 = resynth ]
 then
-   $0 test_resynth $EXPERIMENT
-   $0 test_resynth_costs $EXPERIMENT
-   $0 test_resynth_costs_f0 $EXPERIMENT
-   $0 test_resynth_costs_nof0 $EXPERIMENT
-   $0 test_resynth_costs_mcd $EXPERIMENT
+   $0 test_resynth $EXPERIMENT $TESTFILE
+   ( $0 test_resynth_costs $EXPERIMENT $TESTFILE ; 
+     $0 test_resynth_costs_f0 $EXPERIMENT $TESTFILE ;
+     $0 test_resynth_costs_nof0 $EXPERIMENT $TESTFILE ;
+     $0 test_resynth_costs_mcd $EXPERIMENT $TESTFILE ) | 
+   tee test/$EXPERIMENT/scores
+   exit 0
+fi
+
+if [ $1 = mcdf0 ]
+then
+   $0 test_mcdf0 $EXPERIMENT $TESTFILE
+   $0 test_resynth_costs_f0 $EXPERIMENT $TESTFILE
+   $0 test_resynth_costs_mcd $EXPERIMENT $TESTFILE
+   exit 0
+fi
+
+if [ $1 = resynth_n ]
+then
+   $0 test_resynth $EXPERIMENT $TESTFILE
+#   $0 test_resynth_costs_f0 $EXPERIMENT $TESTFILE
+#   $0 test_resynth_costs $EXPERIMENT $TESTFILE
+   $0 test_resynth_costs_n 1 $EXPERIMENT $TESTFILE
+   $0 test_resynth_costs_n 2 $EXPERIMENT $TESTFILE
+   $0 test_resynth_costs_n 3 $EXPERIMENT $TESTFILE
+   $0 test_resynth_costs_n 4 $EXPERIMENT $TESTFILE
+   $0 test_resynth_costs_n 5 $EXPERIMENT $TESTFILE
+   $0 test_resynth_costs_n 29 $EXPERIMENT $TESTFILE
+#   $0 test_resynth_costs_mcd $EXPERIMENT $TESTFILE
    exit 0
 fi
 
 if [ $1 = synth ]
 then
-   $0 test_synth $EXPERIMENT
-   $0 test_synth_costs $EXPERIMENT
+   $0 test_synth $EXPERIMENT $TESTFILE
+   $0 test_synth_costs $EXPERIMENT $TESTFILE
    exit 0
 fi
 
 if [ $1 = "test_synth" ]
 then
-   $ESTDIR/../festival/bin/festival --heap 10000000  -b festvox/$FV_VOICENAME"_cg.scm" $CLUSTERGENDIR/clustergen_build.scm '(begin (voice_'$FV_VOICENAME'_cg) (ClusterGen_test_set "'$PROMPTFILE'.test" "'test/$EXPERIMENT'"))'
+   $ESTDIR/../festival/bin/festival --heap $HEAPSIZE  -b festvox/$FV_VOICENAME"_cg.scm" $CLUSTERGENDIR/clustergen_build.scm '(begin (voice_'$FV_VOICENAME'_cg) (ClusterGen_test_set "'$TESTFILE'" "'test/$EXPERIMENT'"))'
    exit 0
 fi
 
@@ -131,13 +163,19 @@ fi
 
 if [ $1 = "test_resynth" ]
 then
-   $ESTDIR/../festival/bin/festival --heap 10000000  -b festvox/$FV_VOICENAME"_cg.scm" $CLUSTERGENDIR/clustergen_build.scm '(begin (voice_'$FV_VOICENAME'_cg) (ClusterGen_test_resynth "'$PROMPTFILE'.test" "'test/$EXPERIMENT'"))'
+   $ESTDIR/../festival/bin/festival --heap $HEAPSIZE -b festvox/$FV_VOICENAME"_cg.scm" $CLUSTERGENDIR/clustergen_build.scm '(begin (voice_'$FV_VOICENAME'_cg) (ClusterGen_test_resynth "'$TESTFILE'" "'test/$EXPERIMENT'"))'
+   exit 0
+fi
+
+if [ $1 = "test_mcdf0" ]
+then
+   $ESTDIR/../festival/bin/festival --heap $HEAPSIZE -b festvox/$FV_VOICENAME"_cg.scm" $CLUSTERGENDIR/clustergen_build.scm '(begin (voice_'$FV_VOICENAME'_cg) (setq cg::generate_resynth_waves nil) (ClusterGen_test_resynth "'$TESTFILE'" "'test/$EXPERIMENT'"))'
    exit 0
 fi
 
 if [ $1 = "test_resynth_costs" ]
 then
-   for i in `cat $PROMPTFILE.test | awk '{print $2}'`
+   for i in `cat $TESTFILE | awk '{print $2}'`
    do
       fname=$i
       $CLUSTERGENDIR/track_diff ccoefs/$i.mcep test/$EXPERIMENT/$i.mcep |
@@ -150,7 +188,7 @@ fi
 
 if [ $1 = "test_resynth_costs_nof0" ]
 then
-   for i in `cat $PROMPTFILE.test | awk '{print $2}'`
+   for i in `cat $TESTFILE | awk '{print $2}'`
    do
       fname=$i
 #      echo $fname >/dev/tty
@@ -164,7 +202,7 @@ fi
 
 if [ $1 = "test_resynth_costs_mcd" ]
 then
-   for i in `cat $PROMPTFILE.test | awk '{print $2}'`
+   for i in `cat $TESTFILE | awk '{print $2}'`
    do
       fname=$i
 #      echo $fname >/dev/tty
@@ -178,7 +216,7 @@ fi
 
 if [ $1 = "test_resynth_costs_f0" ]
 then
-   for i in `cat $PROMPTFILE.test | awk '{print $2}'`
+   for i in `cat $TESTFILE | awk '{print $2}'`
    do
       fname=$i
 #      echo $fname >/dev/tty
@@ -188,6 +226,36 @@ then
    awk '{ n=1.0*$NF; sum+=$1*n; var+=$2*n; samples+=n}
         END {printf("F0   mean %f std %f var %f n %d\n",sum/samples,sqrt(var/samples),var/samples,samples)}'
   exit 0
+fi
+
+if [ $1 = "score_frames" ]
+then
+   # not going to work any more
+   $ESTDIR/../festival/bin/festival --heap $HEAPSIZE -b festvox/$FV_VOICENAME"_cg.scm" $CLUSTERGENDIR/clustergen_build.scm '(begin (voice_'$FV_VOICENAME'_cg) (ClusterGen_score_frames "'NotWorking'" "scores"))'
+   exit 0
+fi
+
+if [ $1 = "test_resynth_costs_n" ]
+then
+   for i in `cat $TESTFILE.test | awk '{print $2}'`
+   do
+      fname=$i
+#      echo $fname >/dev/tty
+#      $CLUSTERGENDIR/track_diff_n $2 ccoefs/$i.mcep test/$3/$i.mcep |
+      ## HNM
+      $CLUSTERGENDIR/track_diff_n $2 hnm/$i.hnm test/$3/$i.mcep |
+      awk '{print $2,$6,$NF}'
+   done |
+   awk '{ n=1.0*$NF; sum+=$1*n; var+=$2*n; samples+=n}
+        END {printf("n %2d mean %f std %f var %f n %d\n",'$2',sum/samples,sqrt(var/samples),var/samples,samples)}'
+  exit 0
+fi
+
+if [ $1 = "tts" ]
+then
+   $FESTVOXDIR/src/promptselect/text2utts -all -odir test/$EXPERIMENT -itype data -otype wavs -eval festvox/${FV_VOICENAME}_cg.scm -eval "(voice_"${FV_VOICENAME}"_cg)" $TESTFILE
+
+   exit 0
 fi
 
 echo cg_test: unknown options $*

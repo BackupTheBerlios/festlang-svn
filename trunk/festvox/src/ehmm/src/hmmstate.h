@@ -552,12 +552,22 @@ void stC::RandomInit(int prbF) {  //perturb Flag....
    }
 
    double ut;
+   double strn = 0.8;
 
-   ut = 1.0/nc;
    //nc == 1 in case of last nodes in the word model...
-   if (1 == nc)  { ut = 0.8;
-                 }
-   for (int j = 0; j < nc; j++) {
+   if (0 == nc) {
+     cout<<"No. of connections cann't be zero...\n";
+     exit(1);
+   }
+
+   if (1 == nc) { 
+      ut = strn;
+   } else {
+     ut = (1.0 - strn) / (nc - 1);
+   }
+
+   trp[0] = strn;
+   for (int j = 1; j < nc; j++) {
       trp[j] = ut;    //Transitions..
    }
 
