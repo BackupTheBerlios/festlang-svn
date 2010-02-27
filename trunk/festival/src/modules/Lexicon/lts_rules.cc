@@ -187,7 +187,7 @@ void LTS_Ruleset::update_alphabet(LISP newitems)
 static LISP fix_postfix_ops(LISP l)
 {
     // This list have been built in reverse so the postfix operators * and +
-    // are wrong.  Destrictively fix them
+    // are wrong.  Destructively fix them
     LISP p,q;
 
     for (p=l; p != NIL; p=cdr(p))

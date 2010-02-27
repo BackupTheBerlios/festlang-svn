@@ -69,7 +69,7 @@ class EST_SCFG_Chart_Edge {
     ~EST_SCFG_Chart_Edge();
     //@}
 
-    /// Postion, 0 1 or 2, where 0 is empty, 1 is incomplete 2 is complete.
+    /// Position, 0 1 or 2, where 0 is empty, 1 is incomplete 2 is complete.
     int pos(void) { return p_pos; }
     /// Edge probability
     double prob(void) { return p_prob; }
