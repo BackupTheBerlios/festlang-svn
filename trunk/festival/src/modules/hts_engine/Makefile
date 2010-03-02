@@ -81,7 +81,7 @@ LIB_BUILD_DIRS=lib
 BUILD_DIRS=$(LIB_BUILD_DIRS) bin
 
 ## All sub directories
-ALL_DIRS=$(BUILD_DIRS) include
+ALL_DIRS=$(BUILD_DIRS)
 
 
 ###########################################################################

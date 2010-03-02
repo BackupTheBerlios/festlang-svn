@@ -35,7 +35,7 @@ DIRNAME=src/include
 H = festival.h \
     Phone.h intonation.h lexicon.h \
     text.h fngram.h modules.h ModuleDescription.h \
-    module_support.h
+    module_support.h HTS_engine.h
 FILES=Makefile $(H)
 
 include $(TOP)/config/common_make_rules

@@ -99,8 +99,6 @@ INLIB = $(TOP)/src/lib/libFestival.a
 ###########################################################################
 ## Any directory specific compilation rules would go here.
 
-LOCAL_INCLUDES += -I../include
-
 ##
 
 ###########################################################################
