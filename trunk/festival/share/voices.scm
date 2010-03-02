@@ -230,6 +230,34 @@ These names can be used as arguments to voice.description and
 voice.describe."
    (mapcar car voice-locations))
 
+(define (voice.find parameters)
+"(voice.find PARAMETERS)
+List of the (potential) voices in the system that match the PARAMETERS described
+in the proclaim_voice description fields."
+  (let ((voices (eval (list voice.list)))
+        (validvoices nil)
+        (voice nil)
+       )
+       (while parameters
+
+             (while voices
+               (set! voice (car voices))
+;;I believe the next line should be improved. equal? doesn't work always.
+               (if (equal? (list (cadr (assoc (caar parameters) (cadr (assoc voice Voice_descriptions))))) (cdar parameters))
+                  (begin
+                     (set! validvoices (append (list voice) validvoices))
+                  )
+               )
+               (set! voices (cdr voices))
+             )
+       (set! voices validvoices)
+       (set! validvoices nil)
+       (set! parameters (cdr parameters))
+       )
+voices
+  )
+)
+
 ;; Voices are found on the voice-path if they are in directories of the form
 ;;		DIR/LANGUAGE/NAME
 
@@ -350,17 +378,25 @@ A variable whose value is a function name that is called on start up to
 the default voice. [see Site initialization]")
 
 (defvar default-voice-priority-list 
-  '(nitech_us_slt_arctic_hts
-    nitech_us_awb_arctic_hts
-    nitech_us_bdl_arctic_hts
-    nitech_us_clb_arctic_hts
-    nitech_us_jmk_arctic_hts
-    nitech_us_rms_arctic_hts
-    kal_diphone
-    ked_diphone
-    cstr_us_awb_arctic_multisyn
-    cstr_us_jmk_arctic_multisyn
+  (reverse (remove-duplicates (reverse 
+  (append 
+    (list 'nitech_us_slt_arctic_hts
+          'nitech_us_awb_arctic_hts
+          'nitech_us_bdl_arctic_hts
+          'nitech_us_clb_arctic_hts
+          'nitech_us_jmk_arctic_hts
+          'nitech_us_rms_arctic_hts
+          'kal_diphone
+          'ked_diphone
+          'cstr_us_awb_arctic_multisyn
+          'cstr_us_jmk_arctic_multisyn
     )
+    (voice.find (list (list 'engine 'hts)))
+    (voice.find (list (list 'engine 'diphone)))
+    (voice.find (list (list 'engine 'clunits)))
+    (voice.find (list (list 'engine 'clustergen)))
+    (voice.list)
+  ))))
   "default-voice-priority-list
    List of voice names. The first of them available becomes the default voice.")
 
@@ -388,34 +424,6 @@ the default voice. [see Site initialization]")
   finish
   )
   )
-
-(define (voice.find parameters)
-"(voice.find PARAMETERS)
-List of the (potential) voices in the system that match the PARAMETERS described
-in the proclaim_voice description fields."
-  (let ((voices (eval (list voice.list)))
-        (validvoices nil)
-        (voice nil)
-       )
-       (while parameters
-
-             (while voices
-               (set! voice (car voices))
-;;I believe the next line should be improved. equal? doesn't work always.
-               (if (equal? (list (cadr (assoc (caar parameters) (cadr (assoc voice Voice_descriptions))))) (cdar parameters))
-                  (begin
-                     (set! validvoices (append (list voice) validvoices))
-                  )
-               )
-               (set! voices (cdr voices))
-             )
-       (set! voices validvoices)
-       (set! validvoices nil)
-       (set! parameters (cdr parameters))
-       )
-voices
-  )
-)
 
 (set_voice_default  default-voice-priority-list)
 (provide 'voices)
