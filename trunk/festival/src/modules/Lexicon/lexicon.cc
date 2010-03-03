@@ -784,7 +784,7 @@ void festival_Lexicon_init(void)
   Compile the list of lexical entries in ENTRYFILE into a compiled file in\n\
   COMPILEFILE.  [see Defining lexicons]");
     init_fsubr("lts.ruleset",lts_def_ruleset,
-    "(lts.ruleset NAME RULES SETS)\n\
+    "(lts.ruleset NAME RULES SETS USE_UTF-8)\n\
   Define a new set of letter to sound rules. [see Letter to sound rules]");
     init_subr_2("lts.apply",lts_apply_ruleset,
     "(lts.apply WORD RULESETNAME)\n\
@@ -792,7 +792,7 @@ void festival_Lexicon_init(void)
   [see Letter to sound rules]");
     init_subr_2("lts.in.alphabet",lts_in_alphabet,
     "(lts.in.alphabet WORD RULESETNAME)\n\
-  Returns t is all characters in symbol word (or items in list WORD)\n\
+  Returns t if all characters in symbol word (or items in list WORD)\n\
   are in the alphabet of letter to sound ruleset name RULESETNAME.  nil\n\
   otherwise. [see Letter to sound rules]");
     init_subr_0("lts.list",lts_list,

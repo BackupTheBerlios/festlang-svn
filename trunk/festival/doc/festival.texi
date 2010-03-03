@@ -2980,10 +2980,12 @@ From lisp there are three basic access functions, there
 are corresponding functions in the C/C++ domain.
 
 @table @code
-@item (lts.ruleset NAME SETS RULES)
+@item (lts.ruleset NAME SETS RULES UTF-8)
 Define a new set of lts rules.  Where @code{NAME} is the name for this
 rule, SETS is a list of set definitions of the form @code{(SETNAME e0 e1
-...)}  and @code{RULES} are a list of rules as described above.
+...)}  and @code{RULES} are a list of rules as described above. UTF-8 is optional,
+if UTF-8 is @code{t}, words will be split into characters according to UTF-8 
+standard instead of being split in bytes.
 @item (lts.apply WORD RULESETNAME)
 Apply the set of rules named @code{RULESETNAME} to @code{WORD}.  If
 @code{WORD} is a symbol it is exploded into a list of the individual
@@ -3042,6 +3044,8 @@ alphabet languages like Japanese and Chinese.  The process described
 here is not (yet) fully automatic but the hand intervention required is
 small and may easily be done even by people with only a very little
 knowledge of the language being dealt with.
+
+
 
 The process involves the following steps
 @itemize @bullet

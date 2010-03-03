@@ -68,10 +68,17 @@
 
 (defvar lts_pos nil)
 
-(define (lts_predict word rules)
-  "(lts_predict word rules)
-Return list of phones related to word using CART trees."
- (let ((utt (make_let_utt (enworden (wordexplode word)))))
+(define (lts_foresee word rules utf8)
+  "(lts_foresee word rules utf8)
+Return list of phones related to word using CART trees. If
+LTS Rules are UTF-8 based, then utf8 should be set to t, Otherwise
+utf8 should be set to nil."
+ 
+ (let ((utt (make_let_utt (enworden 
+            (if (utf8) (wordexplode_utf8 word)
+                       (wordexplode word)
+            )
+      ))))
     (predict_phones utt rules)
     (cdr (reverse (cdr (reverse ;; remove #'s
       (mapcar 
@@ -80,10 +87,29 @@ Return list of phones related to word using CART trees."
     )
 )
 
+(define (lts_predict word rules)
+  "(lts_predict word rules)
+Return list of phones related to word using CART trees."
+   (lts_foresee word rules nil)
+)
+
 (define (wordexplode lets)
+ "(wordexplode lets)
+Return the list of characters that form 'lets'."
   (if (consp lets)
       lets
-      (symbolexplode lets)))
+      (symbolexplode lets)
+      )
+)
+
+(define (wordexplode_utf8 lets)
+ "(wordexplode lets)
+Return the list of characters that form 'lets'."
+  (if (consp lets)
+      lets
+      (utf8explode lets)
+      )
+  )
 
 (define (make_let_utt letters)
 "(make_let_utt letters)
