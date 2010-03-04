@@ -116,6 +116,13 @@ extern "C" {
 #define finite(X) _finite(X)
 #endif
 
+/*Edit by sergioller: Not sure if this is the right place/right way to define this: */
+#if defined(__CYGWIN32__)
+#ifndef isnanf
+#define isnanf(N) 0
+#endif
+#endif
+
 /* These are making assumptions about the under lying architecture  */
 /* that could be wrong (though most probably in a conservative way) */
 #ifndef MAXFLOAT

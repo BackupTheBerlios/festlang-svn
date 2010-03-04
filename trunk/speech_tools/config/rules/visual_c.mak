@@ -90,6 +90,12 @@ ifdef LOCAL_INCLUDES
 	echo ;\
 	} >> VCMakefile
 endif
+ifdef WINMAINRESOURCES
+	@{ \
+	echo WINMAINRESOURCES = $(WINMAINRESOURCES);\
+	echo ;\
+	} >> VCMakefile
+endif
 ifdef WIN_CFLAGS
 	@{ \
 	echo 'CFLAGS = $(WIN_CFLAGS)';\
@@ -162,7 +168,7 @@ ifdef ALL_EXECS
 		if [ -f $${ex}_main.cc ] ;\
 			then \
 			echo "$${ex}.exe : $${ex}_main.obj  \$$(AUX_OBJS) \$$(VCLIBS)" ;\
-			echo "	link/nologo \$$(LINKFLAGS) /out:$${ex}.exe $${ex}_main.obj \$$(AUX_OBJS) \$$(VCLIBS) \$$(WINLIBS)" ;\
+			echo "	link/nologo \$$(LINKFLAGS) /out:$${ex}.exe $${ex}_main.obj \$$(AUX_OBJS) \$$(WINMAINRESOURCES) \$$(VCLIBS) \$$(WINLIBS)" ;\
 		else \
 			echo "$${ex}.exe : $${ex}.obj  \$$(AUX_OBJS) \$$(VCLIBS)" ;\
 			echo "	link/nologo \$$(LINKFLAGS) /out:$${ex}.exe $${ex}.obj \$$(AUX_OBJS) \$$(VCLIBS) \$$(WINLIBS)" ;\
