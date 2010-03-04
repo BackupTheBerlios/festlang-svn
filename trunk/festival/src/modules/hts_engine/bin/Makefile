@@ -57,7 +57,7 @@ TOP=../../../..
 TSRCS =
 
 ## All C++ sources.
-CPPSRCS = hts_engine.cc $(TSRCS)
+CPPSRCS = hts_engine_bin.cc $(TSRCS)
 
 ## Ansi C sources
 #CSRCS = hts_engine.c
@@ -89,7 +89,7 @@ INLIB = $(TOP)/src/lib/libFestival.a
 ###########################################################################
 ## Any directory specific compilation rules would go here.
 
-LOCAL_INCLUDES += -I../lib -I../include
+LOCAL_INCLUDES += -I../lib
 
 ###########################################################################
 ## What we need to do to build this directory

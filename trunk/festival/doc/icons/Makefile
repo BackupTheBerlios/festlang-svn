@@ -30,45 +30,14 @@
 ##  THIS SOFTWARE.                                                       ##
 ##                                                                       ##
 ###########################################################################
-TOP=../..
-DIRNAME=src/main
+TOP=..\..
+DIRNAME=icons
 
-SRCS = festival_main.cc audsp.cc festival_client.cc
-OBJS = $(SRCS:.cc=.o)
-FILES=Makefile $(SRCS)
-LOCAL_CLEAN = $(ETCDIR)/audsp $(ETCDIR)/.made
+FILES=Makefile festival_faces.xcf festival_icon_64.ico resource.rc \
+      VCLocalRules
 
-WINICON = $(TOP)/doc/icons/resource.res
-
-ETCDIR=$(TOP)/lib/$(SYSTEM_TYPE)
-
-ALL_EXECS = festival  festival_client
-
-ALL = $(ALL_EXECS) make_audiosp
+###########################################################################
+## Include the common speech_tools compilation rules
 
 include $(TOP)/config/common_make_rules
-include $(EST)/config/rules/bin_process.mak
-
-ETCDIR=$(TOP)/lib/
-
-festival: festival_main.o $(LIBDEPS)
-	$(LINK_COMMAND) -o festival festival_main.o $(LIBS)
-
-festival_client: festival_client.o $(REQUIRED_LIBDEPS)
-	$(LINK_COMMAND) -o festival_client festival_client.o $(LIBS)
-
-$(ETCDIR)/audsp: $(ETCDIR)/.made audsp.o $(LIBDEPS)
-	$(LINK_COMMAND) -o $(ETCDIR)/audsp audsp.o $(LIBS)
-
-# Can't just rely on the dir as it gets updated with new files
-# check for the data of a file created in etcdir
-
-make_audiosp: $(ETCDIR)/audsp
-	@$(DO_NOTHING)
-
-$(ETCDIR)/.made:
-	@ if [ ! -d $(ETCDIR) ] ; \
-          then mkdir -p $(ETCDIR); fi
-	@ if [ ! -f $(ETCDIR)/.made ] ; \
-          then touch $(ETCDIR)/.made ; fi
 

@@ -1,0 +1,4 @@
+# Special extra rules for this directory
+
+resource.res:
+	rc resource.rc
