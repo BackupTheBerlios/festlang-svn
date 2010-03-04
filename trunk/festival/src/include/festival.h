@@ -142,7 +142,7 @@ extern const char *festival_etcdir;
 extern const char *festival_examplesdir;
 extern const char *festival_docdir;
 
-#ifdef _WIN32
+#if ( defined(_WIN32) || defined(__CYGWIN__) || defined(WINDOWS) )
 extern char festival_currentlibdir[MAX_PATH];
 extern char festival_currentdatadir[MAX_PATH];
 extern char festival_currentetcdir[MAX_PATH];

@@ -38,7 +38,7 @@ OBJS = $(SRCS:.cc=.o)
 FILES=Makefile $(SRCS)
 LOCAL_CLEAN = $(ETCDIR)/audsp $(ETCDIR)/.made
 
-WINICON = $(TOP)/doc/icons/resource.res
+WINMAINRESOURCES = $(TOP)/doc/icons/resource.res
 
 ETCDIR=$(TOP)/lib/$(SYSTEM_TYPE)
 

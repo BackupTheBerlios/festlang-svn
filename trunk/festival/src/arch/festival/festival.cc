@@ -47,11 +47,14 @@
 #include "siod.h"
 #include "ModuleDescription.h"
 
-#ifdef _WIN32
-//Handle /dev/null  in Windows
-#define FTDEVNULL "nul"
+#if ( defined(_WIN32) || defined(__CYGWIN__) || defined(WINDOWS) )
 #include <cstring> //Some path manipulation
 #include "windows.h" //MAX_PATH and GetModuleFileName
+#endif
+
+#if ( ( defined(_WIN32) || defined(WINDOWS) ) && !defined(__CYGWIN__))
+//Handle /dev/null  in Windows
+#define FTDEVNULL "NUL"
 #else
 #define FTDEVNULL "/dev/null"
 #endif
@@ -66,13 +69,7 @@ void festival_load_default_files(void);
 
 const char *festival_version =  STRINGIZE(FTVERSION) ":" STRINGIZE(FTSTATE) " " STRINGIZE(FTDATE);
 
-#ifndef _WIN32
-const char *festival_libdir = FTLIBDIR;
-const char *festival_datadir = FTDATADIR;
-const char *festival_etcdir = FTETCDIR;
-const char *festival_examplesdir = FTEXAMPLESDIR;
-const char *festival_docdir = FTDOCDIR;
-#else
+#if ( defined(_WIN32) || defined(__CYGWIN__) || defined(WINDOWS) )
 char festival_currentlibdir[MAX_PATH];
 char festival_currentdatadir[MAX_PATH];
 char festival_currentetcdir[MAX_PATH];
@@ -84,6 +81,12 @@ const char *festival_datadir = festival_currentdatadir;
 const char *festival_etcdir = festival_currentetcdir;
 const char *festival_examplesdir = festival_currentexamplesdir;
 const char *festival_docdir = festival_currentdocdir;
+#else
+const char *festival_libdir = FTLIBDIR;
+const char *festival_datadir = FTDATADIR;
+const char *festival_etcdir = FTETCDIR;
+const char *festival_examplesdir = FTEXAMPLESDIR;
+const char *festival_docdir = FTDOCDIR;
 #endif
 
 ostream *cdebug;
@@ -101,7 +104,7 @@ void festival_initialize(int load_init_files,int heap_size)
 {
     // all initialisation
     
-	#ifdef _WIN32
+	#if ( defined(_WIN32) || defined(__CYGWIN__) || defined(WINDOWS) )
     //In windows, we determine current festival.exe path
 	//It should be done in a nicer way.
 	GetModuleFileName (NULL, strExePath, MAX_PATH);
