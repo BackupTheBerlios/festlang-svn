@@ -41,8 +41,8 @@
 PROJECT_NAME = Festival Speech Synthesis System
 PROJECT_PREFIX = FESTIVAL
 PROJECT_VERSION = 1.96
-PROJECT_DATE = July 2004
-PROJECT_STATE = beta
+PROJECT_DATE = February 2010
+PROJECT_STATE = svn Beta
 
 
 # config files of projects we depend on
