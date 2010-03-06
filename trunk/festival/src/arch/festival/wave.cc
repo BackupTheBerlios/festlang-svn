@@ -360,9 +360,9 @@ static LISP utt_save_f0(LISP utt, LISP fname)
     EST_Utterance *u = utterance(utt);
     EST_String filename = get_c_string(fname);
 
-    if ((u->relation_present("F0")) && (u->relation("F0")->head() != 0))
+    if ((u->relation_present("f0")) && (u->relation("f0")->head() != 0))
     {
-	EST_Track *f0 = track(u->relation("F0")->head()->f("f0"));
+	EST_Track *f0 = track(u->relation("f0")->head()->f("f0"));
 	if (f0->save(filename,"esps") != write_ok)
 	{
 	    cerr << "utt.save.f0: failed to write f0 to \"" << 
@@ -420,7 +420,7 @@ static void utt_save_f0_from_targets(EST_Utterance *u,EST_String &filename)
 	    }
 	}
     }
-    f0.set_channel_name("F0",0);
+    f0.set_channel_name("f0",0);
     f0.set_channel_name("prob_voice",1);
     f0.fill_time(0.01);
 
