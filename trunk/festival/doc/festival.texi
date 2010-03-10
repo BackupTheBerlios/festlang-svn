@@ -3045,8 +3045,6 @@ here is not (yet) fully automatic but the hand intervention required is
 small and may easily be done even by people with only a very little
 knowledge of the language being dealt with.
 
-
-
 The process involves the following steps
 @itemize @bullet
 @item 

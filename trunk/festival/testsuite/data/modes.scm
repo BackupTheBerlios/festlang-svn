@@ -42,7 +42,7 @@
 
 (format t "\n\nSABLE mode\n")
 (unwind-protect
- (tts (string-append examplesdir "example2.sable") nil))
+ (tts (string-append examplesdir "example2.sable") 'sable))
 (format t "\n\nOGI's mark up mode\n")
 (unwind-protect 
  (tts (string-append examplesdir "ex1.ogi") 'ogimarkup))

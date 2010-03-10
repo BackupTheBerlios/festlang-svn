@@ -75,7 +75,7 @@ LTS Rules are UTF-8 based, then utf8 should be set to t, Otherwise
 utf8 should be set to nil."
  
  (let ((utt (make_let_utt (enworden 
-            (if (utf8) (wordexplode_utf8 word)
+            (if utf8 (wordexplode_utf8 word)
                        (wordexplode word)
             )
       ))))
