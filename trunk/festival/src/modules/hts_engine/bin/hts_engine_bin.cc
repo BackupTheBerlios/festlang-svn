@@ -521,7 +521,7 @@ LISP HTS_Synthesize_Utt(LISP utt)
 
 	if (u->relation("Segment")->first())  /* only if there segments */
 		w->load_file(get_param_str("-or",hts_output_params,"tmp.raw"),
-							"raw", 16000,
+							"raw", sampling_rate,
 							"short", str_to_bo("native"), 1);
 
 	item = u->create_relation("Wave")->append();
