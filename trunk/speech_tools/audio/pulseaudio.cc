@@ -65,6 +65,16 @@ static int transfer_pulse_wave(EST_Wave &inwave, EST_Option &al, int record)
 
     waveform    = inwave.values().memory();
     num_samples = inwave.num_samples();
+    
+    /* In case num_samples == 0, don't play. Pulseaudio returns "invalid
+     * argument" if num_samples == 0, so it's better to check now.
+     * I don't expect num_samples < 0, but as we have to check anyway
+     * it doesn't hurt to check.
+     */
+    if (num_samples <= 0) {
+		ret=1;
+		goto finish;
+	}
 
     s = pa_simple_new(NULL,           // Use the default server.
 	"Festival",                   // Our application's name.
