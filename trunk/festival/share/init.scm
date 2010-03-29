@@ -153,7 +153,7 @@
 ;;; Default voice (have to do something cute so autoloads still work)
 (if (eq? voice_default 'no_voice_error)
     (eval (language.select language_default)) ; sets voice_default if has not been set in personal customizations
-(eval (list voice_default))
+    (eval (list voice_default))
 )
 
 (provide 'init)

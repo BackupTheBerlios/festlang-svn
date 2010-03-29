@@ -36,7 +36,7 @@ OPTIONS
 
      --datadir PATH
 	     Specify alternate to default shared-data directory (used
-	     in	 initializing  the  variable  load-path,  and for
+	     in	 initializing the  variable  load-path,  and for
 	     loading most initialisation files). Typically, the voice and
 		 dictionary files reside here.
 

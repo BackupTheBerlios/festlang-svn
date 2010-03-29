@@ -150,6 +150,12 @@ to be used."
    (Parameter.set 'Word_Method Classic_Word)
    (Parameter.set 'Pause_Method Classic_Pauses)
    (Parameter.set 'PostLex_Method Classic_PostLex)
+   ;; From pos.scm:
+   (set! pos_p_start_tag "punc")
+   (set! pos_pp_start_tag "n")
+   (set! pos_supported nil)
+   (set! pos_ngram_name nil)
+   (set! pos_map nil)
 
    (set! diphone_module_hooks nil)
    (set! UniSyn_module_hooks nil)
@@ -425,5 +431,5 @@ the default voice. [see Site initialization]")
   )
   )
 
-(set_voice_default  default-voice-priority-list)
+(set_voice_default default-voice-priority-list)
 (provide 'voices)
