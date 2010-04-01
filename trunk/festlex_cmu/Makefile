@@ -72,7 +72,7 @@ cmudict-0.4.scm:
 # Can optionally reduce the lexicon size by removing those entries that
 # the LTS system correctly predict.
 reduce:
-	( echo "(load (string-append libdir \"/\" \"siod.scm\"))"; \
+	( echo "(load (string-append datadir \"/\" \"siod.scm\"))"; \
 	  echo "(require 'radio_phones)"; \
 	  echo "(require 'lts_build)"; \
           echo "(reduce_lexicon \"cmudict-0.4.out\" \"cmudict-0.4.exception.out\" cmu_lts_function)" ) | \
