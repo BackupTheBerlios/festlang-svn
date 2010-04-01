@@ -79,16 +79,16 @@ reduce:
 	festival -q
 
 dist:
-	mkdir -p festival/lib/dicts
-	(cd festival/lib/dicts && ln -s ../../../. cmu)
+	mkdir -p festival/share/dicts
+	(cd festival/share/dicts && ln -s ../../../. cmu)
 	tar zcvf festlex_CMU.tar.gz \
-           festival/lib/dicts/cmu/allowables.scm \
-           festival/lib/dicts/cmu/cmu*.scm \
-           festival/lib/dicts/cmu/cmudict-0.4.out \
-           festival/lib/dicts/cmu/Makefile \
-           festival/lib/dicts/cmu/cmudict-0.4.diff \
-           festival/lib/dicts/cmu/cmu2ft \
-           festival/lib/dicts/cmu/COPYING
+           festival/share/dicts/cmu/allowables.scm \
+           festival/share/dicts/cmu/cmu*.scm \
+           festival/share/dicts/cmu/cmudict-0.4.out \
+           festival/share/dicts/cmu/Makefile \
+           festival/share/dicts/cmu/cmudict-0.4.diff \
+           festival/share/dicts/cmu/cmu2ft \
+           festival/share/dicts/cmu/COPYING
 	rm -rf festival    
 
 lts_rules:
