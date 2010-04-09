@@ -133,6 +133,7 @@
 (require 'languages)
 
 ;;; Some higher level functions
+(require 'text)
 (require 'token)
 (require 'tts)
 

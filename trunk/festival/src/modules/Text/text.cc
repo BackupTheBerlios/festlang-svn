@@ -280,8 +280,8 @@ LISP memoff(void)
 void festival_Text_init(void)
 {
     festival_token_init();
-    festival_def_utt_module("Text",FT_Text_Utt,
-    "(Text UTT)\n\
+    festival_def_utt_module("Text_int",FT_Text_Utt,
+    "(Text_int UTT)\n\
   From string in input form tokenize and create a token stream.");
     init_subr_2("tts_file",tts_file,
     "(tts_file FILE MODE)\n\
