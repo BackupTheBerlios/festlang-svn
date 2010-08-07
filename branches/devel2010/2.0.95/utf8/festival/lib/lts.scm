@@ -68,6 +68,19 @@
 
 (defvar lts_pos nil)
 
+(define (lts_predict.utf8 word rules)
+  "(lts_predict.utf8 word rules)
+Return list of phones related to word using CART trees. Rules and word are
+given as UTF-8 text."
+  (let ((utt (make_let_utt (enworden (wordexplode.utf8 word)))))
+    (predict_phones utt rules)
+    (cdr (reverse (cdr (reverse ;; remove #'s
+      (mapcar 
+       (lambda (p) (intern (item.name p)))
+       (utt.relation.items utt 'PHONE))))))
+    )
+)
+
 (define (lts_predict word rules)
   "(lts_predict word rules)
 Return list of phones related to word using CART trees."
@@ -81,9 +94,23 @@ Return list of phones related to word using CART trees."
 )
 
 (define (wordexplode lets)
+ "(wordexplode lets)
+Return the list of characters that form 'lets'."
   (if (consp lets)
       lets
-      (symbolexplode lets)))
+      (symbolexplode lets)
+      )
+)
+
+(define (wordexplode.utf8 lets)
+ "(wordexplode.utf8 lets)
+Return the list of characters that form 'lets', where lets 
+is UTF-8 encoded."
+  (if (consp lets)
+      lets
+      (utf8explode lets)
+      )
+  )
 
 (define (make_let_utt letters)
 "(make_let_utt letters)

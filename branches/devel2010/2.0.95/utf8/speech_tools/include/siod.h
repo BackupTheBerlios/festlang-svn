@@ -149,6 +149,8 @@ LISP copy_list(LISP x);
 LISP quote(LISP item);
 LISP read_from_lstring(LISP x);
 LISP symbolexplode(LISP name);
+LISP utf8_explode(LISP name);
+LISP is_utf8 (LISP name);
 
 LISP fopen_c(const char *name, const char *how);
 LISP fclose_l(LISP p);

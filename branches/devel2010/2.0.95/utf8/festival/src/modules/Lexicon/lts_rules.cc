@@ -58,6 +58,8 @@
 #include "festival.h"
 #include "lts.h"
 
+using namespace std;
+
 class LTS_Ruleset{
   private:
     EST_String p_name;
@@ -65,6 +67,7 @@ class LTS_Ruleset{
     LISP p_rules;
     LISP p_alphabet;
     LISP p_sets;      // short hand for sets
+    bool  p_uses_utf8;
     LISP normalize(LISP rules);
     int item_match(LISP actual_item, LISP rule_item);
     int context_match(LISP actual_context, LISP rule_context);
@@ -73,11 +76,12 @@ class LTS_Ruleset{
     LISP this_match(LISP remainder, LISP rule_this); 
     void update_alphabet(LISP newitems);
  public:
-    LTS_Ruleset(LISP name, LISP rules, LISP sets);
+    LTS_Ruleset(LISP name, LISP rules, LISP sets, LISP use_utf8);
     ~LTS_Ruleset(void);
     const EST_String &name(void) const {return p_name;}
     LISP apply(LISP word);
     LISP check_alpha(LISP word);
+    bool uses_utf8 ();
 };
 
 static LISP fix_postfix_ops(LISP l);
@@ -92,7 +96,8 @@ static LISP lts_rules_list = NIL;
 VAL_REGISTER_CLASS(ltsruleset,LTS_Ruleset)
 SIOD_REGISTER_CLASS(ltsruleset,LTS_Ruleset)
 
-LTS_Ruleset::LTS_Ruleset(LISP name, LISP rules, LISP sets)
+LTS_Ruleset::LTS_Ruleset(LISP name, LISP rules, LISP sets, 
+                         LISP use_utf8 = NIL)
 {
     p_alphabet = NIL;
     gc_protect(&p_alphabet);
@@ -101,6 +106,10 @@ LTS_Ruleset::LTS_Ruleset(LISP name, LISP rules, LISP sets)
     gc_protect(&p_sets);
     p_rules = normalize(rules);
     gc_protect(&p_rules);
+    if (use_utf8 == truth)
+	{    p_uses_utf8 = true;}
+	else
+	{    p_uses_utf8 = false;}
 }
     
 LTS_Ruleset::~LTS_Ruleset(void)
@@ -185,7 +194,7 @@ void LTS_Ruleset::update_alphabet(LISP newitems)
 static LISP fix_postfix_ops(LISP l)
 {
     // This list have been built in reverse so the postfix operators * and +
-    // are wrong.  Destrictively fix them
+    // are wrong.  Destructively fix them
     LISP p,q;
 
     for (p=l; p != NIL; p=cdr(p))
@@ -239,7 +248,12 @@ LISP LTS_Ruleset::check_alpha(LISP word)
     if (consp(word))
 	word_chars = word;
     else
-	word_chars = symbolexplode(word);
+    {
+		if (LTS_Ruleset::p_uses_utf8 == true)
+		{	word_chars = utf8_explode(word);}
+		else
+		{	word_chars = symbolexplode(word);}
+	}
 
     for (p=word_chars; p != NIL; p=cdr(p))
 	if (siod_member_str(get_c_string(car(p)),p_alphabet) == NIL)
@@ -348,13 +362,18 @@ int LTS_Ruleset::item_match(LISP actual_item, LISP rule_item)
     }
 }
 
-LISP lts_def_ruleset(LISP args, LISP penv)
+bool LTS_Ruleset::uses_utf8 (void)
+{
+	return p_uses_utf8;
+}
+
+static LISP lts_def_ruleset_internal(LISP args, LISP penv, LISP utf8)
 {
     // Define a new rule set
     (void)penv;
     LTS_Ruleset *rs = new LTS_Ruleset(car(args),
 				      car(cdr(cdr(args))),
-				      car(cdr(args)));
+				      car(cdr(args)),utf8);
     LISP name = car(args);
     LISP lpair;
     
@@ -378,12 +397,21 @@ LISP lts_def_ruleset(LISP args, LISP penv)
     return name;
 }
 
-LISP lts_in_alphabet(LISP word, LISP rulesetname)
+LISP lts_def_ruleset(LISP args, LISP penv)
 {
-    // check if this word is in the input alphabet for ruleset
-    LTS_Ruleset *rs;
-    LISP lpair;
+    return lts_def_ruleset_internal(args,penv,NIL);
+}
 
+LISP lts_def_ruleset.utf8(LISP args, LISP penv)
+{
+    return lts_def_ruleset_internal(args,penv,truth);
+}
+
+/** Returns specified Ruleset if exists, if it doesn't exist an error
+ ** is returned */
+static LTS_Ruleset* lts_exists_ruleset (LISP rulesetname)
+{
+    LISP lpair;
     lpair = siod_assoc_str(get_c_string(rulesetname),lts_rules_list);
     if (lpair == NIL)
     {
@@ -393,11 +421,20 @@ LISP lts_in_alphabet(LISP word, LISP rulesetname)
     }
     else
     {
-	rs = ltsruleset(car(cdr(lpair)));
-	return rs->check_alpha(word);
+	return ltsruleset(car(cdr(lpair)));
     }
+    return NULL;
+}
 
-    return NIL;
+LISP lts_in_alphabet(LISP word, LISP rulesetname)
+{
+    // check if this word is in the input alphabet for ruleset
+    LTS_Ruleset *rs;
+    rs=lts_exists_ruleset(rulesetname);
+    if (rs != NULL)
+        {return rs->check_alpha(word);}
+    else
+        {return NIL;}
 }
 
 LISP lts_list()
@@ -415,24 +452,22 @@ LISP lts_apply_ruleset(LISP word, LISP rulesetname)
 {
     // Apply the rule set to word (an atom or list of atoms)
     LTS_Ruleset *rs;
-    LISP lpair;
 
-    lpair = siod_assoc_str(get_c_string(rulesetname),lts_rules_list);
-    if (lpair == NIL)
+    rs=lts_exists_ruleset(rulesetname);
+    if (rs != NULL) 
     {
-	cerr << "LTS_Rule: no rule set named \"" << 
-	    get_c_string(rulesetname) << "\"\n";
-	festival_error();
+	if (consp(word))
+		{	return rs->apply(word);}
+		else
+		{
+			if (rs->uses_utf8())
+			{	return rs->apply(utf8_explode(word));}
+			else
+			{	return rs->apply(symbolexplode(word));}
+		}
     }
     else
-    {
-	rs = ltsruleset(car(cdr(lpair)));
-	if (consp(word))
-	    return rs->apply(word);
-	else
-	    return rs->apply(symbolexplode(word));
-    }
-    return NIL;
+    {	return NIL;}
 }
 
 

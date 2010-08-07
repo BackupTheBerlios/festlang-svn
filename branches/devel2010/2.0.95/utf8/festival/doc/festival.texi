@@ -2973,9 +2973,11 @@ are corresponding functions in the C/C++ domain.
 
 @table @code
 @item (lts.ruleset NAME SETS RULES)
-Define a new set of lts rules.  Where @code{NAME} is the name for this
+Define a new set of LTS rules.  Where @code{NAME} is the name for this
 rule, SETS is a list of set definitions of the form @code{(SETNAME e0 e1
 ...)}  and @code{RULES} are a list of rules as described above.
+@item (lts.ruleset.utf8 NAME SETS RULES)
+Define a new set of LTS rules, coded in UTF-8.
 @item (lts.apply WORD RULESETNAME)
 Apply the set of rules named @code{RULESETNAME} to @code{WORD}.  If
 @code{WORD} is a symbol it is exploded into a list of the individual

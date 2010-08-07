@@ -43,6 +43,10 @@
 #include "lexiconP.h"
 #include "lts.h"
 
+using std::cout;
+using std::cerr;
+using std::endl;
+
 static int bl_match_entry(LISP entry,const EST_String &word);
 static int match_features(LISP req_feats, LISP act_feats);
 
@@ -781,13 +785,17 @@ void festival_Lexicon_init(void)
     init_fsubr("lts.ruleset",lts_def_ruleset,
     "(lts.ruleset NAME RULES SETS)\n\
   Define a new set of letter to sound rules. [see Letter to sound rules]");
+    init_fsubr("lts.ruleset.utf8",lts_def_ruleset.utf8,
+    "(lts.ruleset.utf8 NAME RULES SETS)\n\
+  Define a new set of letter to sound rules using UTF-8 encoding. [see Letter to sound rules]");
+
     init_subr_2("lts.apply",lts_apply_ruleset,
     "(lts.apply WORD RULESETNAME)\n\
   Apply lts ruleset RULESETNAME to word returning result. \n\
   [see Letter to sound rules]");
     init_subr_2("lts.in.alphabet",lts_in_alphabet,
     "(lts.in.alphabet WORD RULESETNAME)\n\
-  Returns t is all characters in symbol word (or items in list WORD)\n\
+  Returns t if all characters in symbol word (or items in list WORD)\n\
   are in the alphabet of letter to sound ruleset name RULESETNAME.  nil\n\
   otherwise. [see Letter to sound rules]");
     init_subr_0("lts.list",lts_list,

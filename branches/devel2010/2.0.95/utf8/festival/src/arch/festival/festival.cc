@@ -386,45 +386,6 @@ LISP l_lr_predict(LISP si, LISP lr_model);
 void festival_unitdb_init(void);
 LISP Gen_Viterbi(LISP utt);
 
-LISP utf8_explode(LISP name)
-{
-    /* return a list of utf-8 characters as strings */
-    const unsigned char *xxx = (const unsigned char *)get_c_string(name);
-    LISP chars=NIL;
-    int i, l=0;
-    char utf8char[5];
-
-    for (i=0; xxx[i]; i++)
-    {
-        if (xxx[i] < 0x80)  /* one byte */
-        {
-            sprintf(utf8char,"%c",xxx[i]);
-            l = 1;
-        }
-        else if (xxx[i] < 0xe0) /* two bytes */
-        {
-            sprintf(utf8char,"%c%c",xxx[i],xxx[i+1]);
-            i++;
-            l = 2;
-        }
-        else if (xxx[i] < 0xff) /* three bytes */
-        {
-            sprintf(utf8char,"%c%c%c",xxx[i],xxx[i+1],xxx[i+2]);
-            i++; i++;
-            l = 3;
-        }
-        else
-        {
-            sprintf(utf8char,"%c%c%c%c",xxx[i],xxx[i+1],xxx[i+2],xxx[i+3]);
-            i++; i++; i++;
-            l = 4;
-        }
-        chars = cons(strcons(l,utf8char),chars);
-    }
-    return reverse(chars);
-
-}
-
 void festival_lisp_funcs(void)
 {
     // declare festival specific Lisp functions 
@@ -455,10 +416,6 @@ void festival_lisp_funcs(void)
  "(debug_output ARG)\n\
   If ARG is non-nil cause all future debug output to be sent to cerr,\n\
   otherwise discard it (send it to /dev/null).");
-    init_subr_1("utf8explode", utf8_explode,
- "(utf8explode utf8string)\n\
-  Returns a list of utf-8 characters in given string.");
-    
     init_subr_2("wagon",l_wagon,
  "(wagon ITEM TREE)\n\
   Apply the CART tree TREE to ITEM.  This returns the full\n\

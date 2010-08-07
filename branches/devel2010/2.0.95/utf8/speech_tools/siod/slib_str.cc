@@ -265,6 +265,108 @@ LISP symbolexplode(LISP name)
     return reverse(e);
 }
 
+LISP is_utf8 (LISP name)
+{
+    /* returns t if utf8 is valid, nil otherwise */
+   const unsigned char *xxx = (const unsigned char *)get_c_string(name);
+    int i=0, l;
+
+    for (i=0; xxx[i]; i++)
+    {
+		if (xxx[i] < 0x80) /* one byte character */
+			continue;
+		else if (xxx[i] < 0xc2) /* this bytes can't exist on its own*/
+			return NIL;
+		else if (xxx[i] < 0xe0) /* two bytes character */
+		{
+			if ((xxx[i+1] < 0x80) || (xxx[i+1] >= 0xc0)) /* second byte invalid */
+			   return NIL;
+			else
+			{
+			    i++;
+			    continue;
+			}
+		}
+		else if (xxx[i] < 0xf0) /* 3 bytes character */
+		{
+			for (l=1;l<3;l++)
+			{
+				if ((xxx[i+l] < 0x80) || (xxx[i+l] >= 0xc0))
+					return NIL;
+			}
+			i += 2;
+			continue;
+		}
+		else if (xxx[i] < 0xf5) /* 4 bytes character */
+		{
+			for (l=1;l<4;l++)
+			{
+				if ((xxx[i+l] < 0x80) || (xxx[i+l] >= 0xc0))
+					return NIL;
+			}
+			i += 3;
+			continue;
+		}
+		else
+			return NIL;
+	}
+	   return truth;
+}
+
+
+LISP utf8_explode(LISP name)
+{
+    /* return a list of utf-8 characters as strings */
+    const unsigned char *xxx = (const unsigned char *)get_c_string(name);
+    LISP chars=NIL;
+    int i, l=0;
+    char utf8char[5];
+
+    /* Validate string as UTF-8 */
+    if ( is_utf8(name) == truth)
+    {
+		for (i=0; xxx[i]; i++)
+		{
+			if (xxx[i] < 0x80)  /* one byte */
+			{
+				sprintf(utf8char,"%c",xxx[i]);
+				l = 1;
+			}
+			else if (xxx[i] < 0xe0) /* two bytes */
+			{
+				sprintf(utf8char,"%c%c",xxx[i],xxx[i+1]);
+				i++;
+				l = 2;
+			}
+			else if (xxx[i] < 0xf0) /* three bytes */
+			{
+				sprintf(utf8char,"%c%c%c",xxx[i],xxx[i+1],xxx[i+2]);
+				i++; i++;
+				l = 3;
+			}
+			else
+			{
+				sprintf(utf8char,"%c%c%c%c",xxx[i],xxx[i+1],xxx[i+2],xxx[i+3]);
+				i++; i++; i++;
+				l = 4;
+			}
+			chars = cons(strcons(l,utf8char),chars);
+		}
+    return reverse(chars);
+	}
+    else /*if it is not an UTF-8 valid string, print error message and use symbolexplode */
+    {
+         cerr << "utf8_explode: (Warning) The given string is not UTF-8 valid." << endl;
+         cerr << "utf8_explode: (Warning) Returning symbolexplode instead" << endl;
+         
+		 return symbolexplode(name);
+	}
+
+}
+
+
+
+
 LISP l_matches(LISP atom, LISP regex)
 {
     // t if printname of atom matches regex, nil otherwise
@@ -419,4 +521,12 @@ void init_subrs_str(void)
  "(path-is-dirname PATHNAME)\n\
   Is PATH a directory name.");
 
+//UTF-8 specific functions:
+  init_subr_1("utf8explode", utf8_explode,
+ "(utf8explode utf8string)\n\
+  Returns a list of utf-8 characters in given string.");
+  
+  init_subr_1("is_utf8",is_utf8,
+ "(is_utf8 STRING)\n\
+  Returns t if STRING is UTF-8 valid otherwise it returns nil.");
 }
