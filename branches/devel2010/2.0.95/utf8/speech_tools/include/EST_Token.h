@@ -228,8 +228,9 @@ class EST_TokenTable {
 	  std::map<utf8::uint32_t,char> p_LUT;
 	  
 	  void build_tables();
-	  void getcharinsert(EST_String, char);
-	  void getutf8insert(EST_String, char);
+	  void InsertCharSt(EST_String, char);
+	  void InsertUtf8St(EST_String, char);
+	  void InsertCP(utf8::uint32_t cp, char newclass);
 	
 	public:
 	  EST_TokenTable(const EST_String WhiteSpaceChars,
@@ -258,14 +259,14 @@ class EST_TokenTable {
 	  /// set if punctuation characters are UTF-8 coded
 	  void set_isutf8 (const bool isutf8)
 	      {p_isutf8 = isutf8; p_table_wrong = 1 ;}
-	      
+      /// Mark table to rebuild:
+      void set_p_table_wrong() { p_table_wrong = 1;}
+      /// Show if it is UTF-8:
+      bool isutf8() {return p_isutf8;}
 	  /// Look up a character in the table and return the class
-	  char check (utf8::uint32_t cp);
-	  
-	  /// Insert a character to the table associated to a class
-	  void insert_to_LUT(utf8::uint32_t cp, char newclass);
+	  char CheckCP (utf8::uint32_t cp);
 	
-	
+      void print_table();
 };
 
 enum EST_tokenstream_type {tst_none, tst_file, tst_pipe, tst_string, tst_istream}; 
@@ -298,10 +299,6 @@ enum EST_tokenstream_type {tst_none, tst_file, tst_pipe, tst_string, tst_istream
 class EST_TokenStream{
  private:
     EST_tokenstream_type type;
-    EST_String WhiteSpaceChars;
-    EST_String SingleCharSymbols;
-    EST_String PunctuationSymbols;
-    EST_String PrePunctuationSymbols;
     EST_String Origin;
     FILE *fp;
     istream *is;
@@ -331,10 +328,8 @@ class EST_TokenStream{
     int tok_prepuncslen;
     char *tok_prepuncs;
     int close_at_end;
-
+    int append (utf8::uint32_t cp,char *here);
     /* character class map */
-    bool p_isutf8;
-    bool p_table_wrong;
     EST_TokenTable p_table;
 
     /** This function is deliberately private so that you'll get a compilation
@@ -399,24 +394,24 @@ class EST_TokenStream{
     //@{
     /// set which characters are to be treated as whitespace
     void set_WhiteSpaceChars(const EST_String &ws) 
-        { WhiteSpaceChars = ws; p_table_wrong=1;}
+        { p_table.set_WhiteSpaceChars(ws);}
     /// set which characters are to be treated as single character symbols
     void set_SingleCharSymbols(const EST_String &sc) 
-        { SingleCharSymbols = sc; p_table_wrong=1;}
+        { p_table.set_SingleCharSymbols(sc);}
     /// set which characters are to be treated as (post) punctuation
     void set_PunctuationSymbols(const EST_String &ps) 
-        { PunctuationSymbols = ps; p_table_wrong=1;}
+        { p_table.set_PunctuationSymbols(ps);}
     /// set which characters are to be treated as (post) punctuation
     void set_PrePunctuationSymbols(const EST_String &ps) 
-        { PrePunctuationSymbols = ps; p_table_wrong=1;}
+        { p_table.set_PrePunctuationSymbols(ps);}
     /// set if punctuation characters are UTF-8 coded
     void set_isutf8 (const bool isutf8)
-        { p_isutf8 = isutf8; p_table_wrong=1;}
+        { p_table.set_isutf8(isutf8);}
     /// set characters to be used as quotes and escape, and set quote mode
     void set_quotes(char q, char e) 
-         { quotes = TRUE; quote = (utf8::uint32_t) q; escape = (utf8::uint32_t) e; p_table_wrong=1;}
+         { quotes = TRUE; quote = (utf8::uint32_t) q; escape = (utf8::uint32_t) e; p_table.set_p_table_wrong();}
     void set_quotes(utf8::uint32_t q, utf8::uint32_t e)
-         { quotes = TRUE; quote = q; escape = e; p_table_wrong=1;}
+         { quotes = TRUE; quote = q; escape = e; p_table.set_p_table_wrong();}
     /// query quote mode
     int quoted_mode(void) { return quotes; }
     //@}
