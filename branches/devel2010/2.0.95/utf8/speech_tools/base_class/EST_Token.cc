@@ -50,15 +50,57 @@
 #include "EST_cutils.h"
 #include "EST_error.h"
 
+using namespace std;
+
 const EST_String EST_Token_Default_WhiteSpaceChars = " \t\n\r";
 const EST_String EST_Token_Default_SingleCharSymbols = "(){}[]";
 const EST_String EST_Token_Default_PrePunctuationSymbols = "\"'`({[";
 const EST_String EST_Token_Default_PunctuationSymbols = "\"'`.,:;!?]})";
+
+const EST_String EST_Token_Default_WhiteSpaceCharsUTF8 = " \t\n\r             ​  ⁠";
+const EST_String EST_Token_Default_SingleCharSymbolsUTF8 = "";
+const EST_String EST_Token_Default_PrePunctuationSymbolsUTF8 = "\"'([{«ʻ‹¿¡`";
+const EST_String EST_Token_Default_PunctuationSymbolsUTF8 = "!\"'(),.:;¿?[]`{}¡§«»­ʹʺʻʼʽ؟჻᛫᛬᛭⁕⁖⁗⁘⁙⁚⁛⁜⁝⁞‹›※‼‽⁅⁆⁇⁈⁉";
+
 const EST_String Token_Origin_FD = "existing file descriptor";
 const EST_String Token_Origin_Stream = "existing istream";
 const EST_String Token_Origin_String = "existing string";
 
 static EST_Regex RXanywhitespace("[ \t\n\r]");
+
+
+//zeehio: move this at a more general place:
+void cp2utf8(utf8::uint32_t cp,char *utf8string)
+{
+    if (cp < 0x0080)
+    {
+        utf8string[0]=(char) cp;
+        utf8string[1]='\0';
+    } else if (cp < 0x0800)
+    {
+        utf8string[0]=(char) (0xC0 | (cp >> 6 ));
+        utf8string[1]=(char) (0x80 | (cp & 0x003F));
+        utf8string[2]='\0';
+    } else if (cp < 0xFFFF)
+    {
+        utf8string[0]=(char) (0xE0 | (cp >> 12 ));
+        utf8string[1]=(char) (0x80 | ((cp >> 6) & 0x003F));
+        utf8string[2]=(char) (0x80 | (cp & 0x003F));
+        utf8string[3]='\0';
+    } else if (cp < 0x10FFFF)
+    {
+        utf8string[0]=(char) (0xF0 | (cp >> 18 ));
+        utf8string[1]=(char) (0x80 | ((cp >> 12) & 0x003F));
+        utf8string[2]=(char) (0x80 | ((cp >> 6 ) & 0x003F));
+        utf8string[3]=(char) (0x80 | (cp & 0x003F));
+        utf8string[4]='\0';
+    } else
+    {
+        std::cerr << "invalid Code point: " << cp << std::endl;
+        utf8string[0]='\0';
+    }
+    return;
+}
 
 static inline char *check_extend_str_in(char *str, int pos, int *max)
 {
@@ -66,8 +108,9 @@ static inline char *check_extend_str_in(char *str, int pos, int *max)
     // and copy the old one into the new one
     char *newstuff;
     
-    if (pos == *max)
+    if (pos >= *max - 4) // If we are close to the end (a UTF-8 char may be up to 4 bytes)
     {
+	if (*max <= 4) *max=4; // Let's have space for at least one UTF-8 char!
 	*max *= 2;
 	newstuff = new char[*max];
 	strncpy(newstuff,str,pos);
@@ -79,7 +122,7 @@ static inline char *check_extend_str_in(char *str, int pos, int *max)
 }
 
 #define check_extend_str(STR, POS, MAX) \
-	(((POS)== *(MAX))?check_extend_str_in((STR),(POS),(MAX)):(STR))
+	(((POS)== *(MAX)-4)?check_extend_str_in((STR),(POS),(MAX)):(STR))
 
 ostream& operator<<(ostream& s, const EST_Token &p)
 {
@@ -110,6 +153,115 @@ EST_Token &EST_Token::operator = (const EST_String &a)
 {
     pname = a;
     return *this;
+}
+
+EST_TokenTable::EST_TokenTable(const EST_String ws=EST_Token_Default_WhiteSpaceChars, \
+                               const EST_String sc=EST_Token_Default_SingleCharSymbols, \
+                               const EST_String ps=EST_Token_Default_PunctuationSymbols, \
+                               const EST_String pps=EST_Token_Default_PrePunctuationSymbols, \
+                               bool is_utf8=false)
+{
+	default_values(ws,sc,ps,pps,is_utf8);
+	build_tables();	
+}
+
+void EST_TokenTable::default_values(const EST_String ws, \
+                                    const EST_String sc, \
+                                    const EST_String ps, \
+                                    const EST_String pps, \
+                                    bool is_utf8)
+{
+	p_WhiteSpaceChars = ws;
+	p_SingleCharSymbols = sc;
+	p_PunctuationSymbols = ps;
+	p_PrePunctuationSymbols = pps;
+	p_isutf8 = is_utf8;
+	p_table_wrong = false;
+	return;
+}
+
+char EST_TokenTable::check(utf8::uint32_t cp)
+{
+	TokenTableLUT::iterator it = p_LUT.find(cp);
+	
+	if ( it != p_LUT.end() ) return it->second;	
+	else return '\0';
+}
+
+void EST_TokenTable::insert_to_LUT(utf8::uint32_t cp, TokenTableLUT::mapped_type newclass) 
+{
+	TokenTableLUT::iterator iter =p_LUT.find(cp);
+	TokenTableLUT::mapped_type oldclass;
+	char utf8char[5];
+	
+	if (iter != p_LUT.end() )
+	{
+		oldclass= iter->second;
+		if (oldclass=='@')
+			return;
+		else if (oldclass == '.' && newclass == '$' )
+			p_LUT[cp]='"';
+		else
+		{
+			if (p_isutf8 == true)
+			{
+				cp2utf8(cp,utf8char);
+				EST_warning("Character '%s' has two classes, '%c' and '%c'",
+							utf8char, oldclass,newclass);
+			} else
+			{
+				EST_warning("Character '%c' has two classes, '%c' and '%c'",
+							(char) cp, oldclass,newclass);
+			}
+		}
+	}
+	else
+	{
+		 p_LUT[cp]=newclass;
+	}
+}
+
+void EST_TokenTable::getcharinsert(EST_String st, const char newclass)
+{
+	char *p;
+	for (p=st; *p;++p)
+	    insert_to_LUT((utf8::uint32_t) *p, newclass);
+}
+
+void EST_TokenTable::getutf8insert(EST_String st,const char newclass)
+{
+	utf8::iterator<char*> p,p_end;
+
+	p=utf8::iterator<char*> (st,st,(char*) st+strlen(st));
+	p_end=utf8::iterator<char*> ((char*) st+strlen(st),st,(char*) st+strlen(st));
+	while(p!=p_end)
+	{
+		p_LUT[*p]=newclass;
+		p++;
+	}
+}
+
+void EST_TokenTable::build_tables()
+{
+	p_LUT.clear();
+	if(p_isutf8==false)
+	{
+		getcharinsert(p_WhiteSpaceChars,' ');
+		getcharinsert(p_SingleCharSymbols,'@');
+		getcharinsert(p_PunctuationSymbols,'.');
+		getcharinsert(p_PrePunctuationSymbols,'$');
+	}
+	else
+	{
+		getutf8insert(p_WhiteSpaceChars,' ');
+		getutf8insert(p_SingleCharSymbols,'@');
+		getutf8insert(p_PunctuationSymbols,'.');
+		getutf8insert(p_PrePunctuationSymbols,'$');
+	}
+	p_table_wrong=0;
+	return;
+	
+	
 }
 
 EST_TokenStream::EST_TokenStream()
@@ -153,11 +305,6 @@ void EST_TokenStream::default_values()
     quotes = FALSE;
     p_filepos = 0;
     linepos = 1;  
-    WhiteSpaceChars = EST_Token_Default_WhiteSpaceChars;
-    SingleCharSymbols = EST_String::Empty;
-    PrePunctuationSymbols = EST_String::Empty;
-    PunctuationSymbols = EST_String::Empty;
-    build_table();
     close_at_end=TRUE;
 }
 
@@ -378,8 +525,9 @@ int EST_TokenStream::fread(void *buff, int size, int nitems)
 	return 0;
 	break;
       case tst_istream:
-	cerr << "EST_TokenStream fread istream not yet supported" << endl;
-	return 0;
+    is->read((char*)buff,size*nitems);
+    if (is->eof() == true ) return 0;
+	return nitems;
       case tst_string:
 	if ((buffer_length-pos)/size < nitems)
 	    items_read = (buffer_length-pos)/size;
@@ -462,7 +610,17 @@ int EST_TokenStream::restart(void)
 
     return 0;
 }
-	
+
+int EST_TokenStream::append (utf8:uint32_t cp,char *here)
+{
+	if (p_isutf8 ==false)
+	{
+		*here=(char) cp;
+		return 1;
+	} else
+		return utf8::append(c,here)-here;
+}
+
 EST_TokenStream & EST_TokenStream::operator >>(EST_Token &p)
 {
     return get(p);
@@ -575,61 +733,16 @@ EST_Token &EST_TokenStream::must_get(EST_String expected, bool *ok)
     return tok;
 }
 
-void EST_TokenStream::build_table()
-{
-    int i;
-    const char *p;
-    unsigned char c;
-
-    for (i=0; i<256; ++i)
-	p_table[i]=0;
-
-    for (p=WhiteSpaceChars; *p; ++p)
-	if (p_table[c=(unsigned char)*p])
-	    EST_warning("Character '%c' has two classes, '%c' and '%c'", 
-			*p, c, ' ');
-	else
-	    p_table[c] = ' ';
-
-    for (p=SingleCharSymbols; *p; ++p)
-	if (p_table[c=(unsigned char)*p])
-	    EST_warning("Character '%c' has two classes, '%c' and '%c'", 
-			*p, p_table[c], '!');
-	else
-	    p_table[c] = '@';
-
-    for (p=PunctuationSymbols; *p; ++p)
-	if (p_table[c=(unsigned char)*p] == '@')
-	    continue;
-	else if (p_table[c])
-	    EST_warning("Character '%c' has two classes, '%c' and '%c'", 
-			*p, p_table[c], '.');
-	else
-	    p_table[c] = '.';
-
-    for(p=PrePunctuationSymbols; *p; ++p)
-	if (p_table[c=(unsigned char)*p] == '@')
-	    continue;
-	else if (p_table[c] == '.')
-	    p_table[c] = '"';
-	else if (p_table[c])
-	    EST_warning("Character '%c' has two classes, '%c' and '%c'", 
-			*p, p_table[c], '$');
-	else
-	    p_table[c] = '$';
-
-    p_table_wrong=0;
-}
-
-inline int EST_TokenStream::getpeeked_internal(void)
+inline unsigned int EST_TokenStream::getpeeked_internal(void)
 {
   peeked_charp = FALSE;
   return peeked_char;
 }
 
 inline
-int EST_TokenStream::getch_internal()
+utf8::uint32_t EST_TokenStream::getch_internal()
 {
+	utf8::uint32_t cp;
     // Return next character in stream
     if (EST_TokenStream::peeked_charp)
     {
@@ -643,13 +756,35 @@ int EST_TokenStream::getch_internal()
 	return EOF;
 	break;
       case tst_file:
-	p_filepos++;
 	{
-	    char lc;
-	    if (stdio_fread(&lc,1,1,fp) == 0)
-		return EOF;
-	    else
-		return (int)lc;
+		if (p_isutf8 == false)
+		{
+			p_filepos++;
+			char lc;
+			if (stdio_fread(&lc,1,1,fp) == 0) {
+				eof_flag = TRUE;
+				return EOF;
+			}
+			else
+				return (unsigned int)lc;
+		} else
+		{
+			//The UTF-8 library uses streams.
+			char buffer[5]="\0\0\0\0";
+			char *p=buffer;
+			for (int i=0;i<4;++i)
+			{
+				p_filepos++;
+				if (stdio_fread(&buffer+i,1,1,fp) == 0) {
+					eof_flag=TRUE;
+					return EOF;
+				}
+				if (utf8::is_valid(p,p+i+1))
+					return utf8::unchecked::next(p);
+			}
+			return 0xFFFD; // invalid UTF-8, returning replacement char.
+			cerr << "EST_TokenStream had invalid UTF-8 content" << endl;
+		}
 	}
 /*	return getc(fp); */
       case tst_pipe:
@@ -657,16 +792,40 @@ int EST_TokenStream::getch_internal()
 	return EOF;
 	break;
       case tst_istream:
-	p_filepos++;
-	return is->get();
+
+	if (p_isutf8 ==false)
+	{
+		p_filepos++;
+		return is->get();
+	} else
+	{
+		istreambuf_iterator<char> it(is->rdbuf());
+		istreambuf_iterator<char> eos;
+		if (it != eos) {
+			cp = utf8::next(it,eos);
+			p_filepos+=is->gcount();
+			return cp;
+		} else {
+			eof_flag=TRUE;
+			return EOF;
+		}
+	}
+
       case tst_string:
 	if (pos < buffer_length)
 	{
-	    p_filepos++;
-	    return buffer[pos++];
+		if (p_isutf8 ==false) 
+		{
+			p_filepos++;
+			return buffer[pos++];
+		} else {
+			return utf8::peek_next(&(buffer[pos++]),buffer+buffer_length);
+		}
 	}
 	else
 	    return EOF;
+	    
+	    
       default:
 	cerr << "EST_TokenStream: unknown type" << endl;
 	return EOF;
@@ -675,12 +834,12 @@ int EST_TokenStream::getch_internal()
     return EOF;  // can't get here 
 }
 
-int EST_TokenStream::getch(void)
+utf8::uint32_t EST_TokenStream::getch(void)
 {
   return getch_internal();
 }
 
-inline int EST_TokenStream::peekch_internal()
+inline utf8::uint32_t  EST_TokenStream::peekch_internal()
 {
     // Return next character in stream (without reading it)
 
@@ -691,77 +850,80 @@ inline int EST_TokenStream::peekch_internal()
 }
 
 
-int EST_TokenStream::peekch(void)
+utf8::uint32_t  EST_TokenStream::peekch(void)
 {
   return peekch_internal();
   
 }
 
-#define CLASS(C,CL) (p_table[(unsigned char)(C)]==(CL))
+#define CLASS(C,CL) (p_table.check(C)==(CL))
 
-#define CLASS2(C,CL1,CL2) (p_table[(unsigned char)(C)]==(CL1)||p_table[(unsigned char)(C)]==(CL2))
+#define CLASS2(C,CL1,CL2) (p_table.check(C)==(CL1)||p_table.check(C)==(CL2))
 
 EST_Token &EST_TokenStream::get(void)
 {
     if (peeked_tokp)
     {
-	peeked_tokp = FALSE;
-	return current_tok;
+		peeked_tokp = FALSE;
+		return current_tok;
     }
 
-    if (p_table_wrong)
-      build_table();
-
     char *word;
-    int c,i,j;
+    int i,j,k=0;
+    char utf8char[5]="";
+    utf8::uint32_t c;
 
-    for (i=0; (CLASS(c=getch_internal(),' ') && 
-	       ( c != EOF )); i++)
+    for (i=0;
+         (CLASS(c=getch_internal(),' ') && 
+	       ( ! eof() ));)
     {
-	if (c == '\n') linepos++;
-	tok_wspace = check_extend_str(tok_wspace,i,&tok_wspacelen);
-	tok_wspace[i] = c;
+		if (c == '\n') linepos++;
+		tok_wspace = check_extend_str(tok_wspace,i,&tok_wspacelen);	
+		k=append(c,&(tok_wspace[i]));
+		i+=k;
     }
     tok_wspace[i] = '\0';
 
     current_tok.init();
 
-    if (c != EOF)
-    {   
-	current_tok.set_filepos(p_filepos-1);
+    if ( ! eof() )
+    {
+	current_tok.set_filepos(p_filepos-k);
 
 	if ((quotes) &&  // quoted strings (with escapes) are allowed
 	    (c == quote))
 	{
-	    for (i=0; 
-		 ((c = getch_internal()) != EOF)
+	    for (i=0;
+		 ((c = getch_internal()), ! eof())
 		 ;)
 	    {
-		if (c == quote)
-		    break;
-		tok_stuff = check_extend_str(tok_stuff,i,&tok_stufflen);
-		if (c == escape)
-		    c = getch_internal();
-		tok_stuff[i++] = c;
+			if (c == quote)
+				break;
+			tok_stuff = check_extend_str(tok_stuff,i,&tok_stufflen);
+			if (c == escape)
+				c = getch_internal();
+			i+=append(c,&(tok_stuff[i]));
 	    }
 	    current_tok.set_quoted(TRUE);
 	}
 	else            // standard whitespace separated tokens
 	{
-	    for (i=0,tok_stuff[i++]=c; 
+	    for (i=0,i+=append(c,&(tok_stuff[i])); 
 		 (
 		  !CLASS(c,'@') &&
 		  !CLASS(c=peekch_internal(),' ') && 
 		  !CLASS(c,'@') &&
-		  ( c != EOF )) ;)
+		  ( ! eof() )) ;)
 	    {
 		tok_stuff = check_extend_str(tok_stuff,i,&tok_stufflen);
 		// note, we must have peeked to get here.
-		tok_stuff[i++] = getpeeked_internal();
+		i+=append(getpeeked_internal(),&(tok_stuff[i]));
 	    }
 	}
 	tok_stuff[i] = '\0';
 	// Are there any punctuation symbols at the start?
+	// zeehio: j barre todo tok_stuff, evaluar class2. i apunta al final de tok_stuff.
+	// convertir i y j en iteradores?
 	for (j=0; 
 	     ((j < i) && CLASS2(tok_stuff[j], '$', '"'));
 	     j++);

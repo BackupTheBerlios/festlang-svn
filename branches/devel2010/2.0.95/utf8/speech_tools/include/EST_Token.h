@@ -46,6 +46,8 @@ using namespace std;
 
 #include "EST_String.h"
 #include "EST_common.h"
+#include <map>
+#include "utf8.h"
 
 // I can never really remember this so we'll define it here
 /// The default whitespace characters
@@ -205,6 +207,67 @@ class EST_Token {
     int operator != (const char *a) { return (strcmp(pname,a)!=0); }
 };
 
+/** This class is used by \Ref{TokenStream} to classify characters for 
+    tokenizing.
+
+    @author Sergio Oller (sergioller@gmail.com): April 2010
+*/
+
+typedef std::map<utf8::uint32_t,char> TokenTableLUT;
+
+class EST_TokenTable {
+
+	private:
+	  EST_String p_WhiteSpaceChars;
+	  EST_String p_SingleCharSymbols;
+	  EST_String p_PunctuationSymbols;
+	  EST_String p_PrePunctuationSymbols;
+	  bool p_table_wrong;
+	  bool p_isutf8;
+	  
+	  std::map<utf8::uint32_t,char> p_LUT;
+	  
+	  void build_tables();
+	  void getcharinsert(EST_String, char);
+	  void getutf8insert(EST_String, char);
+	
+	public:
+	  EST_TokenTable(const EST_String WhiteSpaceChars,
+	                 const EST_String SingleCharSymbols,
+	                 const EST_String PunctuationSymbols,
+	                 const EST_String PrePunctuationSymbols,
+	                 bool is_utf8);
+	  void default_values(const EST_String ws=EST_Token_Default_WhiteSpaceChars,
+	                      const EST_String sc=EST_String::Empty,
+	                      const EST_String ps=EST_String::Empty,
+	                      const EST_String pps=EST_String::Empty,
+	                      bool is_utf8=false);
+	  
+	  /// set which characters are to be treated as whitespace
+	  void set_WhiteSpaceChars (const EST_String &ws)
+	      { p_WhiteSpaceChars = ws; p_table_wrong = 1; }
+	  /// set which characters are to be treated as single character symbols
+	  void set_SingleCharSymbols (const EST_String &sc)
+	      { p_SingleCharSymbols = sc; p_table_wrong = 1;}
+	  /// set which characters are to be treated as (post) punctuation
+	  void set_PunctuationSymbols (const EST_String &ps)
+	      { p_PunctuationSymbols = ps; p_table_wrong = 1; }
+	  /// set which characters are to be treated as (pre) punctuation
+	  void set_PrePunctuationSymbols (const EST_String &pps)
+	      { p_PrePunctuationSymbols = pps; p_table_wrong = 1; }
+	  /// set if punctuation characters are UTF-8 coded
+	  void set_isutf8 (const bool isutf8)
+	      {p_isutf8 = isutf8; p_table_wrong = 1 ;}
+	      
+	  /// Look up a character in the table and return the class
+	  char check (utf8::uint32_t cp);
+	  
+	  /// Insert a character to the table associated to a class
+	  void insert_to_LUT(utf8::uint32_t cp, char newclass);
+	
+	
+};
+
 enum EST_tokenstream_type {tst_none, tst_file, tst_pipe, tst_string, tst_istream}; 
 
 /** A class that allows the reading of \Ref{EST_Token}s from a file
@@ -248,16 +311,16 @@ class EST_TokenStream{
     int pos;
     int linepos;
     int p_filepos;
-    int getch(void);
+    utf8::uint32_t getch(void);
     EST_TokenStream &getch(char &C);
     int peeked_charp;
-    int peeked_char;       // ungot character 
-    int peekch(void);
+    utf8::uint32_t peeked_char;       // ungot character 
+    utf8::uint32_t peekch(void);
     int peeked_tokp;
     int eof_flag;
     int quotes;
-    char quote;
-    char escape;
+    utf8::uint32_t quote;
+    utf8::uint32_t escape;
     EST_Token current_tok;
     void default_values(void);
     /* local buffers to save reallocating */
@@ -270,8 +333,9 @@ class EST_TokenStream{
     int close_at_end;
 
     /* character class map */
-    char p_table[256];
+    bool p_isutf8;
     bool p_table_wrong;
+    EST_TokenTable p_table;
 
     /** This function is deliberately private so that you'll get a compilation
         error if you assign a token stream or pass it as an (non-reference)
@@ -286,9 +350,9 @@ class EST_TokenStream{
 
     void build_table();
 
-    inline int getch_internal();
-    inline int peekch_internal();
-    inline int getpeeked_internal();
+    inline utf8::uint32_t getch_internal();
+    inline utf8::uint32_t peekch_internal();
+    inline utf8::uint32_t getpeeked_internal();
   public:
     ///
     EST_TokenStream();
@@ -345,8 +409,14 @@ class EST_TokenStream{
     /// set which characters are to be treated as (post) punctuation
     void set_PrePunctuationSymbols(const EST_String &ps) 
         { PrePunctuationSymbols = ps; p_table_wrong=1;}
+    /// set if punctuation characters are UTF-8 coded
+    void set_isutf8 (const bool isutf8)
+        { p_isutf8 = isutf8; p_table_wrong=1;}
     /// set characters to be used as quotes and escape, and set quote mode
-    void set_quotes(char q, char e) { quotes = TRUE; quote = q; escape = e; p_table_wrong=1;}
+    void set_quotes(char q, char e) 
+         { quotes = TRUE; quote = (utf8::uint32_t) q; escape = (utf8::uint32_t) e; p_table_wrong=1;}
+    void set_quotes(utf8::uint32_t q, utf8::uint32_t e)
+         { quotes = TRUE; quote = q; escape = e; p_table_wrong=1;}
     /// query quote mode
     int quoted_mode(void) { return quotes; }
     //@}
