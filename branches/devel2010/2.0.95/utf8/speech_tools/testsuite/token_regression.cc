@@ -47,9 +47,17 @@ static void find_tokens(EST_TokenStream &ts)
 {
     // Count and display the tokens in this stream
     int tokens;
+    EST_Token tok;
 
     for (tokens=0; !ts.eof(); tokens++)
-	cout << ts.get().string() << endl;
+    {
+        tok=ts.get();
+        cout << "string: |" << tok.string() << "|" << endl;
+        cout << "whitesp: |" << tok.whitespace() << "|" << endl;
+        cout << "punct: |" << tok.punctuation() << "|" << endl;
+        cout << "prepunct: |" << tok.prepunctuation() << "|" << endl;
+    }
+
     cout << "Total: " << tokens << endl << endl;;
 
 }
@@ -111,6 +119,13 @@ int main(int argc,char **argv)
     s = "This \"is \n\
 a\" te\\\"st.";
     cout << "Test 7: " << quote_string(s) << endl;
+    ts.open_string(s);
+    ts.set_quotes('"','\\');
+    find_tokens(ts);
+    ts.close();
+
+    s = "This. \"is a\" te\\\"st.";
+    cout << "Test 8: " << quote_string(s) << endl;
     ts.open_string(s);
     ts.set_quotes('"','\\');
     find_tokens(ts);

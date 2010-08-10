@@ -63,7 +63,7 @@ H = EST_common.h EST_TKVL.h EST_Option.h EST_TList.h \
     EST_TIterator.h EST_kalman.h EST_TDeque.h \
     EST_model_types.h EST_dynamic_model.h EST_FeatureData.h \
     EST_ServiceTable.h EST_Server.h EST_FringeServer.h \
-    utf8.h
+    EST_utf8.h
 
 DEVELOPMENT_DIRS = # development
 

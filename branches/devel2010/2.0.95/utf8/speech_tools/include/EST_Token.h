@@ -47,7 +47,7 @@ using namespace std;
 #include "EST_String.h"
 #include "EST_common.h"
 #include <map>
-#include "utf8.h"
+#include "EST_utf8.h"
 
 // I can never really remember this so we'll define it here
 /// The default whitespace characters

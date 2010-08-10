@@ -35,9 +35,9 @@
 
 TOP=../..
 DIRNAME=include/utf8
-H = checked.h core.h unchecked.h
+ALL_DIRS = utf8
 
-FILES = Makefile $(H)
+FILES = Makefile
 INSTALL = install_incs
 
 include $(TOP)/config/common_make_rules

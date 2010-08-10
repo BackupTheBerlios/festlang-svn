@@ -30,49 +30,18 @@
 ##  THIS SOFTWARE.                                                       ##
 ##                                                                       ##
 ###########################################################################
-#                     Makefile for base classes                           #
-#                                                                         #
-#=========================================================================#
-TOP=..
-DIRNAME=base_class
+##                   Include Directory Makefile                          ##
+###########################################################################
 
-LIB_BUILD_DIRS = string inst_tmpl
-BUILD_DIRS = $(LIB_BUILD_DIRS)
+TOP=../../..
+DIRNAME=include/utf8/utf8
+H = checked.h core.h unchecked.h
 
-ALL_DIRS = $(BUILD_DIRS)
-
-LOCAL_DEFAULT_LIBRARY = estbase
-
-H = EST_matrix_support.h rateconv.h EST_get_function_template.h
-
-T = EST_TList.cc EST_TSortable.cc EST_TKVL.cc \
-	EST_TMatrix.cc EST_TSimpleMatrix.cc \
-	EST_TVector.cc EST_TSimpleVector.cc \
-	EST_THash.cc EST_Tvectlist.cc \
-	EST_TTimeIndex.cc EST_TDeque.cc \
-        EST_TBuffer.cc EST_TNamedEnum.cc
-
-TSRCS =  EST_Featured.cc EST_Features.cc EST_Token.cc
-
-CPPSRCS = EST_UList.cc EST_Option.cc EST_StringTrie.cc  \
-	vec_mat_aux.cc EST_Pathname_unix.cc THash_aux.cc \
-	EST_FMatrix.cc EST_Complex.cc EST_Val.cc \
-	EST_matrix_support.cc rateconv.cc \
-        EST_IMatrix.cc EST_SMatrix.cc \
-        EST_DMatrix.cc vec_mat_aux_d.cc EST_FeatureData.cc\
-        EST_slist_aux.cc EST_svec_aux.cc EST_ilist_aux.cc \
-	EST_features_aux.cc EST_features_io.cc vec_mat_aux_i.cc \
-	EST_utf8.cc $(TSRCS)
-
-SRCS = $(CPPSRCS)
-OBJS = $(CPPSRCS:.cc=.o)
-FILES = $(SRCS) EST_Pathname_win32.cc $(T) $(H)\
-	Makefile
-
-ALL = .buildlib $(BUILD_DIRS)
+FILES = Makefile $(H)
+INSTALL = install_incs
 
 include $(TOP)/config/common_make_rules
 
-# Always compile with -O3 as its an important function
-rateconv.o:
-	$(CXX_COMMAND) -O3 rateconv.cc -o rateconv.o
+install_incs:
+	mkdir -p $(INCDIR)/EST/
+	cp -p *.h $(INCDIR)/EST/

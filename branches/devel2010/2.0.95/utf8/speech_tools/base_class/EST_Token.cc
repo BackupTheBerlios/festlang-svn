@@ -49,7 +49,7 @@
 #include "EST_string_aux.h"
 #include "EST_cutils.h"
 #include "EST_error.h"
-#include "utf8.h"
+#include "EST_utf8.h"
 using namespace std;
 
 
@@ -99,78 +99,6 @@ const EST_String Token_Origin_Stream = "existing istream";
 const EST_String Token_Origin_String = "existing string";
 
 static EST_Regex RXanywhitespace("[ \t\n\r]");
-
-
-//zeehio: move this at a more general place:
-void cp2utf8(utf8::uint32_t cp,char *utf8string)
-{
-    if (cp < 0x0080)
-    {
-        utf8string[0]=(char) cp;
-        utf8string[1]='\0';
-    } else if (cp < 0x0800)
-    {
-        utf8string[0]=(char) (0xC0 | (cp >> 6 ));
-        utf8string[1]=(char) (0x80 | (cp & 0x003F));
-        utf8string[2]='\0';
-    } else if (cp < 0xFFFF)
-    {
-        utf8string[0]=(char) (0xE0 | (cp >> 12 ));
-        utf8string[1]=(char) (0x80 | ((cp >> 6) & 0x003F));
-        utf8string[2]=(char) (0x80 | (cp & 0x003F));
-        utf8string[3]='\0';
-    } else if (cp < 0x10FFFF)
-    {
-        utf8string[0]=(char) (0xF0 | (cp >> 18 ));
-        utf8string[1]=(char) (0x80 | ((cp >> 12) & 0x003F));
-        utf8string[2]=(char) (0x80 | ((cp >> 6 ) & 0x003F));
-        utf8string[3]=(char) (0x80 | (cp & 0x003F));
-        utf8string[4]='\0';
-    } else
-    {
-        std::cerr << "invalid Code point: " << cp << std::endl;
-        utf8string[0]='\0';
-    }
-    return;
-}
-
-/** If st is UTF-8, get the next Unicode Code Point and save it to cp.
-  * If st is not UTF-8, return the next byte.
-  * In any case, return the number of bytes read.
-  */
-int getnextcp(char *st, bool is_utf8, utf8::uint32_t &cp)
-{
-    if (is_utf8 ==false)
-    {
-	cp=(utf8::uint32_t) *st;
-	return 1;
-    } else
-    {
-	char *it=st;
-	cp=utf8::next(it,it+sizeof(it));
-	return it-st;
-    }
-}
-
-/** If st is UTF-8, get the previous Unicode Code Point and save it to cp.
-  * If st is not UTF-8, return the previous byte.
-  * In any case, return the number of bytes unread.
-  */
-int getprevcp(char *st_begin, char *st,
-	      bool is_utf8, utf8::uint32_t &cp)
-{
-    if (st<=st_begin) {cp=0;return 0;}
-    if (is_utf8 == false)
-    {
-	cp=(utf8::uint32_t) *(st-1);
-	return 1;
-    } else
-    {
-	char *it=st,*begin=st_begin;
-	cp=utf8::prior(it,begin);
-	return st-it;
-    }
-}
 
 static inline char *check_extend_str_in(char *str, int pos, int *max)
 {
