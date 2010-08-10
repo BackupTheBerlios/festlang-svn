@@ -231,7 +231,8 @@ class EST_TokenTable {
 	  void InsertCharSt(EST_String, char);
 	  void InsertUtf8St(EST_String, char);
 	  void InsertCP(utf8::uint32_t cp, char newclass);
-	
+	  void TwoClassWarn(utf8::uint32_t cp, TokenTableLUT::mapped_type oldclass, 
+                        TokenTableLUT::mapped_type newclass);
 	public:
 	  EST_TokenTable(const EST_String WhiteSpaceChars,
 	                 const EST_String SingleCharSymbols,
@@ -414,6 +415,7 @@ class EST_TokenStream{
          { quotes = TRUE; quote = q; escape = e; p_table.set_p_table_wrong();}
     /// query quote mode
     int quoted_mode(void) { return quotes; }
+        
     //@}
     /**@name miscellaneous */
     //@{

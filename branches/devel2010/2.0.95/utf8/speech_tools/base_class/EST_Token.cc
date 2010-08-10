@@ -226,9 +226,9 @@ EST_Token &EST_Token::operator = (const EST_String &a)
 }
 
 EST_TokenTable::EST_TokenTable(const EST_String ws=EST_Token_Default_WhiteSpaceChars, \
-                               const EST_String sc=EST_Token_Default_SingleCharSymbols, \
-                               const EST_String ps=EST_Token_Default_PunctuationSymbols, \
-                               const EST_String pps=EST_Token_Default_PrePunctuationSymbols, \
+                               const EST_String sc=EST_String::Empty, \
+                               const EST_String ps=EST_String::Empty, \
+                               const EST_String pps=EST_String::Empty, \
                                bool is_utf8=false)
 {
 	default_values(ws,sc,ps,pps,is_utf8);
@@ -260,36 +260,50 @@ char EST_TokenTable::CheckCP(utf8::uint32_t cp)
 	else return '\0';
 }
 
+void EST_TokenTable::TwoClassWarn(utf8::uint32_t cp, TokenTableLUT::mapped_type oldclass, TokenTableLUT::mapped_type newclass)
+{
+    char utf8char[5];
+    if (p_isutf8 == true)
+    {
+	    cp2utf8(cp,utf8char);
+	    EST_warning("Character '%s' has two classes, '%c' and '%c'",
+				    utf8char, oldclass,newclass);
+    } else
+    {
+	    EST_warning("Character '%c' has two classes, '%c' and '%c'",
+				    (char) cp, oldclass,newclass);
+    }
+    
+}
+
 void EST_TokenTable::InsertCP(utf8::uint32_t cp, TokenTableLUT::mapped_type newclass) 
 {
 	TokenTableLUT::iterator iter =p_LUT.find(cp);
 	TokenTableLUT::mapped_type oldclass;
-	char utf8char[5];
 	
-	if (iter != p_LUT.end() )
-	{
-		oldclass= iter->second;
-		if (oldclass=='@')
-			return;
-		else if (oldclass == '.' && newclass == '$' )
-			p_LUT[cp]='"';
-		else
-		{
-			if (p_isutf8 == true)
-			{
-				cp2utf8(cp,utf8char);
-				EST_warning("Character '%s' has two classes, '%c' and '%c'",
-							utf8char, oldclass,newclass);
-			} else
-			{
-				EST_warning("Character '%c' has two classes, '%c' and '%c'",
-							(char) cp, oldclass,newclass);
-			}
-		}
-	}
+	if (iter == p_LUT.end() )
+	    p_LUT[cp]=newclass;
 	else
 	{
-		 p_LUT[cp]=newclass;
+	    oldclass= iter->second;
+	    switch (newclass) {
+		case ' ': //WhiteSpace or SingleChar
+		case '@':
+		    TwoClassWarn(cp,oldclass,newclass);
+		    return;
+		case '.':  //Punctuation
+		    if (oldclass != '@')
+			TwoClassWarn(cp,oldclass,newclass);
+		    return;
+		case '$': //Prepunctuation
+		    if (oldclass == '@')
+			return;
+		    else if (oldclass == '.')
+			p_LUT[cp]='"';
+		    else
+			TwoClassWarn(cp,oldclass,newclass);
+		    return;
+	    }
 	}
 }
 
@@ -808,7 +822,7 @@ EST_Token &EST_TokenStream::must_get(EST_String expected, bool *ok)
     return tok;
 }
 
-inline unsigned int EST_TokenStream::getpeeked_internal(void)
+inline utf8::uint32_t  EST_TokenStream::getpeeked_internal(void)
 {
   peeked_charp = FALSE;
   return peeked_char;
@@ -995,14 +1009,6 @@ EST_Token &EST_TokenStream::get(void)
 		i+=append(getpeeked_internal(),&(tok_stuff[i]));
 	    }
 	}
-	if(tok_stuff[0] == 's') 
-	{
-	    cerr << "i: " << i << endl;
-	    cerr << "tokstuff: " << tok_stuff << endl;
-	    if (!(CLASS(c,'@'))) cerr << "1 valida" << endl;
-	    if (!(CLASS(peeked_char,' '))) cerr << "2 valida (" << (char)peeked_char << ")" << endl;
-	    if (!(CLASS(peeked_char,'@'))) cerr << "3 valida (" << (char)peeked_char << ")" << endl;
-	}
 	tok_stuff[i] = '\0';
 	// Are there any punctuation symbols at the start?
 	for (j=0, k=getnextcp(&(tok_stuff[j]),p_table.isutf8(),c); 
@@ -1028,10 +1034,8 @@ EST_Token &EST_TokenStream::get(void)
 	     j-=k, k=getprevcp(word,&(word[j]),p_table.isutf8(),c));
 	if (word[j] != '\0')
 	{
-	    cerr << "word: ¿" << word << "¿| j: " << j << " | k: " << k << endl;
 	    current_tok.set_punctuation(&word[j]);
 	    word[j] = '\0';
-	    cerr << "wordAfter: ¿" << word << "¿" << endl;
 	}
 	else
 	    current_tok.set_punctuation(EST_String::Empty);
