@@ -37,7 +37,7 @@
 
 LANG=C; export LANG
 
-DATAFILE=$1
+PROMPTFILE=$1
 UNITTYPE=$2
 OUTFEATS=$3
 
@@ -47,7 +47,7 @@ then
    exit -1
 fi
 
-awk '{print $2}' $DATAFILE |
+festival -b "(db_list_ids \"$PROMPTFILE\")" |
 while read i
 do
    cat festival/coeffs/$i.mcep |

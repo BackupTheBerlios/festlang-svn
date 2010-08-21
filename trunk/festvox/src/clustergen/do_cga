@@ -130,8 +130,7 @@ then
     cd cga/source;
     ../../bin/make_voicing pda ../../$PROMPTFILE
 
-   cat ../../$PROMPTFILE |
-   awk '{print $2}' |
+   festival -b "(db_list_ids \"../../$PROMPTFILE\")" |
    while read i
    do
       fname=$i
@@ -165,7 +164,7 @@ then
     ../../bin/do_clustergen mcep_static
 #    ../../bin/make_voicing pda
 
-    cat $PROMPTFILE | awk '{print $2}' |
+    festival -b "(db_list_ids \"$PROMPTFILE\")" |
     while read fname
     do
        # F0 isn't actually used here yet, but we need something
@@ -184,8 +183,8 @@ if [ $1 = "align_source_target" ]
 then
     # DTW alignment at the frame level
     PHONEALIGN=$FESTVOXDIR/src/general/phonealign
-    cat $PROMPTFILE | awk '{print $2}' |
-    while read fname
+
+    festival -b "(db_list_ids \"$PROMPTFILE\")" | while read fname
     do
        echo cga aligning $fname
        $PHONEALIGN -itrack cga/source/ccoefs/$fname.mcep -ilabel cga/source/lab/$fname.lab -otrack cga/target/ccoefs/$fname.mcep -olabel cga/target/lab/$fname.lab

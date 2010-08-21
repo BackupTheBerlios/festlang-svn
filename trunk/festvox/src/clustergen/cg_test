@@ -140,7 +140,7 @@ fi
 
 if [ $1 = "test_synth_costs" ]
 then
-   for i in `cat $PROMPTFILE.test | awk '{print $2}'`
+   for i in `festival -b "(db_list_ids \"$PROMPTFILE\")"`
    do
       fname=$i
       echo Aligning $i >/dev/tty
@@ -175,7 +175,7 @@ fi
 
 if [ $1 = "test_resynth_costs" ]
 then
-   for i in `cat $TESTFILE | awk '{print $2}'`
+   for i in `festival -b "(db_list_ids \"$PROMPTFILE\")"`
    do
       fname=$i
       $CLUSTERGENDIR/track_diff ccoefs/$i.mcep test/$EXPERIMENT/$i.mcep |

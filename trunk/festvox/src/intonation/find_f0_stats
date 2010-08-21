@@ -71,7 +71,7 @@ F0MAX=400
 
 NUMPROMPTS=`cat $PROMPTFILE | wc -l | awk '{print $1}'`
 
-cat $PROMPTFILE |
+festival -b "(db_list_ids \"$PROMPTFILE\")" |
 awk 'BEGIN { NP='$NUMPROMPTS';
              ENOUGH=100.0
              if (NP/ENOUGH > 2)
@@ -82,7 +82,7 @@ awk 'BEGIN { NP='$NUMPROMPTS';
                 f = 1;
            }
     { if (NR%f == 0)
-          print $2
+          print $0
     }' |
 while read i
 do

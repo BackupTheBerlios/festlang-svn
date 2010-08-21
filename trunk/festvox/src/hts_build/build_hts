@@ -177,7 +177,7 @@ if [ "$1" = "files" ]
 then
     echo HTS "copy in files (utts,wavs)"
 
-    for i in `cat $PROMPTFILE | awk '{print $2}'`
+    for i in `festival -b "(db_list_ids \"$PROMPTFILE\")"`
     do
       echo wave and utt for $i
       $ESTDIR/bin/ch_wave -otype raw -F 16000 wav/$i.wav -o hts_build/data/raw/db_v_$i.raw
@@ -197,7 +197,7 @@ then
 
     . etc/f0range
 
-    for i in `cat $PROMPTFILE | awk '{print $2}'`
+    for i in `festival -b "(db_list_ids \"$PROMPTFILE\")"`
     do
       echo f0 for $i
       if [ -f $HTSDIR/../vc/src/tempo/tempo ]

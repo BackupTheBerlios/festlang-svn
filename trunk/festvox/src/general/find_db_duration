@@ -54,7 +54,7 @@ then
    exit 1
 fi
 
-awk '{print $2}' $1 |
+festival -b "(db_list_ids \"$1\")" |
 while read x
 do
    $ESTDIR/bin/ch_wave -info wav/$x.wav

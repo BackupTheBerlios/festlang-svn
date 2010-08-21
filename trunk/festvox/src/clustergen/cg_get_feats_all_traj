@@ -37,7 +37,7 @@
 
 LANG=C; export LANG
 
-DATAFILE=$1
+PROMPTFILE=$1
 
 if [ $# != 1 ]
 then
@@ -45,7 +45,7 @@ then
    exit -1
 fi
 
-awk '{print $2}' $DATAFILE |
+festival -b "(db_list_ids \"$PROMPTFILE\")" |
 while read i
 do
    awk '{print $1}' festival/coeffs/$i.feats

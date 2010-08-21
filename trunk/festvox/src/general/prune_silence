@@ -35,7 +35,7 @@
 ##  Uses the F0 detector to find speech (approximately)                  ##
 ###########################################################################
 
-PROMPTLIST=$1
+PROMPTFILE=$1
 # Keep up to SILMARGIN seconds of speech before/after first/last voiced frame
 SILMARGIN=0.2
 
@@ -57,8 +57,7 @@ mkdir wav
 # Not yet tested if this is worthwhile to customize to the particualr voice
 PDAPARAMS='-fmin 70 -fmax 240'
 
-cat $PROMPTLIST |
-awk '{print $2}' |
+festival -b "(db_list_ids \"$PROMPTFILE\")" | 
 while read fname
 do
     echo -n $fname

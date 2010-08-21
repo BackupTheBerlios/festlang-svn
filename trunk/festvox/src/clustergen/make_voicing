@@ -103,8 +103,7 @@ fi
 if [ $1 = "get_f0" ]
 then
 
-   cat $PROMPTFILE |
-   awk '{print $2}' |
+   festival -b "(db_list_ids \"$PROMPTFILE\")" |
    while read fname
    do
      echo $fname voicing get_f0
@@ -120,8 +119,7 @@ fi
 if [ $1 = "tempo" ]
 then
 
-   cat $PROMPTFILE |
-   awk '{print $2}' |
+   festival -b "(db_list_ids \"$PROMPTFILE\")" |    
    while read fname
    do
      echo $fname voicing tempo

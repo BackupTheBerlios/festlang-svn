@@ -151,7 +151,7 @@ then
     rm -rf $HTS_BUILD_DIR/data/raw $HTS_BUILD_DIR/data/utts
     mkdir $HTS_BUILD_DIR/data/raw $HTS_BUILD_DIR/data/utts
 
-    for i in `cat $PROMPTFILE | awk '{print $2}'`
+    for i in `festival -b "(db_list_ids \"$PROMPTFILE\")"`
     do
       echo wave and utt for $i
       $ESTDIR/bin/ch_wave -otype raw -F 16000 wav/$i.wav -o $HTS_BUILD_DIR/data/raw/${FV_VOICENAME}_spk_${i}.raw

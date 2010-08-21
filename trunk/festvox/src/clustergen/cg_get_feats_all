@@ -42,10 +42,9 @@
 
 LANG=C; export LANG
 
-DATAFILE=$1
+PROMPTFILE=$1
 
-awk '{print $2}' $DATAFILE |
-while read i
+festival -b "(db_list_ids \"$PROMPTFILE\")" | while read i
 do
 #   echo Collecting feats $i >/dev/tty
    cat festival/coeffs/$i.feats
@@ -58,8 +57,7 @@ echo Sorting all feats
 sort -n festival/coeffs/cg_all.feats >festival/coeffs/cg_all_sorted.feats
 rm -f festival/coeffs/cg_all.feats
 
-awk '{print $2}' $DATAFILE |
-while read i
+festival -b "(db_list_ids \"$PROMPTFILE\")" | while read i
 do
 #   echo Collecting mcep $i >/dev/tty
    cat festival/coeffs/$i.mcep

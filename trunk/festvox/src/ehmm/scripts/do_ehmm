@@ -181,8 +181,7 @@ then
               printf("  else\n");
               printf("     printf(\"%%s 125 %%d %%s\\n\",$1,statenamemap[$3],statename[$3])\n");
               printf("}\n");}' >etc/mapstatenames.awk
-   cat ${PROMPTFILE} |
-   awk '{print $2}' |
+   festival -b "(db_list_ids \"$PROMPTFILE\")" |
    while read x
    do
       mv lab/$x.sl lab/$x.slehmm

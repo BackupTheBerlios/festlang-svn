@@ -56,7 +56,7 @@ then
    PROMPTFILE=$1
 fi
 
-awk '{print $2}' $PROMPTFILE |
+festival -b "(db_list_ids \"$PROMPTFILE\")" |
 while read i
 do
    fname=$i

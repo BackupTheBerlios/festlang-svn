@@ -143,9 +143,8 @@ then
    then
       mkdir mcep_static
    fi
-   cat $PROMPTFILE |
-   awk '{print $2}' |
-   while read i
+
+   festival -b "(db_list_ids \"$PROMPTFILE\")" | while read i
    do
       fname=$i
       echo $fname MCEP static
@@ -174,8 +173,7 @@ then
       mkdir mcep_deltas 
    fi
 
-   cat $PROMPTFILE |
-   awk '{print $2}' |
+   festival -b "(db_list_ids \"$PROMPTFILE\")" |
    while read i
    do
       fname=$i
@@ -210,9 +208,7 @@ then
    fi
    CG_TMP=cg_tmp_$$
 
-   cat $PROMPTFILE |
-   awk '{print $2}' |
-   while read i
+   festival -b "(db_list_ids \"$PROMPTFILE\")" | while read i
    do
       fname=$i
       echo $fname "COMBINE_COEFFS (f0,mcep_static,v)"
@@ -264,9 +260,7 @@ then
    fi
    CG_TMP=cg_tmp_$$
 
-   cat $PROMPTFILE |
-   awk '{print $2}' |
-   while read i
+   festival -b "(db_list_ids \"$PROMPTFILE\")" | while read i
    do
       fname=$i
       echo $fname "COMBINE_COEFFS (f0,mcep_deltas,v)"
@@ -309,8 +303,7 @@ then
    fi
    CG_TMP=cg_tmp_$$
 
-   cat $PROMPTFILE |
-   awk '{print $2}' |
+   festival -b "(db_list_ids \"$PROMPTFILE\")" |
    while read i
    do
       fname=$i
@@ -354,8 +347,7 @@ then
    fi
    CG_TMP=cg_tmp_$$
 
-   cat $PROMPTFILE |
-   awk '{print $2}' |
+   festival -b "(db_list_ids \"$PROMPTFILE\")" |
    while read i
    do
       fname=$i
@@ -583,8 +575,7 @@ if [ $1 = "cgv_combine_coeffs" ]
 then
    CG_TMP=cg_tmp_$$
 
-   cat $PROMPTFILE |
-   awk '{print $2}' |
+   festival -b "(db_list_ids \"$PROMPTFILE\")" |
    while read i
    do
       fname=$i
@@ -618,8 +609,7 @@ then
    NGRAM_BUILD=$ESTDIR/bin/ngram_build
    ORDER=3;
 
-   cat $PROMPTFILE |
-   awk '{print $2}' |
+   festival -b "(db_list_ids \"$PROMPTFILE\")" |
    while read x
    do
       $ESTDIR/bin/ch_track cgv/lab/$x.cseq |
@@ -657,8 +647,7 @@ then
    WFST_TRAIN=$ESTDIR/bin/wfst_train
    ORDER=3;
 
-   cat $PROMPTFILE |
-   awk '{print $2}' |
+   festival -b "(db_list_ids \"$PROMPTFILE\")" |
    while read x
    do
       $ESTDIR/bin/ch_track cgv/lab/$x.cseq |
