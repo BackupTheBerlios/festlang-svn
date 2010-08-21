@@ -636,4 +636,13 @@ Compile all the scheme files in the library directory."
 (defvar mlsa_alpha_param 0.42)
 (defvar mlsa_beta_param 0.0)
 
+(define (db_list_ids promptsfile)
+  "(db_list_ids promptsfile)
+Extract file list from promptsfile. Used in festvox scripts"
+   (let ((flist (load promptsfile t)) a) 
+	(while flist
+	     (begin (set! a (caar flist)) 
+	          (format t "%s\n" a) 
+		  (set! flist (cdr flist))))))
+
 (provide 'festival)
