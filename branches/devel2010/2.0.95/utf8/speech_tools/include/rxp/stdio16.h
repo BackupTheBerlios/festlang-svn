@@ -32,6 +32,19 @@ extern STD_API FILE16 *Stdin, *Stdout, *Stderr;
 
 STD_API FILE16 *MakeFILE16FromFILE(FILE *f, const char *type);
 STD_API FILE16 *MakeFILE16FromString(void *buf, long size, const char *type);
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+STD_API FILE16 *MakeFILE16FromiStream(void *is,const char *type);
+#ifdef __cplusplus
+}
+#endif
+
+
+
+
 #ifdef WIN32
 #ifdef SOCKETS_IMPLEMENTED
 STD_API FILE16 *MakeFILE16FromWinsock(int sock, const char *type);

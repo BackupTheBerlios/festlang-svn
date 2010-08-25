@@ -243,7 +243,7 @@ EST_read_status EST_Wave::load(const EST_String filename,
     EST_TokenStream ts;
 
     if (filename == "-")
-	ts.open(stdin,FALSE);
+	ts.open(cin);
     else if ((ts.open(filename)) == -1)
     {
 	cerr << "Wave load: can't open file \"" << filename << "\"" << endl;
@@ -292,7 +292,7 @@ EST_read_status EST_Wave::load_file(const EST_String filename,
     EST_TokenStream ts;
 
     if (filename == "-")
-	ts.open(stdin,FALSE);
+	ts.open(cin);
     else if ((ts.open(filename)) == -1)
     {
 	cerr << "Wave load: can't open file \"" << filename << "\"" << endl;

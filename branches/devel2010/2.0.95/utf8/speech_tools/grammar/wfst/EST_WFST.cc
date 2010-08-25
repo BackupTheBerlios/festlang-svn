@@ -442,6 +442,26 @@ static int get_int(FILE *fd,int swap)
 	return i;
 }
 
+
+static float get_float(istream &is,int swap)
+{
+    float f;
+    is.read((char*)&f,4);
+    if (swap) swapfloat(&f);
+    return f;
+}
+
+static int get_int(istream &is,int swap)
+{
+    int i;
+    is.read((char*)&i,4);
+    if (swap) 
+	return SWAPINT(i);
+    else
+	return i;
+}
+
+
 EST_read_status EST_WFST::load_binary(FILE *fd,
 				      EST_Option &hinfo,
 				      int num_states,
@@ -504,11 +524,73 @@ EST_read_status EST_WFST::load_binary(FILE *fd,
     return r;
 }
 
+EST_read_status EST_WFST::load_binary(istream &is,
+				      EST_Option &hinfo,
+				      int num_states,
+				      int swap)
+{
+    EST_read_status r;
+    int i,j, s;
+    int num_trans, state_type;
+    int in_sym, out_sym, next_state;
+    float trans_cost;
+
+    r = format_ok;
+
+    for (i=0; i < num_states; i++)
+    {
+	num_trans = get_int(is,swap);
+	state_type = get_int(is,swap);
+	
+	if (state_type == WFST_FINAL)
+	    s = add_state(wfst_final);
+	else if (state_type == WFST_NONFINAL)
+	    s = add_state(wfst_nonfinal);
+	else if (state_type == WFST_LICENCE)
+	    s = add_state(wfst_licence);
+	else if (state_type == WFST_ERROR)
+	    s = add_state(wfst_error);
+	else
+	{
+	    cerr << "WFST load: unknown state type \"" << 
+		state_type << "\"" << endl;
+	    r = read_format_error;
+	    break;
+	}
+
+	if (s != i)
+	{
+	    cerr << "WFST load: internal error: unexpected state misalignment"
+		 << endl;
+	    r = read_format_error;
+	    break;
+	}
+
+	for (j=0; j < num_trans; j++)
+	{
+	    in_sym = get_int(is,swap);
+	    if (in_sym < 0)
+	    {
+		in_sym *= -1;
+		out_sym = in_sym;
+	    }
+	    else
+		out_sym = get_int(is,swap);
+	    next_state = get_int(is,swap);
+	    trans_cost = get_float(is,swap);
+
+	    p_states[i]->add_transition(trans_cost,next_state,in_sym,out_sym);
+	}
+    }
+
+    return r;
+}
+
 
 EST_read_status EST_WFST::load(const EST_String &filename)
 {
     // Load a WFST from a file
-    FILE *fd;
+    ifstream is(filename,ios_base::in| ios_base::binary);
     EST_TokenStream ts;
     EST_Option hinfo;
     bool ascii;
@@ -517,13 +599,13 @@ EST_read_status EST_WFST::load(const EST_String &filename)
     int i,s;
     int swap;
 
-    if ((fd=fopen(filename,"r")) == NULL)
+    if (is.is_open() == false)
     {
 	cerr << "WFST load: unable to open \"" << filename 
 	    << "\" for reading" << endl;
 	return read_error;
     }
-    ts.open(fd,FALSE);
+    ts.open(is);
     ts.set_quotes('"','\\');
 
     if (((r = read_est_header(ts, hinfo, ascii, t)) != format_ok) ||
@@ -556,13 +638,13 @@ EST_read_status EST_WFST::load(const EST_String &filename)
 	    swap = TRUE;
 	else
 	    swap = FALSE;
-	r = load_binary(fd,hinfo,num_states,swap);
+	r = load_binary(is,hinfo,num_states,swap);
     }
     else
     {
 	for (i=0; i < num_states; i++)
 	{
-	    LISP sd = lreadf(fd);
+	    LISP sd = lreadf(&is);
 	    if (i != get_c_int(car(car(sd))))
 	    {
 		cerr << "WFST load: expected description of state " << i <<
@@ -599,7 +681,7 @@ EST_read_status EST_WFST::load(const EST_String &filename)
 	}
     }
 
-    fclose(fd);
+    is.close();
     
     return r;
 }

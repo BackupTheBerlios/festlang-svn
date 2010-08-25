@@ -43,6 +43,7 @@
 #   error EST can only handle 8 bit characters
 #endif
 
+#include <iostream>
 #include "EST_String.h"
 #include "EST_Regex.h"
 #include "EST_TKVL.h"
@@ -50,6 +51,7 @@
 #include "EST_TDeque.h"
 #include "EST_TList.h"
 #include "rxp/rxp.h"
+
 
 // We only use types and functions from rxp.h, so we can throw away
 // some of the macros which cause problems.
@@ -213,6 +215,16 @@ public:
     * use in errors.
     */
   XML_Parser *make_parser(FILE *input, const EST_String desc, void *data);
+
+
+  /// Create a parser for a istream input stream.
+  XML_Parser *make_parser(istream *is, void *data);
+
+  /** Create a parser for a istream input stream, giving  a description for
+    * use in errors.
+    */
+  XML_Parser *make_parser(istream *is, const EST_String desc, void *data);
+
 
   // Create a parser for the named file.
   XML_Parser *make_parser(const EST_String filename, void *data);

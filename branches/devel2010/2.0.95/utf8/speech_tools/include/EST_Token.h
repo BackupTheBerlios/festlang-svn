@@ -40,15 +40,22 @@
 #ifndef __EST_TOKEN_H__
 #define __EST_TOKEN_H__
 
-#include <cstdio>
+#include <map>
+#include <iostream>
+#include <sstream>
+#include <fstream>
 
-using namespace std;
+#include <vector>
 
 #include "EST_String.h"
 #include "EST_common.h"
-#include <map>
 #include "EST_utf8.h"
 
+using namespace EST; // In the future this should be moved to each of
+                     // the files that include EST_Token.h
+
+namespace EST
+{
 // I can never really remember this so we'll define it here
 /// The default whitespace characters
 extern const EST_String EST_Token_Default_WhiteSpaceChars;
@@ -80,7 +87,7 @@ class EST_Token {
     EST_String punc;
     int linenum;
     int linepos;
-    int p_filepos;
+    streampos p_streamposition;
     int p_quoted;
 
   public:
@@ -89,7 +96,7 @@ class EST_Token {
     ///
     EST_Token(const EST_String p) {init(); pname = p; }
     ///
-    void init() {p_quoted=linenum=linepos=p_filepos=0;}
+    void init() {p_quoted=linenum=linepos=0;}
     
     /**@name Basic access to fields */
     //@{
@@ -175,7 +182,7 @@ class EST_Token {
     ///
     void set_col(int c) { linepos = c; }
     /// Set file position in original \Ref{EST_TokenStream}
-    void set_filepos(int c) { p_filepos = c; }
+    void set_streampos(streampos c) { p_streamposition = c; }
     /// Return lower case version of token name
     EST_String lstring() { return downcase(pname); }
     /// Return upper case version of token name
@@ -185,7 +192,9 @@ class EST_Token {
     /// Line position in original \Ref{EST_TokenStream}.
     int col(void) const { return linepos; }
     /// file position in original \Ref{EST_TokenStream}.
-    int filepos(void) const { return p_filepos; }
+    streampos streamposition(void) const { return p_streamposition; }
+    /// file position in original \Ref{EST_TokenStream}.
+    streampos filepos(void) const { return streampos(); }
 
     /// A string describing current position, suitable for error messages
     const EST_String pos_description() const;
@@ -207,13 +216,13 @@ class EST_Token {
     int operator != (const char *a) { return (strcmp(pname,a)!=0); }
 };
 
-/** This class is used by \Ref{TokenStream} to classify characters for 
-    tokenizing.
+/** This class is used by \Ref{TokenStream} to classify characters
+ *  during Tokenization.
 
     @author Sergio Oller (sergioller@gmail.com): April 2010
 */
 
-typedef std::map<utf8::uint32_t,char> TokenTableLUT;
+typedef std::map<UnicodeChar,char> TokenTableLUT;
 
 class EST_TokenTable {
 
@@ -222,16 +231,16 @@ class EST_TokenTable {
 	  EST_String p_SingleCharSymbols;
 	  EST_String p_PunctuationSymbols;
 	  EST_String p_PrePunctuationSymbols;
-	  bool p_table_wrong;
+	  bool p_LUT_wrong;
 	  bool p_isutf8;
 	  
-	  std::map<utf8::uint32_t,char> p_LUT;
+	  TokenTableLUT p_LUT;
 	  
 	  void build_tables();
 	  void InsertCharSt(EST_String, char);
 	  void InsertUtf8St(EST_String, char);
-	  void InsertCP(utf8::uint32_t cp, char newclass);
-	  void TwoClassWarn(utf8::uint32_t cp, TokenTableLUT::mapped_type oldclass, 
+	  void InsertCP(UnicodeChar cp, TokenTableLUT::mapped_type newclass);
+	  void TwoClassWarn(UnicodeChar cp, TokenTableLUT::mapped_type oldclass, 
                         TokenTableLUT::mapped_type newclass);
 	public:
 	  EST_TokenTable(const EST_String WhiteSpaceChars,
@@ -247,30 +256,50 @@ class EST_TokenTable {
 	  
 	  /// set which characters are to be treated as whitespace
 	  void set_WhiteSpaceChars (const EST_String &ws)
-	      { p_WhiteSpaceChars = ws; p_table_wrong = 1; }
+	      { p_WhiteSpaceChars = ws; p_LUT_wrong = true; }
 	  /// set which characters are to be treated as single character symbols
 	  void set_SingleCharSymbols (const EST_String &sc)
-	      { p_SingleCharSymbols = sc; p_table_wrong = 1;}
+	      { p_SingleCharSymbols = sc; p_LUT_wrong = true;}
 	  /// set which characters are to be treated as (post) punctuation
 	  void set_PunctuationSymbols (const EST_String &ps)
-	      { p_PunctuationSymbols = ps; p_table_wrong = 1; }
+	      { p_PunctuationSymbols = ps; p_LUT_wrong = true; }
 	  /// set which characters are to be treated as (pre) punctuation
 	  void set_PrePunctuationSymbols (const EST_String &pps)
-	      { p_PrePunctuationSymbols = pps; p_table_wrong = 1; }
+	      { p_PrePunctuationSymbols = pps; p_LUT_wrong = true; }
 	  /// set if punctuation characters are UTF-8 coded
 	  void set_isutf8 (const bool isutf8)
-	      {p_isutf8 = isutf8; p_table_wrong = 1 ;}
+	      {p_isutf8 = isutf8; p_LUT_wrong = true ;}
       /// Mark table to rebuild:
-      void set_p_table_wrong() { p_table_wrong = 1;}
+      void set_p_LUT_wrong() { p_LUT_wrong = true;}
       /// Show if it is UTF-8:
       bool isutf8() {return p_isutf8;}
 	  /// Look up a character in the table and return the class
-	  char CheckCP (utf8::uint32_t cp);
+	  TokenTableLUT::mapped_type CheckCP (UnicodeChar cp);
 	
       void print_table();
+      friend class EST_TokenStream;
 };
 
 enum EST_tokenstream_type {tst_none, tst_file, tst_pipe, tst_string, tst_istream}; 
+
+
+class UnicodeStr{
+    private:
+        bool p_isunicode;
+        std::vector<UnicodeChar> vec;
+    public:
+        int set_isunicode(bool isunicode) { p_isunicode=isunicode; return 0;}
+        UnicodeStr(bool unicode=false);
+        friend class EST_TokenStream;
+        friend ostream& operator <<(ostream& s, UnicodeStr &p);
+        ///
+        UnicodeStr & operator >>(const char &p);
+        ///
+        UnicodeStr & operator >>(EST_String &p);
+        ///
+        operator EST_String ();
+
+};
 
 /** A class that allows the reading of \Ref{EST_Token}s from a file
     stream, pipe or string.  It automatically tokenizes a file based on
@@ -301,35 +330,25 @@ class EST_TokenStream{
  private:
     EST_tokenstream_type type;
     EST_String Origin;
-    FILE *fp;
     istream *is;
-    int fd;
-    char *buffer;
-    int buffer_length;
-    int pos;
+    int close_at_end;
     int linepos;
-    int p_filepos;
-    utf8::uint32_t getch(void);
+    UnicodeChar getch(void);
     EST_TokenStream &getch(char &C);
     int peeked_charp;
-    utf8::uint32_t peeked_char;       // ungot character 
-    utf8::uint32_t peekch(void);
+    UnicodeChar peeked_char;       // ungot character 
+    UnicodeChar peekch(void);
     int peeked_tokp;
-    int eof_flag;
     int quotes;
-    utf8::uint32_t quote;
-    utf8::uint32_t escape;
+    UnicodeChar quote;
+    UnicodeChar escape;
     EST_Token current_tok;
     void default_values(void);
     /* local buffers to save reallocating */
-    int tok_wspacelen;
-    char *tok_wspace;
-    int tok_stufflen;
-    char *tok_stuff;
-    int tok_prepuncslen;
-    char *tok_prepuncs;
-    int close_at_end;
-    int append (utf8::uint32_t cp,char *here);
+    UnicodeStr tok_wspace;
+    UnicodeStr tok_stuff;
+    UnicodeStr tok_prepuncs;
+    UnicodeStr tok_punc;
     /* character class map */
     EST_TokenTable p_table;
 
@@ -344,11 +363,9 @@ class EST_TokenStream{
     */
     EST_TokenStream(EST_TokenStream &s);
 
-    void build_table();
-
-    inline utf8::uint32_t getch_internal();
-    inline utf8::uint32_t peekch_internal();
-    inline utf8::uint32_t getpeeked_internal();
+    inline UnicodeChar getch_internal();
+    inline UnicodeChar peekch_internal();
+    inline UnicodeChar getpeeked_internal();
   public:
     ///
     EST_TokenStream();
@@ -357,8 +374,6 @@ class EST_TokenStream{
     //@{
     /// open a \Ref{EST_TokenStream} for a file.
     int open(const EST_String &filename);
-    /// open a \Ref{EST_TokenStream} for an already opened file
-    int open(FILE *ofp, int close_when_finished);
     /// open a \Ref{EST_TokenStream} for an already open istream
     int open(istream &newis);
     /// open a \Ref{EST_TokenStream} for string rather than a file
@@ -407,12 +422,16 @@ class EST_TokenStream{
         { p_table.set_PrePunctuationSymbols(ps);}
     /// set if punctuation characters are UTF-8 coded
     void set_isutf8 (const bool isutf8)
-        { p_table.set_isutf8(isutf8);}
+        { p_table.set_isutf8(isutf8);
+          tok_wspace.set_isunicode(isutf8);
+          tok_stuff.set_isunicode(isutf8);
+          tok_prepuncs.set_isunicode(isutf8);
+        }
     /// set characters to be used as quotes and escape, and set quote mode
     void set_quotes(char q, char e) 
-         { quotes = TRUE; quote = (utf8::uint32_t) q; escape = (utf8::uint32_t) e; p_table.set_p_table_wrong();}
-    void set_quotes(utf8::uint32_t q, utf8::uint32_t e)
-         { quotes = TRUE; quote = q; escape = e; p_table.set_p_table_wrong();}
+         { quotes = TRUE; quote = (UnicodeChar) q; escape = (UnicodeChar) e;}
+    void set_quotes(UnicodeChar q, UnicodeChar e)
+         { quotes = TRUE; quote = q; escape = e;}
     /// query quote mode
     int quoted_mode(void) { return quotes; }
         
@@ -423,15 +442,19 @@ class EST_TokenStream{
     int linenum(void) const {return linepos;}
     /// end of file
     int eof()
-       { return (eof_flag || ((!quotes) && (peek() == ""))); }
+       { return is->eof(); }
     /// end of line
     int eoln();
+    /// get stream descriptor of \Ref{EST_TokenStream}
+    istream* streamdescriptor(void)  
+    { if (type==tst_file ||type==tst_istream ||type==tst_string) return is; 
+      else return NULL;}
     /// current file position in \Ref{EST_TokenStream}
-    int filepos(void) const { return (type == tst_string) ? pos : p_filepos; }
-    /// tell, synonym for filepos
-    int tell(void) const { return filepos(); }
+    streampos StreamPosition(void) const { return is->tellg(); }
+    /// tell, synonym for StreamPosition
+    streampos tell(void) const { return StreamPosition(); }
     /// seek, reposition file pointer
-    int seek(int position);
+    int seek(streampos position);
     int seek_end();
     /// Reset to start of file/string 
     int restart(void);
@@ -439,8 +462,9 @@ class EST_TokenStream{
     const EST_String pos_description();
     /// The originating filename (if there is one)
     const EST_String filename() const { return Origin; }
-    /// For the people who *need* the actual description (if possible)
-    FILE *filedescriptor() { return (type == tst_file) ? fp : 0; }
+
+    bool is_utf8(void) { return p_table.isutf8(); }
+    void print_table() { p_table.print_table(); return;}
     ///
     EST_TokenStream & operator >>(EST_Token &p);
     ///
@@ -457,4 +481,5 @@ EST_String quote_string(const EST_String &s,
 			const EST_String &escape = "\\", 
 			int force=0);
 
+}
 #endif // __EST_TOKEN_H__

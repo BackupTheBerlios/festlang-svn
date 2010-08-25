@@ -43,7 +43,8 @@
 #ifndef __APML_H__
 #define __APML_H__
 
-#include <stdio.h>
+#include <cstdio>
+#include <iostream>
 #include "ling_class/EST_Utterance.h"
 
 EST_read_status apml_read(FILE *file, 
@@ -51,6 +52,10 @@ EST_read_status apml_read(FILE *file,
 			  EST_Utterance &u,
 			  int &max_id);
 
-
+EST_read_status apml_read(istream *is, 
+			     const EST_String &name,
+			     EST_Utterance &u,
+			     int &max_id);
+			     
 #endif // __APML_H__
 //@}

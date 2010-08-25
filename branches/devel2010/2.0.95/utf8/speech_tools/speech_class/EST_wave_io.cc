@@ -758,7 +758,7 @@ enum EST_read_status load_wave_aiff(EST_TokenStream &ts, short **data, int
 	}
 	else 
 	{			/* skip bytes in chunk */
-	    ts.seek(ts.tell()+chunk.size);
+	    ts.streamdescriptor()->ignore(chunk.size);
 	}
     }
     
@@ -952,7 +952,7 @@ enum EST_read_status load_wave_snd(EST_TokenStream &ts, short **data, int
 	(header.data_size == -1))
     {
 	ts.seek_end();
-	bytes = ts.tell() - header.hdr_size;
+	bytes = (unsigned int) ts.tell() - header.hdr_size;
     }
     else
 	bytes = header.data_size;
@@ -1221,7 +1221,7 @@ enum EST_read_status load_wave_sd(EST_TokenStream &ts, short **data, int
 				  offset, int length)
 {
     /* A license free version of an esps file reading program */
-    FILE *fd;
+    istream *is;
     esps_hdr hdr;
     int actual_bo, sample_width, data_length;
     enum EST_read_status rv;
@@ -1230,14 +1230,14 @@ enum EST_read_status load_wave_sd(EST_TokenStream &ts, short **data, int
     double d;
     unsigned char *file_data;
 
-    if ((fd = ts.filedescriptor()) == NULL)
+    if ((is = ts.streamdescriptor()) == NULL)
     {
 	fprintf(stderr, "Can't open esps file %s for reading\n",
 		(const char *)ts.filename());
 	return misc_read_error;
     }
     
-    if ((rv=read_esps_hdr(&hdr,fd)) != format_ok)
+    if ((rv=read_esps_hdr(&hdr,is)) != format_ok)
 	return rv;
     
     if (hdr->file_type != ESPS_SD)
@@ -1268,14 +1268,15 @@ enum EST_read_status load_wave_sd(EST_TokenStream &ts, short **data, int
 	data_length = length *(*num_channels);
     
     file_data = walloc(unsigned char, sample_width * data_length);
-    fseek(fd,hdr->hdr_size+(sample_width*offset*(*num_channels)),
-	  SEEK_SET);
-    if ((dl=fread(file_data,sample_width,data_length,fd)) != data_length)
+    is->seekg(hdr->hdr_size+(sample_width*offset*(*num_channels)),ios_base::beg);
+    is->read((char *) file_data,sample_width*data_length);
+    
+    if (is->good() == false)
     {
 	fprintf(stderr,"WAVE read: esps short file %s\n",
 		(const char *)ts.filename());
 	fprintf(stderr,"WAVE read: at %d got %d instead of %d samples\n",
-		offset,dl,data_length);
+		offset,is->gcount(),data_length);
 	data_length = dl;
     }
     

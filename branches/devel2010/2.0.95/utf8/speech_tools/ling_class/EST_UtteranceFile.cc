@@ -413,33 +413,32 @@ EST_read_status EST_UtteranceFile::load_apml(EST_TokenStream &ts,
 						EST_Utterance &u, 
 						int &max_id)
 {
-  FILE *stream;
+  istream *stream;
 
-  if ((stream=ts.filedescriptor())==NULL)
+  if ((stream=ts.streamdescriptor())==NULL)
     return read_error;
 
-  long pos=ftell(stream);
+  streampos pos=stream->tellg();
 
   {
   char buf[80];
 
-  fgets(buf, 80, stream);
-
+  stream->getline(buf,80);
   if (strncmp(buf, "<?xml", 5) != 0)
     return read_format_error;
 
-  fgets(buf, 80, stream);
+  stream->getline(buf,80);
 
   if (strncmp(buf, "<!DOCTYPE apml", 14) != 0)
     return read_format_error;
   }
 
-  fseek(stream, pos, 0);
+  stream->seekg(pos);
 
   EST_read_status stat = apml_read(stream, ts.filename(),u, max_id);
 
   if (stat != read_ok)
-    fseek(stream, pos, 0);
+    stream->seekg(pos);
 
   return stat;
 }
@@ -451,28 +450,28 @@ EST_read_status EST_UtteranceFile::load_genxml(EST_TokenStream &ts,
 						EST_Utterance &u, 
 						int &max_id)
 {
-  FILE *stream;
+  istream *stream;
 
-  if ((stream=ts.filedescriptor())==NULL)
+  if ((stream=ts.streamdescriptor())==NULL)
     return read_error;
 
-  long pos=ftell(stream);
+  streampos pos=stream->tellg();
 
   {
   char buf[80];
 
-  fgets(buf, 80, stream);
+  stream->getline(buf,80);
 
   if (strncmp(buf, "<?xml", 5) != 0)
     return read_format_error;
   }
 
-  fseek(stream, pos, 0);
+  stream->seekg(pos);
 
   EST_read_status stat = EST_GenXML::read_xml(stream, ts.filename(),u, max_id);
 
   if (stat != read_ok)
-    fseek(stream, pos, 0);
+      stream->seekg(pos);
 
   return stat;
 }

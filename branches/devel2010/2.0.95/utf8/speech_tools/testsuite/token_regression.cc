@@ -52,10 +52,11 @@ static void find_tokens(EST_TokenStream &ts)
     for (tokens=0; !ts.eof(); tokens++)
     {
         tok=ts.get();
+        cout << "Token " << tokens << endl;
         cout << "string: |" << tok.string() << "|" << endl;
         cout << "whitesp: |" << tok.whitespace() << "|" << endl;
         cout << "punct: |" << tok.punctuation() << "|" << endl;
-        cout << "prepunct: |" << tok.prepunctuation() << "|" << endl;
+        cout << "prepunct: |" << tok.prepunctuation() << "|" << endl << endl;
     }
 
     cout << "Total: " << tokens << endl << endl;;

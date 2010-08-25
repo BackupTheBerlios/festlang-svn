@@ -43,7 +43,8 @@
 #ifndef __GENXML_H__
 #define __GENXML_H__
 
-#include <stdio.h>
+#include <cstdio>
+#include <iostream>
 #include "ling_class/EST_Utterance.h"
 #include "rxp/XML_Parser.h"
 #include "EST_types.h"
@@ -55,6 +56,11 @@ public:
 			      const EST_String &name,
 			      EST_Utterance &u,
 			      int &max_id);
+
+  static EST_read_status read_xml(istream *is, 
+				     const EST_String &name,
+				     EST_Utterance &u,
+				     int &max_id);
 
   static void register_id(const EST_String pattern, 
 			  const EST_String result);

@@ -44,6 +44,7 @@
 #include <cstdlib>
 #include <climits>
 #include <cstring>
+#include <string>
 #include "EST_math.h"
 #include "EST_Token.h"
 #include "EST_string_aux.h"
@@ -52,7 +53,9 @@
 #include "EST_utf8.h"
 using namespace std;
 
-
+namespace EST
+{
+#if 0
 #if defined(INSTANTIATE_TEMPLATES)
 template utf8::uint32_t utf8::next<char*>(char*&, char*);
 template utf8::uint32_t utf8::prior<char*>(char*&, char*);
@@ -81,7 +84,11 @@ template utf8::internal::utf_error utf8::internal::get_sequence_1<std::istreambu
 template utf8::internal::utf_error utf8::internal::get_sequence_2<std::istreambuf_iterator<char, std::char_traits<char> > >(std::istreambuf_iterator<char, std::char_traits<char> >&, std::istreambuf_iterator<char, std::char_traits<char> >, utf8::uint32_t*);
 template utf8::internal::utf_error utf8::internal::get_sequence_3<std::istreambuf_iterator<char, std::char_traits<char> > >(std::istreambuf_iterator<char, std::char_traits<char> >&, std::istreambuf_iterator<char, std::char_traits<char> >, utf8::uint32_t*);
 template utf8::internal::utf_error utf8::internal::get_sequence_4<std::istreambuf_iterator<char, std::char_traits<char> > >(std::istreambuf_iterator<char, std::char_traits<char> >&, std::istreambuf_iterator<char, std::char_traits<char> >, utf8::uint32_t*);
+template class utf8::iterator<char*>;
+template class utf8::iterator<char*>(__gnu_cxx::__normal_iterator<char*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, __gnu_cxx::__normal_iterator<char*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, __gnu_cxx::__normal_iterator<char*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >;
+//template utf8::iterator<char*> (tok_stuff.begin(),tok_stuff.begin(),tok_stuff.end());
 
+#endif
 #endif
 
 const EST_String EST_Token_Default_WhiteSpaceChars = " \t\n\r";
@@ -100,27 +107,6 @@ const EST_String Token_Origin_String = "existing string";
 
 static EST_Regex RXanywhitespace("[ \t\n\r]");
 
-static inline char *check_extend_str_in(char *str, int pos, int *max)
-{
-    // Check we are not at the end of the string, if so get some more
-    // and copy the old one into the new one
-    char *newstuff;
-    
-    if (pos >= *max - 4) // If we are close to the end (a UTF-8 char may be up to 4 bytes)
-    {
-	if (*max <= 4) *max=4; // Let's have space for at least one UTF-8 char!
-	*max *= 2;
-	newstuff = new char[*max];
-	strncpy(newstuff,str,pos);
-	delete [] str;
-	return newstuff;
-    }
-    else 
-	return str;
-}
-
-#define check_extend_str(STR, POS, MAX) \
-	(((POS)== *(MAX)-4)?check_extend_str_in((STR),(POS),(MAX)):(STR))
 
 ostream& operator<<(ostream& s, const EST_Token &p)
 {
@@ -133,7 +119,7 @@ EST_Token &EST_Token::operator = (const EST_Token &a)
 {
     linenum = a.linenum;
     linepos = a.linepos;
-    p_filepos = a.p_filepos;
+    p_streamposition = a.p_streamposition;
     p_quoted = a.p_quoted;
     space = a.space;
     prepunc = a.prepunc;
@@ -174,71 +160,72 @@ void EST_TokenTable::default_values(const EST_String ws, \
 	p_PunctuationSymbols = ps;
 	p_PrePunctuationSymbols = pps;
 	p_isutf8 = is_utf8;
-	p_table_wrong = false;
+	p_LUT_wrong = true;
 	return;
 }
 
-char EST_TokenTable::CheckCP(utf8::uint32_t cp)
+TokenTableLUT::mapped_type EST_TokenTable::CheckCP(UnicodeChar cp)
 {
 	TokenTableLUT::iterator it;
 	
-	if (p_table_wrong == 1) build_tables();
+	if (p_LUT_wrong == true) build_tables();
 	it = p_LUT.find(cp);
 	if ( it != p_LUT.end() ) return it->second;	
 	else return '\0';
 }
 
-void EST_TokenTable::TwoClassWarn(utf8::uint32_t cp, TokenTableLUT::mapped_type oldclass, TokenTableLUT::mapped_type newclass)
+void EST_TokenTable::TwoClassWarn(UnicodeChar cp, TokenTableLUT::mapped_type oldclass,
+                                  TokenTableLUT::mapped_type newclass)
 {
     char utf8char[5];
     if (p_isutf8 == true)
     {
-	    cp2utf8(cp,utf8char);
-	    EST_warning("Character '%s' has two classes, '%c' and '%c'",
-				    utf8char, oldclass,newclass);
+	cp2utf8(cp,utf8char);
+	EST_warning("Character '%s' has two classes, '%c' and '%c'",
+				utf8char, oldclass,newclass);
     } else
     {
-	    EST_warning("Character '%c' has two classes, '%c' and '%c'",
-				    (char) cp, oldclass,newclass);
+	EST_warning("Character '%c' has two classes, '%c' and '%c'",
+				(char) cp, oldclass,newclass);
     }
     
 }
 
-void EST_TokenTable::InsertCP(utf8::uint32_t cp, TokenTableLUT::mapped_type newclass) 
+void EST_TokenTable::InsertCP(UnicodeChar cp, TokenTableLUT::mapped_type newclass) 
 {
-	TokenTableLUT::iterator iter =p_LUT.find(cp);
-	TokenTableLUT::mapped_type oldclass;
-	
-	if (iter == p_LUT.end() )
-	    p_LUT[cp]=newclass;
-	else
-	{
-	    oldclass= iter->second;
-	    switch (newclass) {
-		case ' ': //WhiteSpace or SingleChar
-		case '@':
+    TokenTableLUT::iterator iter =p_LUT.find(cp);
+    TokenTableLUT::mapped_type oldclass;
+    
+    if (iter == p_LUT.end() )
+	p_LUT[cp]=newclass;
+    else
+    {
+	oldclass= iter->second;
+	switch (newclass) {
+	    case ' ': //WhiteSpace or SingleChar
+	    case '@':
+		TwoClassWarn(cp,oldclass,newclass);
+		return;
+	    case '.':  //Punctuation
+		if (oldclass != '@')
 		    TwoClassWarn(cp,oldclass,newclass);
+		return;
+	    case '$': //Prepunctuation
+		if (oldclass == '@')
 		    return;
-		case '.':  //Punctuation
-		    if (oldclass != '@')
-			TwoClassWarn(cp,oldclass,newclass);
-		    return;
-		case '$': //Prepunctuation
-		    if (oldclass == '@')
-			return;
-		    else if (oldclass == '.')
-			p_LUT[cp]='"';
-		    else
-			TwoClassWarn(cp,oldclass,newclass);
-		    return;
-	    }
+		else if (oldclass == '.')
+		    p_LUT[cp]='"';
+		else
+		    TwoClassWarn(cp,oldclass,newclass);
+		return;
 	}
+    }
 }
 
 void EST_TokenTable::InsertCharSt(EST_String st, const char newclass)
 {
 	char *p;
-	for (p=st; *p;++p) InsertCP((utf8::uint32_t) *p, newclass);
+	for (p=st; *p;++p) InsertCP((UnicodeChar) *p, newclass);
 }
 
 void EST_TokenTable::InsertUtf8St(EST_String st,const char newclass)
@@ -255,7 +242,7 @@ void EST_TokenTable::print_table()
       iter != p_LUT.end(); ++iter )
       {
       cp2utf8(iter->first,utf8string);
-      cout << utf8string << '\t' << iter->second << '\n';
+      std::cout << utf8string << '\t' << iter->second << std::endl;
       }
     
 }
@@ -277,19 +264,51 @@ void EST_TokenTable::build_tables()
 		InsertUtf8St(p_PunctuationSymbols,'.');
 		InsertUtf8St(p_PrePunctuationSymbols,'$');
 	}
-	p_table_wrong=0;
+	p_LUT_wrong=false;
 	return;
+}
+
+UnicodeStr::UnicodeStr(bool unicode)
+{
+    p_isunicode=unicode;  
+}
+
+ostream& operator <<(ostream& s, UnicodeStr &p)
+{
+    EST_String t=(EST_String) p;
+    s << t;
+    return s;
+}
+
+UnicodeStr::operator EST_String ()
+{
+    EST_String s;
+    
+    for (std::vector<UnicodeChar>::iterator it=vec.begin();
+	 it < vec.end() && *it != 0;
+	 ++it)
+    {
+	append(*it,p_isunicode,s);
+    }
+    return s;
+}
+
+
+EST_String& operator <<(EST_String& s, UnicodeStr &p)
+{
+    s+=(EST_String) p;
+    return s;
 }
 
 EST_TokenStream::EST_TokenStream()
 {
-    tok_wspacelen = 64;  // will grow if necessary
-    tok_wspace = new char[tok_wspacelen];
-    tok_stufflen = 512;  // will grow if necessary
-    tok_stuff = new char[tok_stufflen];
-    tok_prepuncslen = 32;  // will grow if necessary
-    tok_prepuncs = new char[tok_prepuncslen];
-
+    // Initial sizes
+    tok_wspace.vec.reserve(64);
+    tok_wspace.p_isunicode=false;
+    tok_stuff.vec.reserve(512);
+    tok_stuff.p_isunicode=false;
+    tok_prepuncs.vec.reserve(32);
+    tok_prepuncs.p_isunicode=false;
     default_values();
 }
 
@@ -318,9 +337,7 @@ void EST_TokenStream::default_values()
     type = tst_none;
     peeked_tokp = FALSE;
     peeked_charp = FALSE;
-    eof_flag = FALSE;
     quotes = FALSE;
-    p_filepos = 0;
     linepos = 1;  
     close_at_end=TRUE;
 }
@@ -329,9 +346,6 @@ EST_TokenStream::~EST_TokenStream()
 {
     if (type != tst_none) 
 	close();
-    delete [] tok_wspace;
-    delete [] tok_stuff;
-    delete [] tok_prepuncs;
     
 }
 
@@ -363,36 +377,16 @@ int EST_TokenStream::open(const EST_String &filename)
     if (type != tst_none)
 	close();
     default_values();
-    fp = fopen(filename,"rb");
-    if (fp == NULL)
+    is=new ifstream(filename,ios_base::in|ios_base::binary);
+    if (is->fail())
     {
-	cerr << "Cannot open file " << filename << " as tokenstream" 
-	    << endl;
+	std::cerr << "Cannot open file " << filename << " as tokenstream" 
+	    << std::endl;
 	return -1;
     }
     Origin = filename;
     type = tst_file;
-
-    return 0;
-}
-
-int EST_TokenStream::open(FILE *ofp, int close_when_finished)
-{
-    // absorb already open stream
-    if (type != tst_none)
-	close();
-    default_values();
-    fp = ofp;
-    if (fp == NULL)
-    {
-	cerr << "Cannot absorb NULL filestream as tokenstream" << endl;
-	return -1;
-    }
-    Origin = Token_Origin_FD;
-    type = tst_file;
-    
-    close_at_end = close_when_finished;
-    
+    close_at_end=TRUE;
     return 0;
 }
 
@@ -405,25 +399,21 @@ int EST_TokenStream::open(istream &newis)
     is = &newis;
     Origin = Token_Origin_Stream;
     type = tst_istream;
-
+    close_at_end=FALSE;
     return 0;
 }
 
 int EST_TokenStream::open_string(const EST_String &newbuffer)
 {
     // Make a tokenstream from an internal existing string/buffer
-    const char *buf;
     if (type != tst_none)
 	close();
     default_values();
-    buf = (const char *)newbuffer;
-    buffer_length = newbuffer.length();
-    buffer = new char[buffer_length+1];
-    memmove(buffer,buf,buffer_length+1);
-    pos = 0;
+    std::string tmpstring((const char*) newbuffer, newbuffer.length());
+    is=new istringstream(tmpstring,stringstream::in|stringstream::binary);
     Origin = Token_Origin_String;
     type = tst_string;
-
+    close_at_end=TRUE;
     return 0;
 }
 
@@ -439,21 +429,16 @@ int EST_TokenStream::seek_end()
 	cerr << "EST_TokenStream unset" << endl;
 	return -1;
 	break;
-      case tst_file:
-	fseek(fp,0,SEEK_END);
-	p_filepos = ftell(fp);
-	return p_filepos;
       case tst_pipe:
-	cerr << "EST_TokenStream seek on pipe not supported" << endl;
+	cerr << "EST_TokenStream seek_end on pipe not supported" << endl;
 	return -1;
 	break;
+      case tst_file:
       case tst_istream:
-	cerr << "EST_TokenStream seek on istream not yet supported" << endl;
-	return -1;
-	break;
       case tst_string:
-	pos = buffer_length;
-	return pos;
+        is->seekg(0,std::ios_base::end);
+	return is->tellg();
+	break;
       default:
 	cerr << "EST_TokenStream: unknown type" << endl;
 	return -1;
@@ -462,60 +447,37 @@ int EST_TokenStream::seek_end()
     return -1;  // can't get here 
 }
 
-int EST_TokenStream::seek(int position)
+int EST_TokenStream::seek(streampos position)
 {
-    peeked_charp = FALSE;
-    peeked_tokp = FALSE;
-
     switch (type)
     {
       case tst_none: 
 	cerr << "EST_TokenStream unset" << endl;
 	return -1;
 	break;
-      case tst_file:
-	p_filepos = position;
-	return fseek(fp,position,SEEK_SET);
       case tst_pipe:
-	cerr << "EST_TokenStream seek on pipe not supported" << endl;
+	cerr << "EST_TokenStream seek on pipe with streampos not supported" << endl;
 	return -1;
 	break;
+      case tst_file:
       case tst_istream:
-	cerr << "EST_TokenStream seek on istream not yet supported" << endl;
-	return -1;
-	break;
       case tst_string:
-	if (position >= pos)
-	{
-	    pos = position;
-	    return -1;
-	}
-	else
-	{
-	    pos = position;
-	    return 0;
-	}
+        is->seekg(position);
+	if (is->good()) return 0;
+	else return -1;
 	break;
       default:
 	cerr << "EST_TokenStream: unknown type" << endl;
 	return -1;
     }
-
+    
     return -1;  // can't get here 
-
-}
-
-static int stdio_fread(void *buff,int size,int nitems,FILE *fp)
-{
-    // So it can find the stdio one rather than the TokenStream one
-    return fread(buff,size,nitems,fp);
 }
 
 int EST_TokenStream::fread(void *buff, int size, int nitems)
 {
     // switching into binary mode for current position
-    int items_read;
-
+      char *buf2=(char *) buff;
     // so we can continue to read afterwards
     if (peeked_tokp)
     {
@@ -533,29 +495,33 @@ int EST_TokenStream::fread(void *buff, int size, int nitems)
 	cerr << "EST_TokenStream unset" << endl;
 	return 0;
 	break;
-      case tst_file:
-	items_read = stdio_fread(buff,(size_t)size,(size_t)nitems,fp);
-	p_filepos += items_read*size;
-	return items_read;
       case tst_pipe:
 	cerr << "EST_TokenStream fread pipe not yet supported" << endl;
 	return 0;
 	break;
+      case tst_file:
       case tst_istream:
-    is->read((char*)buff,size*nitems);
-    if (is->eof() == true ) return 0;
-	return nitems;
       case tst_string:
-	if ((buffer_length-pos)/size < nitems)
-	    items_read = (buffer_length-pos)/size;
+	for (int i=0;
+	     i<nitems;
+	     ++i)
+	{
+	    is->read(buf2,size);
+	    buf2+=is->gcount();
+	}
+	
+        if (is->good() == false )
+	{
+	    std::cerr << "EST_TokenStream fread error" << std::endl;
+	    return 0;
+	}
 	else
-	    items_read = nitems;
-	memcpy(buff,&buffer[pos],items_read*size);
-	pos += items_read*size;
-	return items_read;
+	    return nitems;
+	break;
       default:
 	cerr << "EST_TokenStream: unknown type" << endl;
-	return EOF;
+	return -1;
+	break;
     }
 
     return 0;  // can't get here 
@@ -570,17 +536,17 @@ void EST_TokenStream::close(void)
     {
       case tst_none: 
 	break;
-      case tst_file:
-	if (close_at_end)
-	  fclose(fp);
       case tst_pipe:
 	// close(fd);
 	break;
+      case tst_file:
       case tst_istream:
-	break;
       case tst_string:
-	delete [] buffer;
-	buffer = 0;
+        if (close_at_end == TRUE)
+	{
+	    delete is;
+	    is=NULL;
+	}
 	break;
       default:
 	cerr << "EST_TokenStream: unknown type" << endl;
@@ -601,19 +567,14 @@ int EST_TokenStream::restart(void)
     {
       case tst_none: 
 	break;
-      case tst_file:
-        fp = freopen(Origin,"rb",fp);
-	p_filepos = 0;
-	break;
       case tst_pipe:
 	cerr << "EST_TokenStream: can't rewind pipe" << endl;
 	return -1;
 	break;
+      case tst_file:
       case tst_istream:
-	cerr << "EST_TokenStream: can't rewind istream" << endl;
-	break;
       case tst_string:
-	pos = 0;
+        is->seekg(0,ios_base::beg);
 	break;
       default:
 	cerr << "EST_TokenStream: unknown type" << endl;
@@ -623,19 +584,8 @@ int EST_TokenStream::restart(void)
     linepos = 1;
     peeked_charp = FALSE;
     peeked_tokp = FALSE;
-    eof_flag = FALSE;
 
     return 0;
-}
-
-int EST_TokenStream::append (utf8::uint32_t cp,char *here)
-{
-    if (p_table.isutf8() ==false)
-    {
-	    *here=(char) cp;
-	    return 1;
-    } else
-	    return utf8::append(cp,here)-here;
 }
 
 EST_TokenStream & EST_TokenStream::operator >>(EST_Token &p)
@@ -750,16 +700,17 @@ EST_Token &EST_TokenStream::must_get(EST_String expected, bool *ok)
     return tok;
 }
 
-inline utf8::uint32_t  EST_TokenStream::getpeeked_internal(void)
+inline UnicodeChar  EST_TokenStream::getpeeked_internal(void)
 {
   peeked_charp = FALSE;
   return peeked_char;
 }
 
+
 inline
-utf8::uint32_t EST_TokenStream::getch_internal()
+UnicodeChar EST_TokenStream::getch_internal()
 {
-    utf8::uint32_t cp;
+    UnicodeChar cp;
     // Return next character in stream
     if (EST_TokenStream::peeked_charp)
     {
@@ -770,94 +721,44 @@ utf8::uint32_t EST_TokenStream::getch_internal()
     {
       case tst_none: 
 	cerr << "EST_TokenStream unset" << endl;
-	return EOF;
+	return ErrUnicodeChar;
 	break;
-      case tst_file:
-	{
-		if (p_table.isutf8() == false)
-		{
-			p_filepos++;
-			unsigned char lc;
-			if (stdio_fread(&lc,1,1,fp) == 0) {
-				eof_flag = TRUE;
-				return 0;
-			}
-			else
-				return (utf8::uint32_t)lc;
-		} else
-		{
-			//The UTF-8 library uses streams.
-			char buffer[5]="\0\0\0\0";
-			char *p=buffer;
-			for (int i=0;i<4;++i)
-			{
-				p_filepos++;
-				if (stdio_fread(&buffer+i,1,1,fp) == 0) {
-					eof_flag=TRUE;
-					return EOF;
-				}
-				if (utf8::is_valid(p,p+i+1))
-					return utf8::unchecked::next(p);
-			}
-			return 0xFFFD; // invalid UTF-8, returning replacement char.
-			cerr << "EST_TokenStream had invalid UTF-8 content" << endl;
-		}
-	}
-/*	return getc(fp); */
       case tst_pipe:
 	cerr << "EST_TokenStream pipe not yet supported" << endl;
-	return EOF;
+	return ErrUnicodeChar;
 	break;
+      case tst_file:
       case tst_istream:
-
+      case tst_string:
 	if (p_table.isutf8() ==false)
 	{
-		p_filepos++;
-		return is->get();
+	    return (is->good()) ? is->get() : ErrUnicodeChar;
 	} else
 	{
 		istreambuf_iterator<char> it(is->rdbuf());
 		istreambuf_iterator<char> eos;
 		if (it != eos) {
 			cp = utf8::next(it,eos);
-			p_filepos+=is->gcount();
 			return cp;
 		} else {
-			eof_flag=TRUE;
-			return EOF;
+			return ErrUnicodeChar;
 		}
 	}
-
-      case tst_string:
-	if (pos < buffer_length)
-	{
-	    int bytesread;
-	    bytesread=getnextcp(&(buffer[pos]),p_table.isutf8(),cp);
-	    p_filepos+=bytesread;
-	    pos+=bytesread;
-	    return cp;
-	}
-	else
-	{
-	    eof_flag=TRUE;
-	    return EOF;
-	}
-	    
-	    
+        break;
       default:
 	cerr << "EST_TokenStream: unknown type" << endl;
-	return EOF;
+	return ErrUnicodeChar;
     }
 
-    return EOF;  // can't get here 
+    return ErrUnicodeChar;  // can't get here 
 }
 
-utf8::uint32_t EST_TokenStream::getch(void)
+UnicodeChar EST_TokenStream::getch(void)
 {
   return getch_internal();
 }
 
-inline utf8::uint32_t  EST_TokenStream::peekch_internal()
+inline UnicodeChar  EST_TokenStream::peekch_internal()
 {
     // Return next character in stream (without reading it)
 
@@ -868,7 +769,7 @@ inline utf8::uint32_t  EST_TokenStream::peekch_internal()
 }
 
 
-utf8::uint32_t  EST_TokenStream::peekch(void)
+UnicodeChar  EST_TokenStream::peekch(void)
 {
   return peekch_internal();
   
@@ -878,6 +779,7 @@ utf8::uint32_t  EST_TokenStream::peekch(void)
 
 #define CLASS2(C,CL1,CL2) (p_table.CheckCP(C)==(CL1)||p_table.CheckCP(C)==(CL2))
 
+
 EST_Token &EST_TokenStream::get(void)
 {
     if (peeked_tokp)
@@ -886,103 +788,110 @@ EST_Token &EST_TokenStream::get(void)
 		return current_tok;
     }
 
-    char *word;
-    int i,j,k;
-    utf8::uint32_t c;
+    streampos tmpposition;
+    std::vector<UnicodeChar> temp;
+    UnicodeStr temp2;
+    std::vector<UnicodeChar>::iterator it,endit,word,it2;
+    UnicodeChar c;
+    
+    tok_wspace.vec.clear();
+    tok_stuff.vec.clear();
+    tok_prepuncs.vec.clear();
+    tok_punc.vec.clear();
 
-    for (i=k=0;
-         (CLASS(c=getch_internal(),' ') && 
-	       ( ! eof_flag ));)
+    tmpposition=tell();
+    c=getch_internal();
+    while(CLASS(c,' ') && ( ! eof() ) && (c!=ErrUnicodeChar) )
     {
-		if (c == '\n') linepos++;
-		tok_wspace = check_extend_str(tok_wspace,i,&tok_wspacelen);	
-		k=append(c,&(tok_wspace[i]));
-		i+=k;
+	if (c == '\n') linepos++;
+	tok_wspace.vec.push_back(c);
+	tmpposition=tell();
+	c=getch_internal();
     }
-    tok_wspace[i] = '\0';
-
     current_tok.init();
-
-    if ( ! eof_flag )
+    current_tok.set_streampos(tmpposition);
+    if ( ! eof() )
     {
-	current_tok.set_filepos(p_filepos-k);
-
 	if ((quotes) &&  // quoted strings (with escapes) are allowed
 	    (c == quote))
 	{
-	    for (i=0;
-		 ((c = getch_internal()), ! eof_flag)
-		 ;)
+	    while ( (c = getch_internal()), ! eof() )
 	    {
-			if (c == quote)
-				break;
-			tok_stuff = check_extend_str(tok_stuff,i,&tok_stufflen);
-			if (c == escape)
-				c = getch_internal();
-			i+=append(c,&(tok_stuff[i]));
+		if (c == quote)
+		    break;
+		if (c == escape)
+		    c = getch_internal();
+		tok_stuff.vec.push_back(c);
 	    }
 	    current_tok.set_quoted(TRUE);
 	}
 	else            // standard whitespace separated tokens
 	{
-	    for (i=0,i+=append(c,&(tok_stuff[i])); 
-		 (
+	    tok_stuff.vec.push_back(c);
+	    while(
 		  !CLASS(c,'@') &&
 		  !CLASS(c=peekch_internal(),' ') && 
 		  !CLASS(c,'@') &&
-		  ( ! eof_flag )) ;)
+		  ( ! eof() ))
 	    {
-		tok_stuff = check_extend_str(tok_stuff,i,&tok_stufflen);
 		// note, we must have peeked to get here.
-		i+=append(getpeeked_internal(),&(tok_stuff[i]));
+		tok_stuff.vec.push_back(getpeeked_internal());
 	    }
 	}
-	tok_stuff[i] = '\0';
+	
 	// Are there any punctuation symbols at the start?
-	for (j=0, k=getnextcp(&(tok_stuff[j]),p_table.isutf8(),c); 
-	     ((j < i) && CLASS2(c, '$', '"') && c!=0);
-	     j+=k,k=getnextcp(&(tok_stuff[j]),p_table.isutf8(),c));
-	if ((j > 0) && (j < i))  // there are
+	it=tok_stuff.vec.begin();
+	
+	for (;
+	    ((it < tok_stuff.vec.end()) && CLASS2(*it, '$', '"') && *it!=ErrUnicodeChar);
+	    ++it);
+	
+	if ( (it > tok_stuff.vec.begin() ) && (it < tok_stuff.vec.end()))  // there are
 	{
-	    tok_prepuncs = check_extend_str(tok_prepuncs,j+1,&tok_prepuncslen);
-	    memmove(tok_prepuncs,tok_stuff,j);
-	    tok_prepuncs[j] = '\0';
-	    current_tok.set_prepunctuation(tok_prepuncs);
-	    word=&tok_stuff[j];
-	    i-=j;  // reduce size by number of prepuncs
+	    tok_prepuncs.vec.insert(tok_prepuncs.vec.end(),tok_stuff.vec.begin(),it);
+	    current_tok.set_prepunctuation((EST_String) tok_prepuncs);
+	    word=it;
 	}
 	else
 	{
 	    current_tok.set_prepunctuation(EST_String::Empty);
-	    word = tok_stuff;
+	    word = tok_stuff.vec.begin();
 	}
+
 	// Are there any punctuation symbols at the end
-	for (j=i, k=getprevcp(word,&(word[j]),p_table.isutf8(),c);
-	     ((j > 0) && CLASS2(c,'.','"') && k!=0);
-	     j-=k, k=getprevcp(word,&(word[j]),p_table.isutf8(),c));
-	if (word[j] != '\0')
+	
+	for (it=tok_stuff.vec.end()-1; 
+	     ((it != word) && CLASS2(*it,'.','"'));
+	     --it);
+	++it;
+	if (it < tok_stuff.vec.end()) // There are
 	{
-	    current_tok.set_punctuation(&word[j]);
-	    word[j] = '\0';
+	    tok_punc.vec.insert(tok_punc.vec.end(),it,tok_stuff.vec.end());
+	    current_tok.set_punctuation((EST_String) tok_punc);
+
 	}
 	else
+	{
 	    current_tok.set_punctuation(EST_String::Empty);
-	    
-	current_tok.set_token(word);
-	if (tok_wspace[0] == '\0') // feature paths will have null whitespace
+	}
+
+	temp2.vec.assign(word,it);
+	temp2.p_isunicode=tok_stuff.p_isunicode;
+	current_tok.set_token((EST_String) temp2);
+	
+	if (*(tok_wspace.vec.begin()) == '\0') // feature paths will have null whitespace
 	    current_tok.set_whitespace(EST_String::Empty);
 	else
-	    current_tok.set_whitespace(tok_wspace);
+	    current_tok.set_whitespace((EST_String) tok_wspace);
     }
     else
     {
 	current_tok.set_token(EST_String::Empty);
-	current_tok.set_whitespace(tok_wspace);
+	current_tok.set_whitespace((EST_String) tok_wspace);
 	current_tok.set_punctuation(EST_String::Empty);
 	current_tok.set_prepunctuation(EST_String::Empty);
-	eof_flag = TRUE;
     }
-	
+
     return current_tok;
 }
 
@@ -1039,4 +948,5 @@ EST_String quote_string(const EST_String &s,
 const EST_String EST_TokenStream::pos_description()
 {
     return Origin+":"+itoString(linepos);
+}
 }

@@ -75,11 +75,12 @@ EST_read_status EST_TrackFile::load_ssff_ts(EST_TokenStream &ts, EST_Track &tr, 
     (void)startt;
     int num_frames, num_channels;
     int swap = FALSE;
-    int i,j,pos,end;
+    int i,j;
     float Start_Time, Record_Freq;
     EST_Features channels;
     EST_String c, name, type, size, cname;
-    FILE *fp;
+    istream *is;
+    streampos pos,end;
     double dbuff[2];
     short  sbuff[2];
 
@@ -166,11 +167,11 @@ EST_read_status EST_TrackFile::load_ssff_ts(EST_TokenStream &ts, EST_Track &tr, 
 
     // There's no num_records field in the header so have to use file's 
     // length to calculate it
-    fp = ts.filedescriptor();
-    pos = ftell(fp);
-    fseek(fp,0,SEEK_END);
-    end = ftell(fp);
-    fseek(fp,pos,SEEK_SET);
+    is = ts.streamdescriptor();
+    pos = is->tellg();
+    is->seekg(0,ios_base::end);
+    end = is->tellg();
+    is->seekg(pos);
     num_frames = (end - pos)/(num_channels*sizeof(double));
     
     // Finished reading header

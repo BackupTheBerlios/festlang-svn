@@ -136,6 +136,8 @@ LISP newcell(long type);
 void put_st(const char *st);
 int f_getc(FILE *f);
 void f_ungetc(int c, FILE *f);
+int is_getc(istream *f);
+void is_ungetc(int c, istream *f);
 long no_interrupt(long n);
 LISP readtl(struct gen_readio *f);
 long repl_driver(long want_sigint,long want_init,struct repl_hooks *);

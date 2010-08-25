@@ -1071,9 +1071,9 @@ bool EST_Ngrammar::oov_preprocess(const EST_String &filename,
     // open the original files for reading
     if (filename == "-")
     {
-	if( ts.open(stdin, FALSE) == -1)
+	if( ts.open(cin) == -1)
 	{
-	    cerr << "EST_Ngrammar:: failed to open stdin";
+	    cerr << "EST_Ngrammar:: failed to open cin";
 	    cerr << " for reading" << endl;
 	    return false;
 	}
@@ -1204,7 +1204,7 @@ bool EST_Ngrammar::build_ngram(const EST_String &filename,
     
     if (filename == "-")
     {
-	if( ts.open(stdin, FALSE) == -1)
+	if( ts.open(cin) == -1)
 	{
 	    cerr << "EST_Ngrammar:: failed to open stdin";
 	    cerr << " for reading" << endl;

@@ -44,7 +44,11 @@
 #include "EST_TIterator.h"
 #include "EST_error.h"
 
-class EST_TokenStream;
+namespace EST
+{
+    class EST_TokenStream;
+}
+using EST::EST_TokenStream;
 class EST_String;
 
 VAL_REGISTER_CLASS_DCLS(feats,EST_Features)

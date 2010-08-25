@@ -82,6 +82,7 @@ Cambridge, MA 02138
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
 
 #include "EST_unix.h"
 
@@ -1540,6 +1541,31 @@ int f_getc(FILE *f)
 void f_ungetc(int c, FILE *f)
 {ungetc(c,f);}
 
+
+int is_getc(istream *is)
+{long iflag,dflag;
+ int c;
+ iflag = no_interrupt(1);
+ dflag = interrupt_differed;
+ c=is->get();
+ if ((c == '\n') && (is == cin) && (siod_interactive))
+ {
+     fprintf(stdout,"%s",repl_prompt);
+     fflush(stdout);
+ }
+#ifdef VMS
+ if ((dflag == 0) & interrupt_differed & (is == cin))
+   while((c != 0) & (! is->eof())) c=is->get();
+#endif
+ no_interrupt(iflag);
+ return(c);}
+
+void is_ungetc(int c,istream *is)
+{is->putback((char)c);}
+
+
+
+
 #ifdef WIN32
 int winsock_unget_buffer;
 bool winsock_unget_buffer_unused=true;
@@ -1604,6 +1630,16 @@ LISP lreadf(FILE *f)
      s.cb_argument = (char *) f;
  }
  return(readtl(&s));}
+
+LISP lreadf(istream *is)
+{struct gen_readio s;
+
+ s.getc_fcn = (int (*)(char *))is_getc;
+ s.ungetc_fcn = (void (*)(int, char *))is_ungetc;
+ s.cb_argument = (char *) is;
+
+ return(readtl(&s));}
+
 
 #ifdef WIN32
 LISP lreadwinsock(void)

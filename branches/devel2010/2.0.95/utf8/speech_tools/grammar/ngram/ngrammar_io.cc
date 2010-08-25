@@ -190,7 +190,7 @@ load_ngram_arpa(const EST_String filename, EST_Ngrammar &n, const EST_StrList &v
 	    if (!ts.eoln())
 	    {
 		cerr << "EST_Ngrammar:load_ngram_arpa expect end of line at filepos "
-		    << ts.filepos() << endl;
+		    << ts.StreamPosition() << endl;
 		ts.close();
 		return misc_read_error;
 	    }
@@ -259,7 +259,7 @@ load_ngram_cstr_ascii(const EST_String filename, EST_Ngrammar &n)
 	if (ts.get().string() != ":")
 	{
 	    cerr << "EST_Ngrammar:load_ngram_cstr_ascii missing colon at filepos "
-		<< ts.filepos() << endl;
+		<< ts.StreamPosition() << endl;
 	    return misc_read_error;
 	}
 	occur = atof(ts.get().string());
@@ -267,7 +267,7 @@ load_ngram_cstr_ascii(const EST_String filename, EST_Ngrammar &n)
 	if (!ts.eoln())
 	{
 	    cerr << "EST_Ngrammar:load_ngram_cstr_ascii expect end of line at filepos "
-		<< ts.filepos() << endl;
+		<< ts.StreamPosition() << endl;
 	    return misc_read_error;
 	}
     }
@@ -285,20 +285,20 @@ load_ngram_cstr_bin(const EST_String filename, EST_Ngrammar &n)
     EST_Litem *k;
     int num_entries;
     double approx_num_samples = 0.0;
-    long freq_data_start, freq_data_end;
-    FILE *ifd;
+    streampos freq_data_start, freq_data_end;
+    ifstream is(filename,ios_base::in|ios_base::binary);
     int magic = 0;
     int swap = FALSE;
     
-    if ((ifd=fopen(filename,"rb")) == NULL)
+    if (is.is_open() ==false)
 	return misc_read_error;
-    fread(&magic,sizeof(int),1,ifd);
+    is.read((char*)&magic,sizeof(int));
     
     if (SWAPINT(magic) == EST_NGRAMBIN_MAGIC)
 	swap = TRUE;
     else if (magic != EST_NGRAMBIN_MAGIC)
 	return wrong_format;
-    if (ts.open(ifd, FALSE) == -1)
+    if (ts.open(is) == -1)
 	return misc_read_error;
     
     ts.set_SingleCharSymbols("\n");
@@ -306,7 +306,7 @@ load_ngram_cstr_bin(const EST_String filename, EST_Ngrammar &n)
     
     if (ts.peek().string() != "mBin_2")
     {
-	fclose(ifd);
+	is.close();
 	ts.close();
 	return wrong_format;
     }
@@ -315,7 +315,7 @@ load_ngram_cstr_bin(const EST_String filename, EST_Ngrammar &n)
     order = atoi(ts.get().string());
     if (ts.get() != "\n")
     {
-	fclose(ifd);
+	is.close();
 	ts.close();
 	return misc_read_error;
     }
@@ -330,31 +330,31 @@ load_ngram_cstr_bin(const EST_String filename, EST_Ngrammar &n)
     
     // Need to get to the position one after the newline and
     // who knows what TokenStream has already read,
-    fseek(ifd,(long)(ts.peek().filepos()+5),SEEK_SET);
+    is.seekg((long)((long int) ts.peek().streamposition()+5),ios_base::beg);
     
     if(!n.init(order,EST_Ngrammar::dense,vocab,pred_vocab))
     {
 	ts.close();
-	fclose(ifd);
+	is.close();
 	return misc_read_error;
     }
     
     EST_StrVector window(order);
     
-    freq_data_start = ftell(ifd);
-    fseek(ifd,0,SEEK_END);
-    freq_data_end = ftell(ifd);
+    freq_data_start = is.tellg();
+    is.seekg(0,ios_base::end);
+    freq_data_end = is.tellg();
     num_entries = (freq_data_end-freq_data_start)/sizeof(double);
     double *dd = new double[num_entries];
     
     // Go back to start of data
-    fseek(ifd,freq_data_start,SEEK_SET);
+    is.seekg(freq_data_start);
     
-    if (fread(dd,sizeof(double),num_entries,ifd) != (unsigned)num_entries)
+    if (is.read((char*)dd,sizeof(double)*num_entries).gcount() != (int) sizeof(double)*num_entries)
     {
 	cerr << "EST_Ngrammar::load_ngram_cstr_bin format does not have expected number of entries" << endl;
 	ts.close();
-	fclose(ifd);
+	is.close();
 	return misc_read_error;
     }
     if (swap)
@@ -366,7 +366,7 @@ load_ngram_cstr_bin(const EST_String filename, EST_Ngrammar &n)
 	{
 	    cerr << "EST_Ngrammar::load_ngram_cstr_bin unexpected end of frequency data" << endl;
 	    ts.close();
-	    fclose(ifd);
+	    is.close();
 	    return misc_read_error;	
 	}
 	for (k=n.p_states[i].pdf().item_start();
@@ -397,7 +397,7 @@ load_ngram_cstr_bin(const EST_String filename, EST_Ngrammar &n)
     delete [] dd;
     
     ts.close();
-    fclose(ifd);
+    is.close();
     
     return format_ok;
 }

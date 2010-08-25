@@ -39,6 +39,8 @@
 #ifndef __ESPS_IO_H__
 #define __ESPS_IO_H__
 
+#include <iostream>
+
 #define ESPS_MAGIC 27162
 struct ESPS_PREAMBLE {
     int machine_code;   /* the machine that generated this (4 is sun) */
@@ -153,13 +155,21 @@ typedef struct ESPS_HDR_struct *esps_hdr;
 esps_fea new_esps_fea(void);
 void delete_esps_fea(esps_fea r);
 void print_esps_fea(esps_fea r);
+
 esps_fea read_esps_fea(FILE *fd, esps_hdr hdr);
 void write_esps_fea(FILE *fd, esps_fea t, esps_hdr hdr);
+esps_fea read_esps_fea(istream *is, esps_hdr hdr);
+void write_esps_fea(ostream *os, esps_fea t,esps_hdr hdr);
+
 esps_hdr make_esps_hdr(void);
 esps_hdr make_esps_sd_hdr(void);
 void delete_esps_hdr(esps_hdr h);
+
 enum EST_read_status read_esps_hdr(esps_hdr *hdr,FILE *fd);
 enum EST_write_status write_esps_hdr(esps_hdr hdr,FILE *fd);
+enum EST_read_status read_esps_hdr(esps_hdr *hdr,istream *is);
+enum EST_write_status write_esps_hdr(esps_hdr hdr,ostream *os);
+
 
 int fea_value_d(const char *name,int pos,esps_hdr hdr,double *d);
 int fea_value_f(const char *name,int pos,esps_hdr hdr,float *d);

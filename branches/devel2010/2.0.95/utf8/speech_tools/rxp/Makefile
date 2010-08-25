@@ -31,11 +31,13 @@ H =
 SRCSC = charset.c dtd.c string16.c url.c \
         ctype16.c input.c stdio16.c system.c xmlparser.c
 
+CPPSRCS = streamif.cc
+
 TSRCS = XML_Parser.cc
 
-SRCS = $(SRCSC) $(TSRCS)
+SRCS = $(SRCSC) $(TSRCS) $(CPPSRCS)
 
-OBJS = $(SRCSC:.c=.o) $(TSRCS:.cc=.o) 
+OBJS = $(SRCSC:.c=.o) $(TSRCS:.cc=.o) $(CPPSRCS:.cc=.o) 
 
 FILES = Makefile $(SRCS) $(H) rxp.c rxp.mak
 

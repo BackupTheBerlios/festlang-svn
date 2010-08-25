@@ -51,7 +51,12 @@ class EST_Track;
 
 typedef EST_TMatrix<EST_Val> EST_ValMatrix;
 
-class EST_TokenStream;
+namespace EST
+{
+    class EST_TokenStream;
+}
+using namespace EST;
+
 class EST_String;
 
 typedef enum EST_TrackFileType {

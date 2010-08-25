@@ -40,22 +40,41 @@
 #ifndef __EST_UTF8_H__
 #define __EST_UTF8_H__
 
+#include <vector>
+#include "EST_String.h"
 #include "utf8/utf8.h"
 
-void cp2utf8(utf8::uint32_t cp,char *utf8string);
+#define ErrUnicodeChar 0xE000  // First character from the Unicode Private Use Area
+                               // We use it as an EOF mark.
+
+namespace EST
+{
+typedef utf8::uint32_t UnicodeChar;
+
+/** cp2utf8 converts an UnicodeChar "cp" into a UTF-8 string ( maybe 0-ended)
+ *  Returns 0 if cp is valid or -1 if cp is invalid.
+ *  cp2utf8 does not allocate space, so there should be up to 5 bytes free
+ *  in utf8string, as an UTF-8 character can be up to 4 four bytes long
+ *  and cp2utf8 may add a 0 at the end if appendzero is false.
+ */
+char* cp2utf8(UnicodeChar cp,char *utf8string,bool appendzero=true);
+
+int append (UnicodeChar cp, bool is_utf8, EST_String &st);
+int append (std::vector<UnicodeChar> vec, bool is_utf8, EST_String &st);
 
 /** If st is UTF-8, get the next Unicode Code Point and save it to cp.
   * If st is not UTF-8, return the next byte.
   * In any case, return the number of bytes read.
   */
-int getnextcp(char *st, bool is_utf8, utf8::uint32_t &cp);
+int getnextcp(char *st, bool is_utf8, UnicodeChar &cp);
 
 /** If st is UTF-8, get the previous Unicode Code Point and save it to cp.
   * If st is not UTF-8, return the previous byte.
   * In any case, return the number of bytes unread.
   */
 int getprevcp(char *st_begin, char *st,
-	      bool is_utf8, utf8::uint32_t &cp);
+	      bool is_utf8, UnicodeChar &cp);
 	      
 
+}
 #endif

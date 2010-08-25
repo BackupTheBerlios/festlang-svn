@@ -403,7 +403,7 @@ EST_PredictionSuffixTree::build(const EST_String filename,
     int i;
 
     if (filename == "-")
-	ts.open(stdin, FALSE);
+	ts.open(cin);
     else if (ts.open(filename) == -1)
 	return;
 
@@ -470,7 +470,7 @@ EST_PredictionSuffixTree::test(const EST_String filename)
     int i;
 
     if (filename == "-")
-	ts.open(stdin, FALSE);
+	ts.open(cin);
     else if (ts.open(filename) == -1)
 	return;
 

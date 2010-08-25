@@ -40,44 +40,47 @@
 #include <iostream>
 #include "EST_utf8.h"
 
-void cp2utf8(utf8::uint32_t cp,char *utf8string)
+namespace EST {
+char* cp2utf8(UnicodeChar cp,char *utf8string,bool appendzero)
 {
-    if (cp < 0x0080)
-    {
-        utf8string[0]=(char) cp;
-        utf8string[1]='\0';
-    } else if (cp < 0x0800)
-    {
-        utf8string[0]=(char) (0xC0 | (cp >> 6 ));
-        utf8string[1]=(char) (0x80 | (cp & 0x003F));
-        utf8string[2]='\0';
-    } else if (cp < 0xFFFF)
-    {
-        utf8string[0]=(char) (0xE0 | (cp >> 12 ));
-        utf8string[1]=(char) (0x80 | ((cp >> 6) & 0x003F));
-        utf8string[2]=(char) (0x80 | (cp & 0x003F));
-        utf8string[3]='\0';
-    } else if (cp < 0x10FFFF)
-    {
-        utf8string[0]=(char) (0xF0 | (cp >> 18 ));
-        utf8string[1]=(char) (0x80 | ((cp >> 12) & 0x003F));
-        utf8string[2]=(char) (0x80 | ((cp >> 6 ) & 0x003F));
-        utf8string[3]=(char) (0x80 | (cp & 0x003F));
-        utf8string[4]='\0';
-    } else
-    {
-        std::cerr << "invalid Code point: " << cp << std::endl;
-        utf8string[0]='\0';
-    }
-    return;
+    char *t;
+    t=utf8::append(cp,utf8string);
+    *t='\0';
+    return t+1;
+
 }
 
-
-int getnextcp(char *st, bool is_utf8, utf8::uint32_t &cp)
+int append (UnicodeChar cp, bool is_utf8, EST_String &st)
 {
     if (is_utf8 ==false)
     {
-	cp=(utf8::uint32_t) *st;
+	char stri[2]={(char) cp, '\0' };
+	st+=stri;
+	return 0;
+    } else
+    {
+	char utf8char[5];
+	cp2utf8(cp,utf8char,true);
+	st+=utf8char;
+	return 0;
+    }
+}
+
+int append (std::vector<UnicodeChar> vec, bool is_utf8, EST_String &st)
+{
+    for (std::vector<UnicodeChar>::iterator it=vec.begin();
+	 it != vec.end();
+	 ++it)
+	append(*it,is_utf8,st);
+    return 0;
+}
+
+
+int getnextcp(char *st, bool is_utf8, UnicodeChar &cp)
+{
+    if (is_utf8 ==false)
+    {
+	cp=(UnicodeChar) *st;
 	return 1;
     } else
     {
@@ -88,12 +91,12 @@ int getnextcp(char *st, bool is_utf8, utf8::uint32_t &cp)
 }
 
 int getprevcp(char *st_begin, char *st,
-	      bool is_utf8, utf8::uint32_t &cp)
+	      bool is_utf8, UnicodeChar &cp)
 {
     if (st<=st_begin) {cp=0;return 0;}
     if (is_utf8 == false)
     {
-	cp=(utf8::uint32_t) *(st-1);
+	cp=(UnicodeChar) *(st-1);
 	return 1;
     } else
     {
@@ -101,4 +104,5 @@ int getprevcp(char *st_begin, char *st,
 	cp=utf8::prior(it,begin);
 	return st-it;
     }
+}
 }

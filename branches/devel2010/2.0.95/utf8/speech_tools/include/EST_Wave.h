@@ -48,7 +48,12 @@
 
 class EST_Track;
 class EST_String;
-class EST_TokenStream;
+
+namespace EST
+{
+    class EST_TokenStream;
+}
+using namespace EST;
 
 
 /** A class for storing digital waveforms. The waveform is stored as

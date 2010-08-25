@@ -497,6 +497,52 @@ void write_esps_fea(FILE *fd, esps_fea t,esps_hdr hdr)
     return;
 }
 
+void write_esps_fea(ostream *os, esps_fea t,esps_hdr hdr)
+{
+    /* write out this fea */
+    (void)hdr;
+    short clength;
+    char *nspace;
+    int i;
+
+    os->write((char*)&t->type,2);
+    clength = (strlen(t->name)+3)/4;
+    os->write((char*)&clength,2);
+    nspace = walloc(char, clength*4);
+    memset(nspace,0,clength*4);
+    memmove(nspace,t->name,strlen(t->name));
+    os->write(nspace,clength*4);
+    wfree(nspace);
+    if ((t->type == 11) ||
+	(t->type == 1) ||
+	(t->type == 15))
+	return;
+    os->write((char*)&t->count,4);
+    os->write((char*)&t->dtype,2);
+    
+    for (i=0; i<t->count; i++)
+    {
+	switch(t->dtype)
+	{
+	  case ESPS_DOUBLE: 
+	    os->write((char*)&t->v.dval[i],8); break;
+	  case ESPS_FLOAT: 
+	    os->write((char*)&t->v.fval[i],4); break;
+	  case ESPS_INT: 
+	    os->write((char*)&t->v.ival[i],4); break;
+	  case ESPS_SHORT: 
+	    os->write((char*)&t->v.sval[i],2); break;
+	  case ESPS_CHAR: 
+	    os->write((char*)&t->v.cval[i],1); break;
+	  default:
+	    fprintf(stderr,"ESPS write_hdr: unsupported FEA dtype %d\n",
+		    t->dtype);
+	}
+    }
+    return;
+}
+
+
 int write_esps_rec(esps_rec r, esps_hdr h, FILE *fd)
 {
     /* will have to worry about swap someday */
@@ -623,6 +669,98 @@ esps_fea read_esps_fea(FILE *fd, esps_hdr hdr)
     return r;
 }    
 
+esps_fea read_esps_fea(istream *is, esps_hdr hdr)
+{
+    /* read next FEA record at point */
+    esps_fea r = new_esps_fea();
+    short sdata;
+    int i;
+    int idata;
+    float fdata;
+    double ddata;
+    char cdata;
+
+    is->read((char*)&sdata,2);
+    if (hdr->swapped) sdata = SWAPSHORT(sdata);
+    r->type = sdata;
+    if (r->type == 0)              /* a field name */
+    {   /* next short is the size in bytes */
+	is->read((char*)&sdata,2);
+	if (hdr->swapped) sdata = SWAPSHORT(sdata);
+	r->clength = sdata;
+    }
+    else if ((r->type == 13) ||   /* a feature and value */
+             (r->type == 11) ||   /* a single string (comment ?) */
+             (r->type == 1)  ||   /* a filename */
+             (r->type == 4)  ||   /* a filename */
+	     (r->type == 15))     /* directory name */
+    {                 
+	is->read((char*)&sdata,2);
+	if (hdr->swapped) sdata = SWAPSHORT(sdata);
+	r->clength = sdata * 4;
+    }
+    else
+    {
+	fprintf(stderr,"ESPS: fea record unknown type\n");
+	wfree(r);
+	return NULL;
+    }
+    r->name = walloc(char,r->clength+1);
+    is->read(r->name,r->clength);
+    r->name[r->clength] = '\0';
+    if ((r->type == 11) ||       /* a single string */
+	(r->type == 1)  ||       /* a filename */
+	(r->type == 15))         /* directory name */
+	return r;  
+    is->read((char*)&idata,4);
+    if (hdr->swapped) idata = SWAPINT(idata);
+    r->count = idata;
+    is->read((char*)&sdata,2);
+    if (hdr->swapped) sdata = SWAPSHORT(sdata);
+    r->dtype = sdata;
+    if (esps_alloc_fea(r) == -1)
+	return NULL;
+    for (i=0; i<r->count; i++)
+    {
+	switch (r->dtype)
+	{
+	  case ESPS_DOUBLE:
+	    is->read((char*)&ddata,8);
+	    if (hdr->swapped) swapdouble(&ddata);
+	    r->v.dval[i] = ddata;
+	    break;
+	  case ESPS_FLOAT:
+	    is->read((char*)&fdata,4);
+	    if (hdr->swapped) swapfloat(&fdata);
+	    r->v.fval[i] = fdata;
+	    break;
+	  case ESPS_INT:
+	    is->read((char*)&idata,4);
+	    if (hdr->swapped) idata = SWAPINT(idata);
+	    r->v.ival[i] = idata;
+	    break;
+	  case ESPS_SHORT:
+	    is->read((char*)&sdata,2);
+	    if (hdr->swapped) sdata = SWAPSHORT(sdata);
+	    r->v.sval[i] = sdata;
+	    break;
+	  case ESPS_CHAR:
+	    is->read((char*)&cdata,1);
+	    r->v.cval[i] = cdata;
+	    break;
+	  default:
+	    fprintf(stderr,"ESPS read_hdr: unsupported FEA dtype %d\n",r->dtype);
+	    wfree(r);
+	    return NULL;
+	}
+    }
+
+    return r;
+}    
+
+
+
+
 static char *esps_get_field_name(FILE *fd, esps_hdr hdr, int expect_source)
 {
     /* read the next field name */
@@ -676,6 +814,67 @@ static void esps_put_field_name(char *name,FILE *fd, esps_hdr hdr)
     }
     return;
 }
+
+
+static char *esps_get_field_name(istream *is, esps_hdr hdr, int expect_source)
+{
+    /* read the next field name */
+  short size=0;  /* bet its really a short */
+  char *name;
+  
+  is->read((char*)&size,2);
+  if (is->gcount() != 2)
+    {
+      fputs("error reading field name size\n", stderr);
+      return wstrdup("ERROR");
+    }
+  if (hdr->swapped) size = SWAPSHORT(size);
+  name = walloc(char,size+1);
+  is->read(name,size);
+  if (is->gcount() != (int)size)
+    {
+      fputs("error reading field name\n", stderr);
+      strncpy(name, "ERROR", size);
+    }
+  name[size] = '\0';
+  if (hdr->file_type == ESPS_SD || expect_source)
+    is->ignore(6);
+  else
+    is->ignore(2);
+
+  if (expect_source)
+    {
+      is->read((char*)&size,2);
+      if (hdr->swapped) size = SWAPSHORT(size);
+      is->ignore(size);
+    }
+
+  return name;
+}
+
+static void esps_put_field_name(char *name,ostream *os, esps_hdr hdr)
+    {
+    /* write the next field name */
+    short size = strlen(name);
+    short shortdata;
+
+    shortdata = 0;
+    os->write((char*)&shortdata,2);
+    os->write((char*)&size,2);
+    os->write(name,size);
+    if (hdr->file_type == ESPS_SD)
+    {
+	shortdata = 0;
+	os->write((char*)&shortdata,2);
+	os->write((char*)&shortdata,2);
+	os->write((char*)&shortdata,2);
+    }
+    return;
+}
+
+
+
+
 
 esps_hdr new_esps_hdr(void)
 {
@@ -1188,3 +1387,277 @@ enum EST_write_status write_esps_hdr(esps_hdr hdr,FILE *fd)
     
     return write_ok;
 }
+
+
+
+enum EST_read_status read_esps_hdr(esps_hdr *uhdr,istream *is)
+{
+    /* reads an ESPS header from is at point (should be position 0) */
+    /* leaves point at start of data (immediately after header)     */
+    struct ESPS_PREAMBLE preamble;
+    struct ESPS_FIXED_HDR fhdr;
+    esps_hdr hdr;
+    int intdata,i;
+    streampos pos,end;
+    short shortdata;
+    double sd_sample_rate;
+    int typematch;
+    int swap;
+    short name_flag;
+
+    is->read((char*) &preamble,sizeof(preamble));
+    if (preamble.check == ESPS_MAGIC)
+	swap = FALSE;
+    else if (preamble.check == SWAPINT(ESPS_MAGIC))
+	swap = TRUE;
+    else
+	return wrong_format;
+
+    hdr = new_esps_hdr();
+    hdr->swapped = swap;
+    is->read((char*)&fhdr,sizeof(fhdr));
+    if (hdr->swapped) 
+    {
+	preamble.data_offset = SWAPINT(preamble.data_offset);
+	preamble.record_size = SWAPINT(preamble.record_size);
+	fhdr.num_samples = SWAPINT(fhdr.num_samples);
+	fhdr.num_doubles = SWAPINT(fhdr.num_doubles);
+	fhdr.num_floats = SWAPINT(fhdr.num_floats);
+	fhdr.num_ints = SWAPINT(fhdr.num_ints);
+	fhdr.num_shorts = SWAPINT(fhdr.num_shorts);
+	fhdr.num_chars = SWAPINT(fhdr.num_chars);
+	fhdr.fea_type = SWAPSHORT(fhdr.fea_type);
+	fhdr.num_fields = SWAPSHORT(fhdr.num_fields);
+    }
+    pos = is->tellg();
+    if (fhdr.num_samples == 0)  /* has to be derived from the file size */
+    {
+	is->seekg(0,ios_base::end);
+	end = is->tellg();
+	is->seekg(pos);
+	fhdr.num_samples = ((unsigned int)end - preamble.data_offset)/preamble.record_size;
+    }
+    hdr->num_records = fhdr.num_samples;
+    hdr->num_fields = fhdr.num_fields;
+    hdr->hdr_size = preamble.data_offset;
+    if (fhdr.thirteen == 9)
+    {   /* esps identifies such files are as Sample Data Files */
+	hdr->file_type = ESPS_SD;
+	/* fake the rest to make it appear like other SD files */
+	hdr->num_fields = 1;
+	hdr->field_dimension = walloc(int,hdr->num_fields);
+	hdr->field_dimension[0] = 1;
+	hdr->field_type = walloc(short,hdr->num_fields);
+	hdr->field_type[0] = ESPS_SHORT;
+	hdr->field_name = walloc(char *,1);
+	hdr->field_name[0] = wstrdup("samples");
+	is->seekg(hdr->hdr_size,ios_base::beg);
+	/* In this cases its just in the header as a float */
+	sd_sample_rate = *((float *)&fhdr.fil4[0]);
+	add_fea_d(hdr,"record_freq",0,(double)sd_sample_rate);
+	*uhdr = hdr;
+	return format_ok;
+    }
+    else if ((fhdr.fea_type == 8) &&
+	     (hdr->num_fields == 1) &&
+	     ((fhdr.num_shorts*2) == preamble.record_size))
+	hdr->file_type = ESPS_SD;  /* this is a heuristic */
+    else
+	hdr->file_type = ESPS_FEA;
+    /* Now we have the field descriptions */
+    
+    /* 0000 0001 dimensions */
+    hdr->field_dimension = walloc(int,hdr->num_fields);
+    for (i=0; i<hdr->num_fields; i++)                   
+    {
+	is->read((char*)&intdata,4);
+	if (hdr->swapped) intdata = SWAPINT(intdata);
+	hdr->field_dimension[i] = intdata;
+    }
+    /* 0 -> num_fields-1 -- probably ordering information */
+    is->seekg(hdr->num_fields*4,ios_base::cur);         /* ordering info */
+    is->seekg(hdr->num_fields*2,ios_base::cur);         /* zeros */
+    hdr->field_type = walloc(short,hdr->num_fields);    
+    for (i=0; i<hdr->num_fields; i++)
+    {
+	is->read((char*)&shortdata,2);                       /* field types */  
+	if (hdr->swapped) shortdata = SWAPSHORT(shortdata);
+	hdr->field_type[i] = shortdata;
+    }
+    typematch = TRUE;
+    is->read((char*)&intdata,4);                             /* number of doubles */
+    if (hdr->swapped) intdata = SWAPINT(intdata);
+    if (fhdr.num_doubles != intdata) typematch = FALSE;
+    is->read((char*)&intdata,4);                             /* number of floats */
+    if (hdr->swapped) intdata = SWAPINT(intdata);
+    if (fhdr.num_floats != intdata) typematch = FALSE;
+    is->read((char*)&intdata,4);                             /* number of ints */
+    if (hdr->swapped) intdata = SWAPINT(intdata);
+    if (fhdr.num_ints != intdata) typematch = FALSE;
+    is->read((char*)&intdata,4);                            /* number of shorts */
+    if (hdr->swapped) intdata = SWAPINT(intdata);
+    if (fhdr.num_shorts != intdata) typematch = FALSE;
+    is->read((char*)&intdata,4);                             /* number of chars */
+    if (hdr->swapped) intdata = SWAPINT(intdata);
+    if (fhdr.num_chars != intdata) typematch = FALSE;
+    if ((hdr->file_type != ESPS_SD) && (typematch == FALSE))
+    {
+	fprintf(stderr,"ESPS hdr: got lost in the header (record description)\n");
+	delete_esps_hdr(hdr);
+	return misc_read_error;
+    }
+    /* other types ... */
+    is->seekg(9*2,ios_base::cur);                       /* other types */
+    is->seekg(hdr->num_fields*2,ios_base::cur);         /* zeros */
+    /* Now we can read the field names */
+    hdr->field_name = walloc(char *,hdr->num_fields);
+
+    is->read((char*)&name_flag,2);
+    if (hdr->swapped) name_flag = SWAPSHORT(name_flag);
+
+    for (i=0; i < hdr->num_fields; i++)
+	hdr->field_name[i] = esps_get_field_name(is,hdr,name_flag); /* field names */
+    if (hdr->file_type == ESPS_SD)
+    {   /* Only one field 'samples' */
+	if (!streq(hdr->field_name[0],"samples"))
+	{
+	    fprintf(stderr,"ESPS hdr: guessed wrong about FEA_SD file (no 'samples' field)\n");
+	    delete_esps_hdr(hdr);
+	    return misc_read_error;
+	}
+    }
+
+    /* Now fea, feature and value -- but how many are there ? */
+    while (is->tellg() < preamble.data_offset-4)
+    {
+	esps_fea r = read_esps_fea(is,hdr);              /* feas */
+	if (r == NULL) break;
+/*	print_esps_fea(r); */
+	r->next = hdr->fea;
+	hdr->fea = r;
+	if (r->type == 1) 
+	    break; /* I think this (filename) is last FEA */
+    }
+    /* There's other gunk after this but I think I've done enough */
+    /* The rest seems to be mostly previous headers               */
+
+    is->seekg(hdr->hdr_size,ios_base::beg); /* skip the rest of the header */
+    *uhdr = hdr;
+	
+    return format_ok;
+}
+
+
+enum EST_write_status write_esps_hdr(esps_hdr hdr,ostream *os)
+{
+    /* well here's the scary part, try to write a valid file hdr to */
+    /* the file                                                     */
+    struct ESPS_PREAMBLE preamble;
+    struct ESPS_FIXED_HDR fhdr;
+    time_t tx = time(0);
+    esps_fea t;
+    int i,intdata;
+    short shortdata;
+
+    memset(&preamble,0,sizeof(preamble));
+    memset(&fhdr,0,sizeof(fhdr));
+    /* I can't really make the machine code work properly, so I'll  */
+    /* just fix it for the two major byte orders to Sun and Suni386 */
+    if (EST_NATIVE_BO == bo_big)
+	preamble.machine_code = 4;  /* a sun */
+    else
+	preamble.machine_code = 6;  /* a suni386 */
+    preamble.check_code  = 3000;  /* ? */
+    preamble.data_offset = 0;  /* will come back and fix this later */
+    preamble.record_size = esps_record_size(hdr);
+    preamble.check = ESPS_MAGIC;
+    preamble.edr = 0;
+    preamble.fil1 = 0;
+    preamble.foreign_hd = 0; /* docs say it should be -1, but its always 0 */
+
+    fhdr.thirteen = 13;      /* must be for luck */
+    fhdr.sdr_size = 0;
+    fhdr.magic = ESPS_MAGIC;
+    strncpy(fhdr.date,ctime(&tx),26);
+    sprintf(fhdr.version,"1.91");  /* that's what all the others have */
+    sprintf(fhdr.prog,"EDST");
+    sprintf(fhdr.vers,"0.1");
+    strncpy(fhdr.progcompdate,ctime(&tx),26);
+    fhdr.num_samples = hdr->num_records;
+    fhdr.filler = 0;
+    /* in each record */
+    fhdr.num_doubles = esps_num_of_type(ESPS_DOUBLE,hdr);
+    fhdr.num_floats  = esps_num_of_type(ESPS_FLOAT,hdr);
+    fhdr.num_ints    = esps_num_of_type(ESPS_INT,hdr);
+    fhdr.num_shorts  = esps_num_of_type(ESPS_SHORT,hdr);
+    fhdr.num_chars   = esps_num_of_type(ESPS_CHAR,hdr);
+    fhdr.fsize = 40;
+    fhdr.hsize = 0;    /* given value below on second shot */
+    if (hdr->file_type == ESPS_SD)
+	fhdr.fea_type = 8;
+    else
+	fhdr.fea_type = 0;
+    fhdr.num_fields = hdr->num_fields;
+    os->write((char*)&preamble,sizeof(preamble));
+    os->write((char*)&fhdr,sizeof(fhdr));
+    /* The following cover dimensions, type and ordering info */
+    for (i=0; i < hdr->num_fields; i++)
+    {   /* Dimensions (i.e. number of channels) */
+	intdata = 1;
+	os->write((char*)&intdata,4);                 /* dimensions */
+    }
+    for (i=0; i < hdr->num_fields; i++)                 /* ordering info (?) */
+	os->write((char*) &i,4);
+    if (hdr->file_type == ESPS_SD)  /* zeros hmm should be zeroes only */
+	shortdata = 1;              /* is FEA case, 1 in ESPS_SD case  */
+    else                            /* fixed 24/7/98                   */
+	shortdata = 0;
+    for (i=0; i < hdr->num_fields; i++)
+	os->write((char*)shortdata,2);
+    for (i=0; i < hdr->num_fields; i++)    
+    {
+	shortdata = hdr->field_type[0];                 /* field types */
+	os->write((char*)&shortdata,2);
+    }
+    intdata = fhdr.num_doubles;                        /* number of doubles */
+    os->write((char*)&intdata,4);
+    intdata = fhdr.num_floats;                         /* number of floats */
+    os->write((char*)&intdata,4);
+    intdata = fhdr.num_ints;                           /* number of ints */
+    os->write((char*)&intdata,4);
+    intdata = fhdr.num_shorts;                         /* number of shorts */
+    os->write((char*)&intdata,4);
+    intdata = fhdr.num_chars;                          /* number of chars */
+    os->write((char*)&intdata,4);
+    shortdata = 0;
+    for (i=0; i < 9; i++)
+	os->write((char*)&shortdata,2);                /* other types */
+    for (i=0; i < hdr->num_fields; i++)
+	os->write((char*)&shortdata,2);                /* zeros */
+    /* Now dump the filednames */
+    for (i=0; i < hdr->num_fields; i++)
+	esps_put_field_name(hdr->field_name[i],os,hdr); /* field names */
+    if (hdr->file_type != ESPS_SD)
+	os->write((char*)&shortdata,2);   /* another 0 */
+    /* Now the feas */
+    for (t=hdr->fea; t != NULL; t=t->next)
+	write_esps_fea(os,t,hdr);                       /* feas */
+    /* now have to go back and fix the header size */
+    intdata = 0;
+    os->write((char*)&intdata,4);
+    preamble.data_offset = os->tellp();
+    fhdr.hsize = (preamble.data_offset-249)/2;
+    os->seekp(0,ios_base::beg);
+    if (os->good() ==false)
+    {
+	fprintf(stderr,"esps write header: can't fseek to start of file\n");
+	return misc_write_error;
+    }
+    os->write((char*)&preamble,sizeof(preamble));
+    os->write((char*)&fhdr,sizeof(fhdr));
+    os->seekp(preamble.data_offset,ios_base::beg);
+    
+    return write_ok;
+}
+
+

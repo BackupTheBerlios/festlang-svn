@@ -41,6 +41,8 @@
 #include "XML_Parser.h"
 #include "rxp.h"
 
+
+
 XML_Parser_Class::XML_Parser_Class()
 {
 }
@@ -97,6 +99,31 @@ XML_Parser *XML_Parser_Class::make_parser(FILE *input,
 {
   return make_parser(input, "<ANONYMOUS>", data);
 }
+
+
+XML_Parser *XML_Parser_Class::make_parser(std::istream *is, 
+					   const EST_String desc, 
+					   void *data)
+{
+  Entity ent = NewExternalEntity(0,0,strdup8(desc),0,0);
+
+  FILE16 *input16=MakeFILE16FromiStream(is, "r");
+
+  if (input16==NULL)
+    EST_sys_error("Can't open 16 bit '%s'", (const char *)desc);
+
+  SetCloseUnderlying(input16, 0);
+
+  return make_parser(NewInputSource(ent, input16), ent, data);
+}
+
+
+XML_Parser *XML_Parser_Class::make_parser(istream *is, 
+					   void *data)
+{
+  return make_parser(is, "<ANONYMOUS>", data);
+}
+
 
 
 XML_Parser *XML_Parser_Class::make_parser(const EST_String filename, 

@@ -67,28 +67,7 @@
 
 #define BufferSize 4096
 
-typedef int ReadProc(FILE16 *file, unsigned char *buf, int max_count);
-typedef int WriteProc(FILE16 *file, const unsigned char *buf, int count);
-typedef int SeekProc(FILE16 *file, long offset, int ptrname);
-typedef int FlushProc(FILE16 *file);
-typedef int CloseProc(FILE16 *file);
-
-struct _FILE16 {
-    void *handle;
-    int handle2, handle3;
-    ReadProc *read;
-    WriteProc *write;
-    SeekProc *seek;
-    FlushProc *flush;
-    CloseProc *close;
-    int flags;
-    CharacterEncoding enc;
-    char16 save;
-};
-
-#define FILE16_read             0x01
-#define FILE16_write            0x02
-#define FILE16_close_underlying 0x04
+#include "stdio16b.h"
 
 static int FileRead(FILE16 *file, unsigned char *buf, int max_count);
 static int FileWrite(FILE16 *file, const unsigned char *buf, int count);
@@ -640,7 +619,7 @@ int Vfprintf(FILE16 *file, const char *format, va_list args)
     return nchars;
 }
 
-static FILE16 *MakeFILE16(const char *type)
+FILE16 *MakeFILE16(const char *type)
 {
     FILE16 *file;
 

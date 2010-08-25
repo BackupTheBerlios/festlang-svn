@@ -200,6 +200,32 @@ EST_read_status EST_GenXML::read_xml(FILE *file,
   return read_ok;
 }
 
+EST_read_status EST_GenXML::read_xml(istream *is, 
+				     const EST_String &name,
+				     EST_Utterance &u,
+				     int &max_id)
+{
+  (void)max_id;
+  (void)print_attributes;	// just to shut -Wall up.
+  GenXML_Parse_State state;
+
+  u.clear();
+
+  state.utt=&u;
+
+  XML_Parser *parser = EST_GenXML::pclass->make_parser(is, name, &state);
+  parser->track_context(TRUE);
+
+  CATCH_ERRORS()
+    return read_format_error;
+
+  parser->go();
+
+  END_CATCH_ERRORS();
+
+  return read_ok;
+}
+
 static void ensure_relation(GenXML_Parse_State *state, EST_String name)
 {
   if (state->rel!=NULL && name == state->relName)

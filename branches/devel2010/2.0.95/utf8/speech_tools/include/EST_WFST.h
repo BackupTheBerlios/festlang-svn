@@ -245,6 +245,10 @@ class EST_WFST {
 				EST_Option &hinfo, 
 				int num_states,
 				int swap);
+    EST_read_status load_binary(istream &is,
+                EST_Option &hinfo,
+				int num_states,
+				int swap);
     //@}
 
     /**@name transduction functions */

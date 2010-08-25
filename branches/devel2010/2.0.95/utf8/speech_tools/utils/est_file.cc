@@ -84,7 +84,7 @@ EST_read_status read_est_header(EST_TokenStream &ts, EST_Features &hinfo,
 {
     EST_String k, v;
     char magic_number[9];
-    int pos;
+    streampos pos;
 
     // read initial file type identifier, can't use peek or get
     // as that could read *way* too far if it's binary so just read
@@ -140,7 +140,7 @@ EST_read_status read_est_header(EST_TokenStream &ts, EST_Option &hinfo,
 {
     EST_String k, v;
     char magic_number[9];
-    int pos;
+    streampos pos;
 
     // read initial file type identifier, can't use peek or get
     // as that could read *way* too far if it's binary so just read

@@ -110,12 +110,12 @@ EST_ServiceTable::Entry::operator EST_String() const
 void EST_ServiceTable::read_table(EST_String socketsFileName)
 {
   EST_TokenStream str;
-  FILE *sfile;
+  ifstream sfile(socketsFileName,ios_base::in);
 
-  if ((sfile = fopen(socketsFileName, "r"))==NULL)
+  if (sfile.fail()==false)
     return;
 
-  if (str.open(sfile, 1))
+  if (str.open(sfile))
     EST_sys_error("Can't access fringe file '%s'", 
 		  (const char *)socketsFileName);
 
@@ -167,7 +167,7 @@ void EST_ServiceTable::read_table(EST_String socketsFileName)
 		    (const char *)str.pos_description());
     }
 
-  str.close();
+  sfile.close();
 }
 
 void EST_ServiceTable::write_table(EST_String filename)

@@ -107,7 +107,7 @@ bool test_stats(EST_Ngrammar &ngram,
     (void)last;
 
     if (filename == "-")
-	ts.open(stdin,FALSE);
+	ts.open(cin);
     else if (ts.open(filename) == -1)
 	EST_error("EST_Ngrammar test: unable to open test file \"%s\"\n",
 		  (const char *)filename);

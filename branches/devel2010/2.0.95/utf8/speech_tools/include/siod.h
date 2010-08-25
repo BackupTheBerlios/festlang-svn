@@ -161,6 +161,7 @@ void pprint_to_fd(FILE *fd,LISP exp);
 LISP lread(void);
 LISP lreadtk(long j);
 LISP lreadf(FILE *f);
+LISP lreadf(istream *is);
 #ifdef WIN32
 LISP lreadwinsock(void);
 #endif

@@ -48,6 +48,7 @@
 #include <cstring>
 #include "EST_Wagon.h"
 #include "EST_cmd_line.h"
+#include "EST_Token.h"
 
 enum wn_strategy_type {wn_decision_list, wn_decision_tree};
 
@@ -153,7 +154,7 @@ static int set_Vertex_Feats(EST_Track &wgn_VertexFeats,
         {
             printf("wagon: track_feats invalid: %s at position %d\n",
                    (const char *)wagon_track_features,
-                   ts.filepos());
+                   (int) ts.StreamPosition());
             exit(-1);
         }
     }

@@ -44,6 +44,7 @@
 #include "EST.h"
 #include "EST_simplestats.h"
 #include "EST_WFST.h"
+#include "EST_Token.h"
 
 static int wfst_run_main(int argc, char **argv);
 
@@ -148,7 +149,7 @@ static int wfst_run_main(int argc, char **argv)
     for (f=files.head(); f != 0; f=next(f))
     {
 	if (files(f) == "-")
-	    ts.open(stdin,FALSE);
+	    ts.open(cin);
 	else
 	    if (ts.open(files(f)) != 0)
 		EST_error("failed to read WFST data file from \"%s\"",
