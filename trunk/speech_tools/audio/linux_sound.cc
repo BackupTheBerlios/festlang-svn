@@ -241,7 +241,7 @@ int play_linux_wave(EST_Wave &inwave, EST_Option &al)
 	  if (r <= 0)
 	    {
 	      THREAD_UNPROTECT();
-	      EST_warning("%s: failed to write to buffer (sr=%d)",aud_sys_name, sample_rate );
+	      EST_warning("%s: failed to write to buffer (sr=%d)", aud_sys_name, sample_rate );
 		close(audio);
 		return -1;
 	    }
@@ -469,18 +469,13 @@ static inline void print_pcm_state(snd_pcm_t *handle, char *msg)
 cst_audiodev *audio_open_alsa(int sps, int channels, cst_audiofmt fmt)
 {
   cst_audiodev *ad;
-  unsigned 	int real_rate;
   int err;
 
   /* alsa specific stuff */
   snd_pcm_t *pcm_handle;          
   snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
-  snd_pcm_hw_params_t *hwparams;
   snd_pcm_format_t format;
   snd_pcm_access_t access = SND_PCM_ACCESS_RW_INTERLEAVED;
-
-  /* Allocate the snd_pcm_hw_params_t structure on the stack. */
-  snd_pcm_hw_params_alloca(&hwparams);
 
   /* Open pcm device */
   err = snd_pcm_open(&pcm_handle, pcm_dev_name, stream, 0);
@@ -489,24 +484,6 @@ cst_audiodev *audio_open_alsa(int sps, int channels, cst_audiofmt fmt)
       EST_warning("audio_open_alsa: failed to open audio device %s. %s\n",
                   pcm_dev_name, snd_strerror(err));
       return NULL;
-  }
-
-  /* Init hwparams with full configuration space */
-  err = snd_pcm_hw_params_any(pcm_handle, hwparams);
-  if (err < 0) 
-  {
-	snd_pcm_close(pcm_handle);
-	EST_warning("audio_open_alsa: failed to get hardware parameters from audio device. %s\n", snd_strerror(err));
-	return NULL;
-  }
-
-  /* Set access mode */
-  err = snd_pcm_hw_params_set_access(pcm_handle, hwparams, access);
-  if (err < 0) 
-  {
-	snd_pcm_close(pcm_handle);
-	EST_warning("audio_open_alsa: failed to set access mode. %s.\n", snd_strerror(err));
-	return NULL;
   }
 
   /* Determine matching alsa sample format */
@@ -533,41 +510,9 @@ cst_audiodev *audio_open_alsa(int sps, int channels, cst_audiofmt fmt)
 	break;
   }
 
-  /* Set samble format */
-  err = snd_pcm_hw_params_set_format(pcm_handle, hwparams, format);
-  if (err <0) 
-  {
+  if ((err = snd_pcm_set_params(pcm_handle, format, access, channels, sps, 1, 50000)) < 0) {
+        EST_warning("audio_open_alsa: failed to set params: %s\n", snd_strerror(err));
 	snd_pcm_close(pcm_handle);
-	EST_warning("audio_open_alsa: failed to set format. %s.\n", snd_strerror(err));
-	return NULL;
-  }
-
-  /* Set sample rate near the disired rate */
-  real_rate = sps;
-  err = snd_pcm_hw_params_set_rate_near(pcm_handle, hwparams, &real_rate, 0);
-  if (err < 0)   
-  {
-	snd_pcm_close(pcm_handle);
-	EST_warning("audio_open_alsa: failed to set sample rate near %d. %s.\n", sps, snd_strerror(err));
-	return NULL;
-  }
-
-  /* Set number of channels */
-  assert(channels >0);
-  err = snd_pcm_hw_params_set_channels(pcm_handle, hwparams, channels);
-  if (err < 0) 
-  {
-	snd_pcm_close(pcm_handle);
-	EST_warning("audio_open_alsa: failed to set number of channels to %d. %s.\n", channels, snd_strerror(err));
-	return NULL;
-  }
-
-  /* Commit hardware parameters */
-  err = snd_pcm_hw_params(pcm_handle, hwparams);
-  if (err < 0) 
-  {
-	snd_pcm_close(pcm_handle);
-	EST_warning("audio_open_alsa: failed to set hw parameters. %s.\n", snd_strerror(err));
 	return NULL;
   }
 
