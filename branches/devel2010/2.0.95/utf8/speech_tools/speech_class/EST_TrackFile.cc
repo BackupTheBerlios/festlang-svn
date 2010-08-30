@@ -365,7 +365,7 @@ EST_read_status EST_TrackFile::load_est(const EST_String filename,
 
     if ((r == format_ok) && (!ts.eof()))
     {
-	cerr << "Not end of file, but expected it\n";
+	cerr << "Not end of file, at " << ts.tell() << "but expected it\n";
 	return misc_read_error;
     }
     else

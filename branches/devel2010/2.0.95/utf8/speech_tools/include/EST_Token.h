@@ -45,6 +45,7 @@
 #include <sstream>
 #include <fstream>
 
+#include <deque>
 #include <vector>
 
 #include "EST_String.h"
@@ -65,6 +66,14 @@ extern const EST_String EST_Token_Default_SingleCharSymbols;
 extern const EST_String EST_Token_Default_PunctuationSymbols;
 ///
 extern const EST_String EST_Token_Default_PrePunctuationSymbols;
+
+extern const EST_String EST_Token_Default_WhiteSpaceCharsUTF8;
+///
+extern const EST_String EST_Token_Default_SingleCharSymbolsUTF8;
+///
+extern const EST_String EST_Token_Default_PunctuationSymbolsUTF8;
+///
+extern const EST_String EST_Token_Default_PrePunctuationSymbolsUTF8;
 
 /** This class is similar to \Ref{EST_String} but also maintains 
     the original punctuation and whitespace found around the 
@@ -333,17 +342,35 @@ class EST_TokenStream{
     istream *is;
     int close_at_end;
     int linepos;
+    
+    
+    void default_values(void);
+        
     UnicodeChar getch(void);
+    // Several functions used by getch() :
+    int clear_tok_buffers(void);
+    int get_tok_wspace(void);
+    int get_tok_prepunct(void);
+    int get_tok_string(void);
+    int get_tok_punc(void);
+    int get_tok_finish(void);
+    int mv_stuff_punc();
+    //
+    inline void ungetch(UnicodeChar cp,bool escaping);
     EST_TokenStream &getch(char &C);
-    int peeked_charp;
-    UnicodeChar peeked_char;       // ungot character 
+    std::deque<UnicodeChar> peeked_char;       // ungot characters 
     UnicodeChar peekch(void);
+    
     int peeked_tokp;
+    EST_Token current_tok;
+    
+    
     int quotes;
+    bool inquotes;
     UnicodeChar quote;
     UnicodeChar escape;
-    EST_Token current_tok;
-    void default_values(void);
+
+
     /* local buffers to save reallocating */
     UnicodeStr tok_wspace;
     UnicodeStr tok_stuff;
@@ -434,6 +461,15 @@ class EST_TokenStream{
          { quotes = TRUE; quote = q; escape = e;}
     /// query quote mode
     int quoted_mode(void) { return quotes; }
+    void ignore(unsigned int numcp)
+    {
+        unsigned int ignored=0;
+        while(ignored<numcp)
+        {
+            getch();
+            ++ignored;
+        }
+    }
         
     //@}
     /**@name miscellaneous */
@@ -443,6 +479,8 @@ class EST_TokenStream{
     /// end of file
     int eof()
        { return is->eof(); }
+    int good()
+       { return is->good();}
     /// end of line
     int eoln();
     /// get stream descriptor of \Ref{EST_TokenStream}
@@ -450,9 +488,9 @@ class EST_TokenStream{
     { if (type==tst_file ||type==tst_istream ||type==tst_string) return is; 
       else return NULL;}
     /// current file position in \Ref{EST_TokenStream}
-    streampos StreamPosition(void) const { return is->tellg(); }
+    streampos streamposition(void) const { return is->tellg(); }
     /// tell, synonym for StreamPosition
-    streampos tell(void) const { return StreamPosition(); }
+    streampos tell(void) const { return streamposition(); }
     /// seek, reposition file pointer
     int seek(streampos position);
     int seek_end();

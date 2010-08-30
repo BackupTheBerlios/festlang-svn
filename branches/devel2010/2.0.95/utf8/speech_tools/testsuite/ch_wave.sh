@@ -60,9 +60,9 @@ test_raw () {
       then echo ch_wave raw binary test: pass
       else echo ch_wave raw binary test: fail
    fi
-   $CH_WAVE -otype raw -ostype ascii "$DATA"/ch_wave.wav -o tmp/ch_wave.raw
-   $CH_WAVE -itype raw -istype ascii -f $SAMPLE_RATE tmp/ch_wave.raw -otype nist -obo MSB -o tmp/ch_wave.nist
-   if cmp "$DATA"/ch_wave.wav tmp/ch_wave.nist 
+   $CH_WAVE -otype raw -ostype ascii "$DATA"/ch_wave.wav -o tmp/ch_wave.raw23
+   $CH_WAVE -itype raw -istype ascii -f $SAMPLE_RATE tmp/ch_wave.raw23 -otype nist -obo MSB -o tmp/ch_wave.nist23
+   if cmp "$DATA"/ch_wave.wav tmp/ch_wave.nist23
       then echo ch_wave raw ascii test: pass
       else echo ch_wave raw ascii test: fail
    fi
@@ -76,7 +76,7 @@ test_byte_order ()
    SAMPLE_RATE=`$CH_WAVE -info "$DATA"/ch_wave.wav | awk '{if ($1 == "Sample") print $3}'`
    $CH_WAVE -obo MSB -otype raw "$DATA"/ch_wave.wav -o tmp/ch_wave.raw  || exit 1
    dd if=tmp/ch_wave.raw conv=swab of=tmp/ch_wave.swab
-   $CH_WAVE -ibo LSB -itype raw -istype short -f $SAMPLE_RATE tmp/ch_wave.swab -obo MSB -otype nist -o tmp/ch_wave.raw  || exit 1
+   $CH_WAVE -ibo LSB -itype raw -istype short -f $SAMPLE_RATE tmp/ch_wave.swab -obo MSB -otype nist -o tmp/ch_wave.nist  || exit 1
    if cmp "$DATA"/ch_wave.wav tmp/ch_wave.nist 
       then echo ch_wave byte order test: pass
       else echo ch_wave byte order test: fail

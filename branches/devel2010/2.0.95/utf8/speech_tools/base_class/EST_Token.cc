@@ -51,45 +51,13 @@
 #include "EST_cutils.h"
 #include "EST_error.h"
 #include "EST_utf8.h"
+
+#include "inst_tmpl/token.cc"
 using namespace std;
 
 namespace EST
 {
-#if 0
-#if defined(INSTANTIATE_TEMPLATES)
-template utf8::uint32_t utf8::next<char*>(char*&, char*);
-template utf8::uint32_t utf8::prior<char*>(char*&, char*);
-template char* utf8::append<char*>(utf8::uint32_t, char*);
-template class std::_Rb_tree<utf8::uint32_t,std::pair <utf8::uint32_t const, char>, \
-	std::_Select1st<std::pair<utf8::uint32_t const, char> >, \
-	std::less<utf8::uint32_t>, \
-	std::allocator<std::pair<utf8::uint32_t const, char> > >;
 
-template char* utf8::find_invalid<char*>(char*, char*);
-template utf8::uint32_t utf8::unchecked::next<char*>(char*&);
-
-template utf8::uint32_t utf8::next<std::istreambuf_iterator<char, std::char_traits<char> > > \
-			          (std::istreambuf_iterator<char, std::char_traits<char> >&, \
-				   std::istreambuf_iterator<char, std::char_traits<char> >);
-
-template utf8::internal::utf_error utf8::internal::validate_next<char*>(char*&, char*, utf8::uint32_t *);
-template utf8::internal::utf_error utf8::internal::get_sequence_1<char*>(char*&, char*, utf8::uint32_t*);
-template utf8::internal::utf_error utf8::internal::get_sequence_2<char*>(char*&, char*, utf8::uint32_t*);
-template utf8::internal::utf_error utf8::internal::get_sequence_3<char*>(char*&, char*, utf8::uint32_t*);
-template utf8::internal::utf_error utf8::internal::get_sequence_4<char*>(char*&, char*, utf8::uint32_t*);
-
-template utf8::internal::utf_error utf8::internal::validate_next<std::istreambuf_iterator<char, std::char_traits<char> > >(std::istreambuf_iterator<char, std::char_traits<char> >&, std::istreambuf_iterator<char, std::char_traits<char> >, utf8::uint32_t*);
-
-template utf8::internal::utf_error utf8::internal::get_sequence_1<std::istreambuf_iterator<char, std::char_traits<char> > >(std::istreambuf_iterator<char, std::char_traits<char> >&, std::istreambuf_iterator<char, std::char_traits<char> >, utf8::uint32_t*);
-template utf8::internal::utf_error utf8::internal::get_sequence_2<std::istreambuf_iterator<char, std::char_traits<char> > >(std::istreambuf_iterator<char, std::char_traits<char> >&, std::istreambuf_iterator<char, std::char_traits<char> >, utf8::uint32_t*);
-template utf8::internal::utf_error utf8::internal::get_sequence_3<std::istreambuf_iterator<char, std::char_traits<char> > >(std::istreambuf_iterator<char, std::char_traits<char> >&, std::istreambuf_iterator<char, std::char_traits<char> >, utf8::uint32_t*);
-template utf8::internal::utf_error utf8::internal::get_sequence_4<std::istreambuf_iterator<char, std::char_traits<char> > >(std::istreambuf_iterator<char, std::char_traits<char> >&, std::istreambuf_iterator<char, std::char_traits<char> >, utf8::uint32_t*);
-template class utf8::iterator<char*>;
-template class utf8::iterator<char*>(__gnu_cxx::__normal_iterator<char*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, __gnu_cxx::__normal_iterator<char*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >, __gnu_cxx::__normal_iterator<char*, std::basic_string<char, std::char_traits<char>, std::allocator<char> > >;
-//template utf8::iterator<char*> (tok_stuff.begin(),tok_stuff.begin(),tok_stuff.end());
-
-#endif
-#endif
 
 const EST_String EST_Token_Default_WhiteSpaceChars = " \t\n\r";
 const EST_String EST_Token_Default_SingleCharSymbols = "(){}[]";
@@ -166,10 +134,9 @@ void EST_TokenTable::default_values(const EST_String ws, \
 
 TokenTableLUT::mapped_type EST_TokenTable::CheckCP(UnicodeChar cp)
 {
-	TokenTableLUT::iterator it;
-	
 	if (p_LUT_wrong == true) build_tables();
-	it = p_LUT.find(cp);
+
+	TokenTableLUT::iterator it = p_LUT.find(cp);
 	if ( it != p_LUT.end() ) return it->second;	
 	else return '\0';
 }
@@ -218,6 +185,10 @@ void EST_TokenTable::InsertCP(UnicodeChar cp, TokenTableLUT::mapped_type newclas
 		else
 		    TwoClassWarn(cp,oldclass,newclass);
 		return;
+	    default: // Other classes, overwrite and warn
+		p_LUT[cp]=newclass;
+		TwoClassWarn(cp,oldclass,newclass);
+		return;	
 	}
     }
 }
@@ -264,6 +235,7 @@ void EST_TokenTable::build_tables()
 		InsertUtf8St(p_PunctuationSymbols,'.');
 		InsertUtf8St(p_PrePunctuationSymbols,'$');
 	}
+	InsertCP(ErrUnicodeChar,'!');
 	p_LUT_wrong=false;
 	return;
 }
@@ -284,8 +256,10 @@ UnicodeStr::operator EST_String ()
 {
     EST_String s;
     
+    if (vec.empty() == true ) return s;
+    
     for (std::vector<UnicodeChar>::iterator it=vec.begin();
-	 it < vec.end() && *it != 0;
+	 it < vec.end() && *it != ErrUnicodeChar;
 	 ++it)
     {
 	append(*it,p_isunicode,s);
@@ -336,7 +310,6 @@ void EST_TokenStream::default_values()
 {
     type = tst_none;
     peeked_tokp = FALSE;
-    peeked_charp = FALSE;
     quotes = FALSE;
     linepos = 1;  
     close_at_end=TRUE;
@@ -420,7 +393,7 @@ int EST_TokenStream::open_string(const EST_String &newbuffer)
 int EST_TokenStream::seek_end()
 {
     // This isn't actually useful but people expect it 
-    peeked_charp = FALSE;
+    peeked_char.clear();
     peeked_tokp = FALSE;
 
     switch (type)
@@ -479,14 +452,22 @@ int EST_TokenStream::fread(void *buff, int size, int nitems)
     // switching into binary mode for current position
       char *buf2=(char *) buff;
     // so we can continue to read afterwards
+    
+    if (nitems == 0) return 0;
+    
     if (peeked_tokp)
     {
 	cerr << "ERROR " << pos_description() 
 	    << " peeked into binary data" << endl;
 	return 0;
     }
+    
+    if(is_utf8() == true)
+    {
+	cerr << "ERROR: EST_TokenStream can't read binary data " <<
+	        "from an UTF-8 TokenStream" << endl;
+    }
 
-    peeked_charp = FALSE;
     peeked_tokp = FALSE;
 
     switch (type)
@@ -502,11 +483,29 @@ int EST_TokenStream::fread(void *buff, int size, int nitems)
       case tst_file:
       case tst_istream:
       case tst_string:
+        // We have to deal with unget characters:
 	for (int i=0;
 	     i<nitems;
 	     ++i)
 	{
-	    is->read(buf2,size);
+	    int alreadyread=0;
+	    while (peeked_char.empty() == false && alreadyread<size)
+	    {
+		if ( peeked_char.front() == ErrUnicodeChar)
+		{
+		    is->setstate(ios::eofbit);
+		    peeked_char.pop_front();
+		    break;
+		}
+		else
+		{
+		    *buf2++=(char) peeked_char.front();
+		    peeked_char.pop_front();
+		    ++alreadyread;
+		}
+	    }
+	    
+	    is->read(buf2,size-alreadyread);
 	    buf2+=is->gcount();
 	}
 	
@@ -554,7 +553,7 @@ void EST_TokenStream::close(void)
     }
 
     type = tst_none;
-    peeked_charp = FALSE;
+    peeked_char.clear();
     peeked_tokp = FALSE;
 
 }
@@ -582,7 +581,7 @@ int EST_TokenStream::restart(void)
     }
 
     linepos = 1;
-    peeked_charp = FALSE;
+    peeked_char.clear();
     peeked_tokp = FALSE;
 
     return 0;
@@ -702,21 +701,18 @@ EST_Token &EST_TokenStream::must_get(EST_String expected, bool *ok)
 
 inline UnicodeChar  EST_TokenStream::getpeeked_internal(void)
 {
-  peeked_charp = FALSE;
-  return peeked_char;
+  UnicodeChar cp=peeked_char.front();
+  peeked_char.pop_front();
+  return cp;
 }
 
 
 inline
 UnicodeChar EST_TokenStream::getch_internal()
 {
+    // Gets the next Code Point or char from the stream.
     UnicodeChar cp;
-    // Return next character in stream
-    if (EST_TokenStream::peeked_charp)
-    {
-      return getpeeked_internal();
-    }
-    
+        
     switch (type)
     {
       case tst_none: 
@@ -732,15 +728,21 @@ UnicodeChar EST_TokenStream::getch_internal()
       case tst_string:
 	if (p_table.isutf8() ==false)
 	{
-	    return (is->good()) ? is->get() : ErrUnicodeChar;
+	    int ch;
+	    if ( (is->good()) && ( (ch=is->get()) != EOF ) )
+		return ch;
+	    else
+		return ErrUnicodeChar;
 	} else
 	{
-		istreambuf_iterator<char> it(is->rdbuf());
-		istreambuf_iterator<char> eos;
+		std::istreambuf_iterator<char> it (*is);
+		std::istreambuf_iterator<char> eos;
 		if (it != eos) {
 			cp = utf8::next(it,eos);
+			if (it == eos) is->setstate(ios::eofbit);
 			return cp;
 		} else {
+			if (it == eos) is->setstate(ios::eofbit);
 			return ErrUnicodeChar;
 		}
 	}
@@ -755,24 +757,36 @@ UnicodeChar EST_TokenStream::getch_internal()
 
 UnicodeChar EST_TokenStream::getch(void)
 {
-  return getch_internal();
+  UnicodeChar cp;
+  
+  if (peeked_char.empty() == false) cp=getpeeked_internal();
+  else  cp=getch_internal();
+  
+  if (cp == '\n') ++linepos;
+  
+  return cp;
 }
 
 inline UnicodeChar  EST_TokenStream::peekch_internal()
 {
     // Return next character in stream (without reading it)
-
-    if (!peeked_charp)
-	peeked_char = getch_internal();
-    peeked_charp = TRUE;
-    return peeked_char;
+    if (peeked_char.empty() == true )
+	peeked_char.push_back(getch_internal());
+    return peeked_char.front();
 }
 
 
-UnicodeChar  EST_TokenStream::peekch(void)
+UnicodeChar  EST_TokenStream::peekch()
 {
   return peekch_internal();
-  
+}
+
+inline 
+void EST_TokenStream::ungetch(UnicodeChar cp, bool escaping=false)
+{
+    if (cp == '\n') --linepos;
+    peeked_char.push_front(cp);
+    if (escaping==true) ungetch(escape);
 }
 
 #define CLASS(C,CL) (p_table.CheckCP(C)==(CL))
@@ -780,118 +794,387 @@ UnicodeChar  EST_TokenStream::peekch(void)
 #define CLASS2(C,CL1,CL2) (p_table.CheckCP(C)==(CL1)||p_table.CheckCP(C)==(CL2))
 
 
-EST_Token &EST_TokenStream::get(void)
+int EST_TokenStream::clear_tok_buffers(void)
 {
-    if (peeked_tokp)
-    {
-		peeked_tokp = FALSE;
-		return current_tok;
-    }
-
-    streampos tmpposition;
-    std::vector<UnicodeChar> temp;
-    UnicodeStr temp2;
-    std::vector<UnicodeChar>::iterator it,endit,word,it2;
-    UnicodeChar c;
-    
     tok_wspace.vec.clear();
     tok_stuff.vec.clear();
     tok_prepuncs.vec.clear();
     tok_punc.vec.clear();
 
-    tmpposition=tell();
-    c=getch_internal();
-    while(CLASS(c,' ') && ( ! eof() ) && (c!=ErrUnicodeChar) )
+    return 0;
+}
+
+int EST_TokenStream::get_tok_finish(void)
+{
+//    cout << "debug: Finishing token" << endl;
+    current_tok.set_whitespace((EST_String) tok_wspace);
+    current_tok.set_token((EST_String) tok_stuff);
+    current_tok.set_punctuation((EST_String) tok_punc);
+    current_tok.set_prepunctuation((EST_String) tok_prepuncs);
+    return 0;
+}
+
+int EST_TokenStream::get_tok_wspace()
+{
+    streampos tmpposition=tell();
+    bool goon=true;
+    char classCP;
+    UnicodeChar c;
+    
+    while(goon)
     {
-	if (c == '\n') linepos++;
-	tok_wspace.vec.push_back(c);
-	tmpposition=tell();
-	c=getch_internal();
+	c=getch();
+//	cout << "debug tokwspace: |" << (char) c << "|" << endl;
+	switch ( classCP=p_table.CheckCP(c) )
+	{
+	  case ' ': 
+	    tok_wspace.vec.push_back(c);
+	    tmpposition=tell();
+	    break;
+	  case '!':
+	    // End of file reached. 
+	  default :
+	    goon=false;
+	    break;
+	}
     }
-    current_tok.init();
+//    cout << "debug: parentesis:" << (char) c << endl;
+    ungetch(c);
+//    cout << "debug: test1: |" << (EST_String) tok_wspace << "|" << endl;
+    
+    if (tok_wspace.vec.front() == '\0') // feature paths will have null whitespace
+	tok_wspace.vec.clear();
+//    cout << "debug: test2: |" << (EST_String) tok_wspace << "|" << endl;
     current_tok.set_streampos(tmpposition);
-    if ( ! eof() )
+    
+    if ( classCP == '!')
     {
-	if ((quotes) &&  // quoted strings (with escapes) are allowed
-	    (c == quote))
+	is->setstate(ios::eofbit); // Just in case.
+	get_tok_finish();
+	return -1;
+    }
+    
+    return 0;
+}
+
+int EST_TokenStream::get_tok_prepunct()
+{
+    bool goon=true;
+    char classCP;
+    UnicodeChar c;
+    bool escaping;
+
+    c=peekch();
+//    cout << "debug tokwprepunct peek: " << (char) c << endl;
+    if ( (quotes) && (c==quote))
+    {
+	getch();
+	current_tok.set_quoted(TRUE);
+    }
+    
+    if ( (current_tok.quoted() == FALSE) && p_table.CheckCP(c) == '@')
+    {
+//	cout << "debug: parentesis" << (char) c << endl; 
+	getch();
+	tok_stuff.vec.push_back(c);
+	get_tok_finish();
+	return -1;
+    }
+    
+    while(goon)
+    {
+	c=getch();
+//    	cout << "debug tok_prepunct: " << (char) c << endl;	
+	if ( (current_tok.quoted() == TRUE ) && (c==quote) )
 	{
-	    while ( (c = getch_internal()), ! eof() )
+	    get_tok_finish();
+	    return -1;
+	}
+
+	if ( (current_tok.quoted() == TRUE ) && (c==escape) )
+	{
+	    c=getch();
+	    escaping=true;
+	}
+	else
+	    escaping=false;
+	
+	switch ( classCP=p_table.CheckCP(c) )
+	{
+	  case '$': // Prepunct
+	  case '"': // defined both prepunct and punct.
+	    tok_prepuncs.vec.push_back(c);
+	    break;
+	  case ' ': // Ignore whitespace between prepunct and string.
+	    break;
+	  case '@': // SingleChar
+	    if ( current_tok.quoted() == TRUE )
 	    {
-		if (c == quote)
-		    break;
-		if (c == escape)
-		    c = getch_internal();
+		goon=false;
+		break;
+	    }
+	    else
+	    {
 		tok_stuff.vec.push_back(c);
+		get_tok_finish();
+		return -1;
 	    }
-	    current_tok.set_quoted(TRUE);
+	    break;
+	  case '!':
+	    // End of file reached. 
+	  default :
+	    goon=false;
+	    break;
 	}
-	else            // standard whitespace separated tokens
-	{
-	    tok_stuff.vec.push_back(c);
-	    while(
-		  !CLASS(c,'@') &&
-		  !CLASS(c=peekch_internal(),' ') && 
-		  !CLASS(c,'@') &&
-		  ( ! eof() ))
-	    {
-		// note, we must have peeked to get here.
-		tok_stuff.vec.push_back(getpeeked_internal());
-	    }
-	}
-	
-	// Are there any punctuation symbols at the start?
-	it=tok_stuff.vec.begin();
-	
-	for (;
-	    ((it < tok_stuff.vec.end()) && CLASS2(*it, '$', '"') && *it!=ErrUnicodeChar);
-	    ++it);
-	
-	if ( (it > tok_stuff.vec.begin() ) && (it < tok_stuff.vec.end()))  // there are
-	{
-	    tok_prepuncs.vec.insert(tok_prepuncs.vec.end(),tok_stuff.vec.begin(),it);
-	    current_tok.set_prepunctuation((EST_String) tok_prepuncs);
-	    word=it;
-	}
-	else
-	{
-	    current_tok.set_prepunctuation(EST_String::Empty);
-	    word = tok_stuff.vec.begin();
-	}
-
-	// Are there any punctuation symbols at the end
-	
-	for (it=tok_stuff.vec.end()-1; 
-	     ((it != word) && CLASS2(*it,'.','"'));
-	     --it);
-	++it;
-	if (it < tok_stuff.vec.end()) // There are
-	{
-	    tok_punc.vec.insert(tok_punc.vec.end(),it,tok_stuff.vec.end());
-	    current_tok.set_punctuation((EST_String) tok_punc);
-
-	}
-	else
-	{
-	    current_tok.set_punctuation(EST_String::Empty);
-	}
-
-	temp2.vec.assign(word,it);
-	temp2.p_isunicode=tok_stuff.p_isunicode;
-	current_tok.set_token((EST_String) temp2);
-	
-	if (*(tok_wspace.vec.begin()) == '\0') // feature paths will have null whitespace
-	    current_tok.set_whitespace(EST_String::Empty);
-	else
-	    current_tok.set_whitespace((EST_String) tok_wspace);
     }
-    else
+    ungetch(c,escaping);
+    
+    if ( classCP == '!')
     {
-	current_tok.set_token(EST_String::Empty);
-	current_tok.set_whitespace((EST_String) tok_wspace);
-	current_tok.set_punctuation(EST_String::Empty);
-	current_tok.set_prepunctuation(EST_String::Empty);
+	is->setstate(ios::eofbit); // Just in case.
+	get_tok_finish();
+	return -1;
+    }
+    
+    return 0;
+}
+
+int EST_TokenStream::mv_stuff_punc()
+{
+    UnicodeChar c;
+    // Check if the last tok_stuff character is a punctuation&prepunct
+    // Or prepunctuation, and move it to tok_punc if necessary.
+    for (c=tok_stuff.vec.back();
+	 CLASS2(c,'$','"');
+	 c=tok_stuff.vec.back()
+	)
+    {
+	tok_stuff.vec.pop_back();
+//	cout << "debug: popping " << (char) c << endl;
+	tok_punc.vec.push_back(c);
+    }
+    return 0;
+}
+
+int EST_TokenStream::get_tok_string()
+{
+    bool goon=true;
+    char classCP;
+    UnicodeChar c;
+    bool escaping;
+
+    c=peekch();
+//    cout << "debug tok_string peekch: " << (char) c << endl;
+    if ( (current_tok.quoted() == FALSE) && p_table.CheckCP(c) == '@')
+    {
+	getch();
+	tok_stuff.vec.push_back(c);
+	get_tok_finish();
+	return -1;
+    }
+    
+    while(goon)
+    {
+//	cout << "debug: tok_stuff: |" << (EST_String) tok_stuff << "|" << endl;
+	c=getch();
+//	cout << "debug tok_string: " << c << endl;
+	if ( (current_tok.quoted() == TRUE) && (c==quote))
+	{
+	    get_tok_finish();
+	    return -1;
+	}
+	
+	if ( (current_tok.quoted() == TRUE ) && (c==escape) )
+	{
+	    c=getch();
+	    escaping=true;
+	}
+	else
+	    escaping=false;
+	
+	switch ( classCP=p_table.CheckCP(c) )
+	{
+	  case '@':
+	    if (current_tok.quoted() == TRUE )
+	    {
+		tok_stuff.vec.push_back(c);
+		break;
+	    }
+	    else
+	    {
+		tok_stuff.vec.push_back(c);
+		get_tok_finish();
+		return -1;
+	    }
+	    break;
+	  case '\0':
+	  case '$': // Prepunct // Apostrophes can be in the middle.
+	  case '"': // defined both prepunct and punct. // Apostrophe...
+	    tok_stuff.vec.push_back(c);
+	    break;
+	  case ' ': // WhiteSpaces are ignored on quoted Tokens.
+	    if ( (current_tok.quoted() == TRUE ) ) 
+	    {
+		tok_stuff.vec.push_back(c);
+		break;
+	    }
+	    else
+	    {
+		goon=false;
+		break;
+	    }
+	  case '.': // Punctuation
+	    if ( (current_tok.quoted() == TRUE ) ) 
+	    {
+		tok_stuff.vec.push_back(c);
+		break;
+	    }
+	  case '!':
+//	    cout << "debug : I see the end" << endl;
+	    // End of file reached. 
+	  default :
+	    goon=false;
+	    break;
+	}
+	if (p_table.CheckCP(peekch()) == '@')
+	{
+	    if (classCP == ' ' || classCP == '$') ungetch(c,escaping);
+	    mv_stuff_punc();
+	    get_tok_finish();
+	    return -1;
+	}
+    }
+    ungetch(c,escaping);
+//    cout << "debug: tok_stuff: |" << (EST_String) tok_stuff << "|" << endl;
+
+    mv_stuff_punc();
+    
+    if ( classCP == '!')
+    {
+//	cout << "debug: end of file" << endl;
+	is->setstate(ios::eofbit); // Just in case.
+	get_tok_finish();
+	return -1;
+    }
+    
+    return 0;
+}
+
+int EST_TokenStream::get_tok_punc()
+{
+    bool goon=true;
+    char classCP;
+    UnicodeChar c;
+    std::vector<UnicodeChar> temp;
+
+    /* There are many different cases:
+     * For "punctuation" characters that are not defined as "prepunctuation":
+     * "a token here" -> token does not have punc
+     * "a token, here" -> token has "," as punc
+     * "a token , here" -> token has a space that we have to ignore and punc
+     * "a token ,here" -> needs fixing also.
+     * 
+     * For characters defined both in punc and prepunc:
+     * "a 'token' here" -> token has prepunct=' and punc='
+     * "a ' token ' here -> token has prepunct=' and we can't know for sure if the second
+     *   "'" belongs to "token" or to "here".
+     */
+    while(goon)
+    {
+	c=getch();
+//        cout << "debug tok_punc first: " << (char) c << endl;
+	switch ( classCP=p_table.CheckCP(c) )
+	{
+	  case '.': // Punctuation
+	  case '"': // defined both prepunct and punct.
+	     tok_punc.vec.push_back(c);
+	     break;
+
+	  case ' ': // WhiteSpace.
+	    goon=false;
+	    break;
+	  case '!': // End of file reached. 
+	    is->setstate(ios::eofbit); // Just in case.
+	    get_tok_finish();
+	    return -1;
+	    break;
+	  case '\0': // Regular character
+	  case '$': // Prepunct
+	  default:
+	    ungetch(c);
+	    get_tok_finish();
+	    return -1;
+	    break;
+	}
+    }
+    temp.push_back(c);
+    
+    goon=true;
+    while(goon)
+    {
+	c=getch();
+//        cout << "debug tok_punc second: " << (char) c << endl;
+	switch ( classCP=p_table.CheckCP(c) )
+	{
+	  case '.': // Punctuation
+	     tok_punc.vec.push_back(c);
+	     temp.clear(); // If there is a punc character, all the spaces before are ignored.
+	     break;
+	  case ' ': // WhiteSpace.
+	    temp.push_back(c);
+	    break;
+	  case '!': // End of file reached. 
+	    temp.push_back(c);
+	    goon=false;
+	    break;
+	  case '@': // A SingleChar belongs to the next token.
+	  case '\0': // Regular character
+	  case '$': // Prepunct
+	  case '"': // defined both prepunct and punct.
+	  default:
+	    temp.push_back(c);
+	    goon=false;
+	    break;
+	}
+    }
+    
+    while(temp.empty()==false)
+    {
+	c=temp.back();
+	temp.pop_back();
+	ungetch(c);
+//	cout << "debug ungetting: |" << (char) c << "|" << endl;
+    }
+	
+    
+    if ( p_table.CheckCP(c) == '!')
+    {
+	is->setstate(ios::eofbit); // Just in case.
+	get_tok_finish();
+	return -1;
+    }
+    
+    return 0;
+}
+
+
+EST_Token &EST_TokenStream::get(void)
+{
+    if (peeked_tokp)
+    {
+	peeked_tokp = FALSE;
+	return current_tok;
     }
 
+    clear_tok_buffers();
+    current_tok.init();
+    
+    if (get_tok_wspace() !=0) return current_tok;
+    if (get_tok_prepunct() != 0) return current_tok;
+    if (get_tok_string() != 0 ) return current_tok;
+    if (get_tok_punc() != 0 ) return current_tok;
+    
+    get_tok_finish();
     return current_tok;
 }
 

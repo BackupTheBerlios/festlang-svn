@@ -66,6 +66,9 @@ TSRCS = list_i_t.cc list_si_t.cc list_f_t.cc list_d_t.cc \
 	\
 	deq_s_t.cc deq_i_t.cc \
 	\
+	token.cc
+	\
+
 
 #	kvl_srcfmp_t.cc kvl_scsmm_t.cc matrix_c_t.cc 
 

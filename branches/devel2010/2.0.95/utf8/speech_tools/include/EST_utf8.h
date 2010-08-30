@@ -47,6 +47,18 @@
 #define ErrUnicodeChar 0xE000  // First character from the Unicode Private Use Area
                                // We use it as an EOF mark.
 
+#define Instantiate_Tutf8_global(ITERAT) \
+	template utf8::internal::utf_error utf8::internal::validate_next<ITERAT>(ITERAT &, ITERAT, utf8::uint32_t *); \
+	template utf8::internal::utf_error utf8::internal::get_sequence_1<ITERAT>(ITERAT &, ITERAT, utf8::uint32_t*); \
+	template utf8::internal::utf_error utf8::internal::get_sequence_2<ITERAT>(ITERAT &, ITERAT, utf8::uint32_t*); \
+	template utf8::internal::utf_error utf8::internal::get_sequence_3<ITERAT>(ITERAT &, ITERAT, utf8::uint32_t*); \
+	template utf8::internal::utf_error utf8::internal::get_sequence_4<ITERAT>(ITERAT &, ITERAT, utf8::uint32_t*);
+
+
+#define Instantiate_Tutf8_next(ITERAT) \
+	template utf8::uint32_t utf8::next<ITERAT>(ITERAT &, ITERAT); \
+	Instantiate_Tutf8_global(ITERAT)
+
 namespace EST
 {
 typedef utf8::uint32_t UnicodeChar;

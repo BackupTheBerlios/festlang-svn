@@ -49,7 +49,7 @@ static void find_tokens(EST_TokenStream &ts)
     int tokens;
     EST_Token tok;
 
-    for (tokens=0; !ts.eof(); tokens++)
+    for (tokens=0; ts.good(); tokens++)
     {
         tok=ts.get();
         cout << "Token " << tokens << endl;
@@ -131,6 +131,22 @@ a\" te\\\"st.";
     ts.set_quotes('"','\\');
     find_tokens(ts);
     ts.close();
+    
+    s = "This is a test.";
+    cout << "Test 9: " << quote_string(s) << endl;
+    ts.open_string(s);
+/*    ts.set_WhiteSpaceChars(EST_Token_Default_WhiteSpaceCharsUTF8);
+    ts.set_SingleCharSymbols(EST_Token_Default_SingleCharSymbolsUTF8);
+    ts.set_PunctuationSymbols(EST_Token_Default_PunctuationSymbolsUTF8);
+    ts.set_PrePunctuationSymbols(EST_Token_Default_PrePunctuationSymbolsUTF8);
+*/
+    ts.set_WhiteSpaceChars(EST_Token_Default_WhiteSpaceChars);
+    ts.set_SingleCharSymbols(EST_String::Empty);
+    ts.set_PunctuationSymbols(EST_String::Empty);
+    ts.set_PrePunctuationSymbols(EST_String::Empty);
+    ts.set_isutf8(true);
+    find_tokens(ts);
+    ts.close();
 
     // test of reading binary data
     binary_read_test();
@@ -191,6 +207,7 @@ static void binary_read_test()
 	cout << "failed to read binary data, missing BINARY token." << endl;
 	exit(-1);
     }
+    ts.ignore(1); // Ignore whitespace
     ts.fread(b,sizeof(int),2);
     cout << b[0] << endl;
     cout << b[1] << endl;
@@ -209,6 +226,7 @@ static void binary_read_test()
 	cout << "failed to read binary data, missing BINARY token." << endl;
 	exit(-1);
     }
+    ts.ignore(1); // Ignore whitespace
     ts.fread(b,sizeof(int),2);
     cout << b[0] << endl;
     cout << b[1] << endl;

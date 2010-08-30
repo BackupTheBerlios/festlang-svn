@@ -154,7 +154,7 @@ static int set_Vertex_Feats(EST_Track &wgn_VertexFeats,
         {
             printf("wagon: track_feats invalid: %s at position %d\n",
                    (const char *)wagon_track_features,
-                   (int) ts.StreamPosition());
+                   (int) ts.tell());
             exit(-1);
         }
     }

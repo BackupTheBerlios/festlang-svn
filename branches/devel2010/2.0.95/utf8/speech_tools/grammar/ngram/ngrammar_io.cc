@@ -190,7 +190,7 @@ load_ngram_arpa(const EST_String filename, EST_Ngrammar &n, const EST_StrList &v
 	    if (!ts.eoln())
 	    {
 		cerr << "EST_Ngrammar:load_ngram_arpa expect end of line at filepos "
-		    << ts.StreamPosition() << endl;
+		    << ts.tell() << endl;
 		ts.close();
 		return misc_read_error;
 	    }
@@ -259,7 +259,7 @@ load_ngram_cstr_ascii(const EST_String filename, EST_Ngrammar &n)
 	if (ts.get().string() != ":")
 	{
 	    cerr << "EST_Ngrammar:load_ngram_cstr_ascii missing colon at filepos "
-		<< ts.StreamPosition() << endl;
+		<< ts.tell() << endl;
 	    return misc_read_error;
 	}
 	occur = atof(ts.get().string());
@@ -267,7 +267,7 @@ load_ngram_cstr_ascii(const EST_String filename, EST_Ngrammar &n)
 	if (!ts.eoln())
 	{
 	    cerr << "EST_Ngrammar:load_ngram_cstr_ascii expect end of line at filepos "
-		<< ts.StreamPosition() << endl;
+		<< ts.tell() << endl;
 	    return misc_read_error;
 	}
     }

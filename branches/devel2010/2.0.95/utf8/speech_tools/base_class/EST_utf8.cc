@@ -45,9 +45,12 @@ char* cp2utf8(UnicodeChar cp,char *utf8string,bool appendzero)
 {
     char *t;
     t=utf8::append(cp,utf8string);
-    *t='\0';
-    return t+1;
-
+    if (appendzero==true) 
+    {
+	*t='\0';
+	return t+1;
+    } else
+	return t;
 }
 
 int append (UnicodeChar cp, bool is_utf8, EST_String &st)
@@ -105,4 +108,18 @@ int getprevcp(char *st_begin, char *st,
 	return st-it;
     }
 }
+/*
+ostream& operator<<(ostream& s, UnicodeChar &p)
+{
+    if ( p < 256)
+	s << (char) p;
+    else
+    {
+	char utf8string[5];
+	cp2utf8(p,utf8string,true);
+	s << utf8string;
+    }
+    return s;
 }
+*/
+} // End of namespace EST.
