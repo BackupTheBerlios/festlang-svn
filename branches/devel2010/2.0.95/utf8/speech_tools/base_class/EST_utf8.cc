@@ -38,13 +38,25 @@
 /*=======================================================================*/
 
 #include <iostream>
+#include <exception>
 #include "EST_utf8.h"
+
+using std::cerr;
+using std::cout;
+using std::endl;
 
 namespace EST {
 char* cp2utf8(UnicodeChar cp,char *utf8string,bool appendzero)
 {
     char *t;
-    t=utf8::append(cp,utf8string);
+    try {
+	t=utf8::append(cp,utf8string);
+    }
+    catch(const utf8::exception& utfcpp_ex) {
+	cerr << utfcpp_ex.what() << endl <<
+	 "Exception at EST_utf8.cc in function cp2utf8" << endl;
+	throw utfcpp_ex;
+    }
     if (appendzero==true) 
     {
 	*t='\0';
@@ -67,6 +79,7 @@ int append (UnicodeChar cp, bool is_utf8, EST_String &st)
 	st+=utf8char;
 	return 0;
     }
+
 }
 
 int append (std::vector<UnicodeChar> vec, bool is_utf8, EST_String &st)
@@ -78,7 +91,7 @@ int append (std::vector<UnicodeChar> vec, bool is_utf8, EST_String &st)
     return 0;
 }
 
-
+/*
 int getnextcp(char *st, bool is_utf8, UnicodeChar &cp)
 {
     if (is_utf8 ==false)
@@ -108,6 +121,8 @@ int getprevcp(char *st_begin, char *st,
 	return st-it;
     }
 }
+*/
+
 /*
 ostream& operator<<(ostream& s, UnicodeChar &p)
 {

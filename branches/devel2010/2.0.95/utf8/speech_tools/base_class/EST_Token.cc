@@ -40,6 +40,7 @@
 /*=======================================================================*/
 #include <cstdio>
 #include <iostream>
+#include <exception>
 #include "EST_unix.h"
 #include <cstdlib>
 #include <climits>
@@ -64,10 +65,10 @@ const EST_String EST_Token_Default_SingleCharSymbols = "(){}[]";
 const EST_String EST_Token_Default_PrePunctuationSymbols = "\"'`({[";
 const EST_String EST_Token_Default_PunctuationSymbols = "\"'`.,:;!?]})";
 
-const EST_String EST_Token_Default_WhiteSpaceCharsUTF8 = " \t\n\r             ​  ⁠";
+const EST_String EST_Token_Default_WhiteSpaceCharsUTF8 = " \t\n\r            ​  ⁠";
 const EST_String EST_Token_Default_SingleCharSymbolsUTF8 = "";
 const EST_String EST_Token_Default_PrePunctuationSymbolsUTF8 = "\"'([{«ʻ‹¿¡`";
-const EST_String EST_Token_Default_PunctuationSymbolsUTF8 = "!\"'(),.:;¿?[]`{}¡§«»­ʹʺʻʼʽ؟჻᛫᛬᛭⁕⁖⁗⁘⁙⁚⁛⁜⁝⁞‹›※‼‽⁅⁆⁇⁈⁉";
+const EST_String EST_Token_Default_PunctuationSymbolsUTF8 = "!\"'(),.:;?]`}§»­ʹʺʻʼʽ؟჻᛫᛬᛭⁕⁖⁗⁘⁙⁚⁛⁜⁝⁞‹›※‼‽⁅⁆⁇⁈⁉";
 
 const EST_String Token_Origin_FD = "existing file descriptor";
 const EST_String Token_Origin_Stream = "existing istream";
@@ -193,16 +194,19 @@ void EST_TokenTable::InsertCP(UnicodeChar cp, TokenTableLUT::mapped_type newclas
     }
 }
 
-void EST_TokenTable::InsertCharSt(EST_String st, const char newclass)
+void EST_TokenTable::InsertCharSt(EST_String &st, const char newclass)
 {
-	char *p;
-	for (p=st; *p;++p) InsertCP((UnicodeChar) *p, newclass);
+    char *p;
+    for (p=st; *p;++p) InsertCP((UnicodeChar) *p, newclass);
 }
 
-void EST_TokenTable::InsertUtf8St(EST_String st,const char newclass)
+void EST_TokenTable::InsertUtf8St(EST_String &st,const char newclass)
 {
-	utf8::iterator<char*> p(st,st,(char*) st+sizeof(st));
-	for(;*p;++p) InsertCP(*p, newclass);
+    utf8::iterator<char*> p(st,st,(char*) st+st.length());
+    utf8::iterator<char*> end((char*) st+st.length(),st,(char*) st+st.length());
+
+    for (;p!=end;++p)
+	InsertCP(*p, newclass);
 }
 
 void EST_TokenTable::print_table()
@@ -223,17 +227,17 @@ void EST_TokenTable::build_tables()
 	p_LUT.clear();
 	if(p_isutf8==false)
 	{
-		InsertCharSt(p_WhiteSpaceChars,' ');
-		InsertCharSt(p_SingleCharSymbols,'@');
-		InsertCharSt(p_PunctuationSymbols,'.');
-		InsertCharSt(p_PrePunctuationSymbols,'$');
+	    InsertCharSt(p_WhiteSpaceChars,' ');
+	    InsertCharSt(p_SingleCharSymbols,'@');
+	    InsertCharSt(p_PunctuationSymbols,'.');
+	    InsertCharSt(p_PrePunctuationSymbols,'$');
 	}
 	else
 	{
-		InsertUtf8St(p_WhiteSpaceChars,' ');
-		InsertUtf8St(p_SingleCharSymbols,'@');
-		InsertUtf8St(p_PunctuationSymbols,'.');
-		InsertUtf8St(p_PrePunctuationSymbols,'$');
+	    InsertUtf8St(p_WhiteSpaceChars,' ');
+	    InsertUtf8St(p_SingleCharSymbols,'@');
+	    InsertUtf8St(p_PunctuationSymbols,'.');
+	    InsertUtf8St(p_PrePunctuationSymbols,'$');
 	}
 	InsertCP(ErrUnicodeChar,'!');
 	p_LUT_wrong=false;
@@ -712,7 +716,6 @@ UnicodeChar EST_TokenStream::getch_internal()
 {
     // Gets the next Code Point or char from the stream.
     UnicodeChar cp;
-        
     switch (type)
     {
       case tst_none: 
@@ -737,8 +740,16 @@ UnicodeChar EST_TokenStream::getch_internal()
 	{
 		std::istreambuf_iterator<char> it (*is);
 		std::istreambuf_iterator<char> eos;
-		if (it != eos) {
-			cp = utf8::next(it,eos);
+		if (it != eos ) {
+			try {
+			    cp = utf8::next(it,eos);
+			}
+			catch(const utf8::exception& utfcpp_ex) {
+			    cerr << utfcpp_ex.what() << endl <<
+			     "Exception at getch_internal doing utf8::next" << endl;
+			    throw utfcpp_ex;
+			}
+
 			if (it == eos) is->setstate(ios::eofbit);
 			return cp;
 		} else {
@@ -806,7 +817,6 @@ int EST_TokenStream::clear_tok_buffers(void)
 
 int EST_TokenStream::get_tok_finish(void)
 {
-//    cout << "debug: Finishing token" << endl;
     current_tok.set_whitespace((EST_String) tok_wspace);
     current_tok.set_token((EST_String) tok_stuff);
     current_tok.set_punctuation((EST_String) tok_punc);
@@ -824,7 +834,6 @@ int EST_TokenStream::get_tok_wspace()
     while(goon)
     {
 	c=getch();
-//	cout << "debug tokwspace: |" << (char) c << "|" << endl;
 	switch ( classCP=p_table.CheckCP(c) )
 	{
 	  case ' ': 
@@ -838,13 +847,10 @@ int EST_TokenStream::get_tok_wspace()
 	    break;
 	}
     }
-//    cout << "debug: parentesis:" << (char) c << endl;
     ungetch(c);
-//    cout << "debug: test1: |" << (EST_String) tok_wspace << "|" << endl;
     
     if (tok_wspace.vec.front() == '\0') // feature paths will have null whitespace
 	tok_wspace.vec.clear();
-//    cout << "debug: test2: |" << (EST_String) tok_wspace << "|" << endl;
     current_tok.set_streampos(tmpposition);
     
     if ( classCP == '!')
@@ -865,7 +871,6 @@ int EST_TokenStream::get_tok_prepunct()
     bool escaping;
 
     c=peekch();
-//    cout << "debug tokwprepunct peek: " << (char) c << endl;
     if ( (quotes) && (c==quote))
     {
 	getch();
@@ -874,7 +879,6 @@ int EST_TokenStream::get_tok_prepunct()
     
     if ( (current_tok.quoted() == FALSE) && p_table.CheckCP(c) == '@')
     {
-//	cout << "debug: parentesis" << (char) c << endl; 
 	getch();
 	tok_stuff.vec.push_back(c);
 	get_tok_finish();
@@ -884,7 +888,6 @@ int EST_TokenStream::get_tok_prepunct()
     while(goon)
     {
 	c=getch();
-//    	cout << "debug tok_prepunct: " << (char) c << endl;	
 	if ( (current_tok.quoted() == TRUE ) && (c==quote) )
 	{
 	    get_tok_finish();
@@ -959,7 +962,6 @@ int EST_TokenStream::get_tok_string()
     bool escaping;
 
     c=peekch();
-//    cout << "debug tok_string peekch: " << (char) c << endl;
     if ( (current_tok.quoted() == FALSE) && p_table.CheckCP(c) == '@')
     {
 	getch();
@@ -970,9 +972,7 @@ int EST_TokenStream::get_tok_string()
     
     while(goon)
     {
-//	cout << "debug: tok_stuff: |" << (EST_String) tok_stuff << "|" << endl;
 	c=getch();
-//	cout << "debug tok_string: " << c << endl;
 	if ( (current_tok.quoted() == TRUE) && (c==quote))
 	{
 	    get_tok_finish();
@@ -1025,7 +1025,6 @@ int EST_TokenStream::get_tok_string()
 		break;
 	    }
 	  case '!':
-//	    cout << "debug : I see the end" << endl;
 	    // End of file reached. 
 	  default :
 	    goon=false;
@@ -1040,13 +1039,11 @@ int EST_TokenStream::get_tok_string()
 	}
     }
     ungetch(c,escaping);
-//    cout << "debug: tok_stuff: |" << (EST_String) tok_stuff << "|" << endl;
 
     mv_stuff_punc();
     
     if ( classCP == '!')
     {
-//	cout << "debug: end of file" << endl;
 	is->setstate(ios::eofbit); // Just in case.
 	get_tok_finish();
 	return -1;
@@ -1077,7 +1074,6 @@ int EST_TokenStream::get_tok_punc()
     while(goon)
     {
 	c=getch();
-//        cout << "debug tok_punc first: " << (char) c << endl;
 	switch ( classCP=p_table.CheckCP(c) )
 	{
 	  case '.': // Punctuation
@@ -1108,7 +1104,6 @@ int EST_TokenStream::get_tok_punc()
     while(goon)
     {
 	c=getch();
-//        cout << "debug tok_punc second: " << (char) c << endl;
 	switch ( classCP=p_table.CheckCP(c) )
 	{
 	  case '.': // Punctuation
@@ -1138,7 +1133,6 @@ int EST_TokenStream::get_tok_punc()
 	c=temp.back();
 	temp.pop_back();
 	ungetch(c);
-//	cout << "debug ungetting: |" << (char) c << "|" << endl;
     }
 	
     

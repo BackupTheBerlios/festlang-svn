@@ -42,6 +42,7 @@
 #include "EST_Token.h"
 
 static void binary_read_test();
+static void test_utf8();
 
 static void find_tokens(EST_TokenStream &ts)
 {
@@ -132,21 +133,7 @@ a\" te\\\"st.";
     find_tokens(ts);
     ts.close();
     
-    s = "This is a test.";
-    cout << "Test 9: " << quote_string(s) << endl;
-    ts.open_string(s);
-/*    ts.set_WhiteSpaceChars(EST_Token_Default_WhiteSpaceCharsUTF8);
-    ts.set_SingleCharSymbols(EST_Token_Default_SingleCharSymbolsUTF8);
-    ts.set_PunctuationSymbols(EST_Token_Default_PunctuationSymbolsUTF8);
-    ts.set_PrePunctuationSymbols(EST_Token_Default_PrePunctuationSymbolsUTF8);
-*/
-    ts.set_WhiteSpaceChars(EST_Token_Default_WhiteSpaceChars);
-    ts.set_SingleCharSymbols(EST_String::Empty);
-    ts.set_PunctuationSymbols(EST_String::Empty);
-    ts.set_PrePunctuationSymbols(EST_String::Empty);
-    ts.set_isutf8(true);
-    find_tokens(ts);
-    ts.close();
+    test_utf8();
 
     // test of reading binary data
     binary_read_test();
@@ -236,4 +223,85 @@ static void binary_read_test()
 
 }
 
+static void test_utf8()
+{
+    EST_TokenStream ts;
+    EST_String s;
 
+    // Basic tokenizing tasks changing punctuation, whitespace and
+    // single character symbols etc.
+    s = "This is a test.";
+    cout << "Test 1: " << quote_string(s) << endl;
+    ts.open_string(s);
+    ts.set_isutf8(true);
+    find_tokens(ts);
+    ts.close();
+
+    s = "This (is) a test.";
+    cout << "Test 2: " << quote_string(s) << endl;
+    ts.open_string(s);
+    ts.set_isutf8(true);
+    find_tokens(ts);
+    ts.close();
+
+    s = "This (is) a test.";
+    cout << "Test 3: " << quote_string(s) << endl;
+    ts.open_string("This (is) a test.");
+    ts.set_isutf8(true);
+    ts.set_PrePunctuationSymbols("({[");
+    ts.set_PunctuationSymbols(EST_Token_Default_PunctuationSymbolsUTF8);
+    find_tokens(ts);
+    ts.close();
+
+    s = "This (is) a test.";
+    cout << "Test 4: " << quote_string(s) << endl;
+    ts.open_string(s);
+    ts.set_isutf8(true);
+    ts.set_SingleCharSymbols("()");
+    ts.set_PunctuationSymbols(EST_Token_Default_PunctuationSymbolsUTF8);
+    find_tokens(ts);
+    ts.close();
+
+    s = "This \"is a\" te\\\"st.";
+    cout << "Test 5: " << quote_string(s) << endl;
+    ts.open_string(s);
+    ts.set_isutf8(true);
+    ts.set_PrePunctuationSymbols(EST_Token_Default_PrePunctuationSymbolsUTF8);
+    ts.set_PunctuationSymbols(EST_Token_Default_PunctuationSymbolsUTF8);
+    find_tokens(ts);
+    ts.close();
+
+    s = "This \"is a\" te\\\"st.";
+    cout << "Test 6: " << quote_string(s) << endl;
+    ts.open_string(s);
+    ts.set_isutf8(true);
+    ts.set_quotes('"','\\');
+    find_tokens(ts);
+    ts.close();
+
+    s = "This \"is \n\
+a\" te\\\"st.";
+    cout << "Test 7: " << quote_string(s) << endl;
+    ts.open_string(s);
+    ts.set_isutf8(true);
+    ts.set_quotes('"','\\');
+    find_tokens(ts);
+    ts.close();
+
+    s = "This. \"is a\" te\\\"st.";
+    cout << "Test 8: " << quote_string(s) << endl;
+    ts.open_string(s);
+    ts.set_isutf8(true);
+    ts.set_quotes('"','\\');
+    find_tokens(ts);
+    ts.close();
+    
+    s = "This «is a» te\\\"st‼";
+    cout << "Test 9: " << quote_string(s) << endl;
+    ts.open_string(s);
+    ts.set_isutf8(true);
+    ts.set_quotes('"','\\');
+    find_tokens(ts);
+    ts.close();
+
+}

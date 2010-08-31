@@ -256,8 +256,8 @@ class EST_TokenTable {
 	  TokenTableLUT p_LUT;
 	  
 	  void build_tables();
-	  void InsertCharSt(EST_String, char);
-	  void InsertUtf8St(EST_String, char);
+	  void InsertCharSt(EST_String&, char);
+	  void InsertUtf8St(EST_String&, char);
 	  void InsertCP(UnicodeChar cp, TokenTableLUT::mapped_type newclass);
 	  void TwoClassWarn(UnicodeChar cp, TokenTableLUT::mapped_type oldclass, 
                         TokenTableLUT::mapped_type newclass);
@@ -463,12 +463,22 @@ class EST_TokenStream{
           tok_wspace.set_isunicode(isutf8);
           tok_stuff.set_isunicode(isutf8);
           tok_prepuncs.set_isunicode(isutf8);
+          tok_punc.set_isunicode(isutf8);
         }
     /// set characters to be used as quotes and escape, and set quote mode
     void set_quotes(char q, char e) 
          { quotes = TRUE; quote = (UnicodeChar) q; escape = (UnicodeChar) e;}
     void set_quotes(UnicodeChar q, UnicodeChar e)
          { quotes = TRUE; quote = q; escape = e;}
+    void set_quotes(char *q, char *e)
+    {
+        UnicodeChar q1,e1;
+        char *it=q;
+        q1=utf8::next(it,it+sizeof(it));
+        it=e;
+        e1=utf8::next(it,it+sizeof(it));
+        set_quotes(q1,e1);
+    }
     /// query quote mode
     int quoted_mode(void) { return quotes; }
     void ignore(unsigned int numcp)
