@@ -39,6 +39,7 @@
 /************************************************************************/
 
 #include <cstdlib>
+#include <iostream>
 #include "EST_Token.h"
 
 #if defined(DATAC)
@@ -80,7 +81,7 @@ int main(int argc,char **argv)
     // you'll probably want to modify the punctuation
     // \173 is '{', it is inserted by number because of a doc++ problem.
 
-    ts.set_PrePunctuationSymbols("\173[(\"'");
+    ts.set_PrePunctuationSymbols("\173[(\"'`");
     ts.set_PunctuationSymbols(EST_Token_Default_PunctuationSymbols);
 
     // Note you may set quotes so quoted tokens are read as single
@@ -89,6 +90,8 @@ int main(int argc,char **argv)
     for (tokens=quotes=alices=0; !ts.eof(); tokens++)
     {
 	t = ts.get();
+	t.print(std::cout);
+	std::cout << std::endl;
 	if (t == "Alice")
 	    alices++;
 	if (t.prepunctuation().contains("\""))

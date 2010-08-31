@@ -121,16 +121,26 @@ class EST_Token {
     void set_punctuation(const EST_String &p) { punc = p; }
     /// 
     void set_punctuation(const char *p) { punc = p; }
-    /// set prepunction
+    /// set prepunctuation
     void set_prepunctuation(const EST_String &p) { prepunc = p; }
     ///
     void set_prepunctuation(const char *p) { prepunc = p; }
     ///
+    /// return general information about the Token
     const EST_String &whitespace() { return space; }
     ///
     const EST_String &punctuation() { return punc; }
     ///
     const EST_String &prepunctuation() { return prepunc; }
+    /// Print to an ostream all the basic information:
+    ostream& print(ostream &s)
+    {
+        s << "[TOKEN    name:  |" << pname << "| ]"  << std::endl <<
+             "[TOKEN   space: |" << space << "| ]"   << std::endl <<
+             "[TOKEN prepunc: |" << prepunc << "| ]" << std::endl <<
+             "[TOKEN    punc: |" << punc << "| ]"    << std::endl;
+    return s;
+    }
 
     /**@name Access token as a string */
     //@{

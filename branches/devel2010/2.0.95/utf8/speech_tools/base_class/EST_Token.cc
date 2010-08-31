@@ -941,18 +941,13 @@ int EST_TokenStream::get_tok_prepunct()
 
 int EST_TokenStream::mv_stuff_punc()
 {
+    std::vector<UnicodeChar>::iterator it(tok_stuff.vec.end());
     UnicodeChar c;
     // Check if the last tok_stuff character is a punctuation&prepunct
     // Or prepunctuation, and move it to tok_punc if necessary.
-    for (c=tok_stuff.vec.back();
-	 CLASS2(c,'$','"');
-	 c=tok_stuff.vec.back()
-	)
-    {
-	tok_stuff.vec.pop_back();
-//	cout << "debug: popping " << (char) c << endl;
-	tok_punc.vec.push_back(c);
-    }
+    do 	c=*(--it); while (CLASS2(c,'$','"'));
+    tok_punc.vec.insert(tok_punc.vec.end(),++it,tok_stuff.vec.end());
+    tok_stuff.vec.erase(it,tok_stuff.vec.end());
     return 0;
 }
 
