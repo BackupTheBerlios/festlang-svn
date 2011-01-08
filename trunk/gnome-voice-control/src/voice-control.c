@@ -534,13 +534,15 @@ int main (int argc, char *argv [])
  	context = g_option_context_new (_("- voice control applet"));
  	g_option_context_add_main_entries (context, applet_control_options, GETTEXT_PACKAGE);
  	g_option_context_add_group (context, gst_init_get_option_group());
+ 	g_option_context_add_group (context, gtk_get_option_group (TRUE));
+
+	if (!g_option_context_parse (context, &argc, &argv, &error)) {
+	   g_error (_("Option parsing failed: %s\n"), error->message);
+	   exit (1);
+	}
 
 	gtk_init (&argc, &argv);						
-	if (!bonobo_init (&argc, argv)) {					
-		g_printerr ("Cannot initialize bonobo.n");
-		g_option_context_free (context);
-		return 1;							
-	}									
+
 	gst_init (&argc, &argv);
 
 	gtk_icon_theme_append_search_path (gtk_icon_theme_get_default (),
@@ -551,13 +553,13 @@ int main (int argc, char *argv [])
 
 	if (o_window) {	
 		window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-		gtk_window_set_title(GTK_WINDOW(window), "Voice Control");
+		gtk_window_set_title(GTK_WINDOW(window), _("Voice Control"));
 		g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK (gtk_main_quit), NULL);
 
 		applet = g_object_new(voice_control_applet_get_type(), NULL);
 		
-		gtk_widget_set_size_request (GTK_WIDGET (window), 50, 50);
+		gtk_widget_set_size_request (GTK_WIDGET (window), 250, 50);
 		
 		retval = voice_control_applet_factory(PANEL_APPLET (applet), NULL, NULL);
 	

@@ -21,8 +21,7 @@ INCLUDES =					\
 	$(DISABLE_DEPRECATED)					\
 	$(GNOME_PANEL_CFLAGS)					\
 	$(GST_CFLAGS)						\
-	$(POCKETSPHINX_CFLAGS)					\
-	$(FR_CFLAGS)
+	$(POCKETSPHINX_CFLAGS)
 
 
 voice_control_applet_LDADD = \
