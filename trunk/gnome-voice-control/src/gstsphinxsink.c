@@ -389,9 +389,17 @@ void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *phrases)
 	sink->fsg = gst_sphinx_construct_fsg (sink, phrases);
 
         fsgs = ps_get_fsgset(sink->decoder);
+
         fsg_set_remove_byname(fsgs, "desktop-control");
         fsg_set_add(fsgs, fsg_model_name(sink->fsg), sink->fsg);
-        fsg_set_select(fsgs, fsg_model_name(sink->fsg));
+        
+        if (!fsg_set_select(fsgs, fsg_model_name(sink->fsg))) {
+#if DEBUG
+    	        g_message("Failed to configure grammar");
+#endif
+    		exit(1);
+    	}
+        
         ps_update_fsgset (sink->decoder);
 #if DEBUG
 	g_message ("New fsg is set");

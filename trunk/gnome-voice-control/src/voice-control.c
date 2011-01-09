@@ -166,6 +166,10 @@ on_sink_after_initialization (VoiceControlApplet *voice_control)
 {
 	GSList *commands;
 	
+	// Set this in main thread as well, sphinxbase doesn't do that automatically unfortunately
+	// for all the threads. Only main thread which called ps_init dumps to stderr
+	err_set_logfp(stderr);
+
 	commands = voice_control_action_append_commands (NULL);	
 	gst_sphinx_sink_set_fsg (GST_SPHINX_SINK(voice_control->sink), commands);
 	g_slist_free (commands);
@@ -537,8 +541,8 @@ int main (int argc, char *argv [])
  	g_option_context_add_group (context, gtk_get_option_group (TRUE));
 
 	if (!g_option_context_parse (context, &argc, &argv, &error)) {
-	   g_error (_("Option parsing failed: %s\n"), error->message);
-	   exit (1);
+		g_error (_("Failed to parse option: %s\n"), error->message);
+		exit (1);
 	}
 
 	gtk_init (&argc, &argv);						
