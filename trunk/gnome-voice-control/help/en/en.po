@@ -1,0 +1,428 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2010-12-02 14:08+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. When image changes, this message will be marked fuzzy or untranslated for you.
+#. It doesn't matter what you translate it to: it's not used at all.
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:148(None)
+msgid "@@image: '/home/ken-ichi/gvc_idle.png'; md5=THIS FILE DOESN'T EXIST"
+msgstr ""
+
+#. When image changes, this message will be marked fuzzy or untranslated for you.
+#. It doesn't matter what you translate it to: it's not used at all.
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:163(None)
+msgid "@@image: '/home/ken-ichi/gvc_init-calib.png'; md5=THIS FILE DOESN'T EXIST"
+msgstr ""
+
+#. When image changes, this message will be marked fuzzy or untranslated for you.
+#. It doesn't matter what you translate it to: it's not used at all.
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:177(None)
+msgid "@@image: '/home/ken-ichi/gvc_ready.png'; md5=THIS FILE DOESN'T EXIST"
+msgstr ""
+
+#. When image changes, this message will be marked fuzzy or untranslated for you.
+#. It doesn't matter what you translate it to: it's not used at all.
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:201(None)
+msgid "@@image: '/home/ken-ichi/gvc_listening.png'; md5=THIS FILE DOESN'T EXIST"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:22(title)
+msgid "Voice Control Applet Manual"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:24(para)
+msgid "Voice Control Applet allows you to control desktop with voice."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:28(year)
+msgid "2007"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:29(holder) /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:56(para)
+msgid "Nickolay V. Shmyrev"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:33(publishername)
+msgid "GNOME Documentation Project"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:2(para)
+msgid "Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License (GFDL), Version 1.1 or any later version published by the Free Software Foundation with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts. You can find a copy of the GFDL at this <ulink type=\"help\" url=\"ghelp:fdl\">link</ulink> or in the file COPYING-DOCS distributed with this manual."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:12(para)
+msgid "This manual is part of a collection of GNOME manuals distributed under the GFDL. If you want to distribute this manual separately from the collection, you can do so by adding a copy of the license to the manual, as described in section 6 of the license."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:19(para)
+msgid "Many of the names used by companies to distinguish their products and services are claimed as trademarks. Where those names appear in any GNOME documentation, and the members of the GNOME Documentation Project are made aware of those trademarks, then the names are in capital letters or initial capital letters."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:35(para)
+msgid "DOCUMENT IS PROVIDED ON AN \"AS IS\" BASIS, WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, WITHOUT LIMITATION, WARRANTIES THAT THE DOCUMENT OR MODIFIED VERSION OF THE DOCUMENT IS FREE OF DEFECTS MERCHANTABLE, FIT FOR A PARTICULAR PURPOSE OR NON-INFRINGING. THE ENTIRE RISK AS TO THE QUALITY, ACCURACY, AND PERFORMANCE OF THE DOCUMENT OR MODIFIED VERSION OF THE DOCUMENT IS WITH YOU. SHOULD ANY DOCUMENT OR MODIFIED VERSION PROVE DEFECTIVE IN ANY RESPECT, YOU (NOT THE INITIAL WRITER, AUTHOR OR ANY CONTRIBUTOR) ASSUME THE COST OF ANY NECESSARY SERVICING, REPAIR OR CORRECTION. THIS DISCLAIMER OF WARRANTY CONSTITUTES AN ESSENTIAL PART OF THIS LICENSE. NO USE OF ANY DOCUMENT OR MODIFIED VERSION OF THE DOCUMENT IS AUTHORIZED HEREUNDER EXCEPT UNDER THIS DISCLAIMER; AND"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:55(para)
+msgid "UNDER NO CIRCUMSTANCES AND UNDER NO LEGAL THEORY, WHETHER IN TORT (INCLUDING NEGLIGENCE), CONTRACT, OR OTHERWISE, SHALL THE AUTHOR, INITIAL WRITER, ANY CONTRIBUTOR, OR ANY DISTRIBUTOR OF THE DOCUMENT OR MODIFIED VERSION OF THE DOCUMENT, OR ANY SUPPLIER OF ANY OF SUCH PARTIES, BE LIABLE TO ANY PERSON FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY CHARACTER INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF GOODWILL, WORK STOPPAGE, COMPUTER FAILURE OR MALFUNCTION, OR ANY AND ALL OTHER DAMAGES OR LOSSES ARISING OUT OF OR RELATING TO USE OF THE DOCUMENT AND MODIFIED VERSIONS OF THE DOCUMENT, EVEN IF SUCH PARTY SHALL HAVE BEEN INFORMED OF THE POSSIBILITY OF SUCH DAMAGES."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:28(para)
+msgid "DOCUMENT AND MODIFIED VERSIONS OF THE DOCUMENT ARE PROVIDED UNDER THE TERMS OF THE GNU FREE DOCUMENTATION LICENSE WITH THE FURTHER UNDERSTANDING THAT: <placeholder-1/>"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:43(firstname)
+msgid "Nickolay V."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:44(surname)
+msgid "Shmyrev"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:46(orgname)
+msgid "GNOME Project"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:53(revnumber)
+msgid "Version 0.1"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:54(date)
+msgid "June 2007"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:60(revnumber)
+msgid "Version 0.2"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:61(date)
+msgid "August 2007"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:63(para)
+msgid "Raphael Nunes da Motta"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:68(releaseinfo)
+msgid "This manual describes version 2.12.0 of Voice Control Applet."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:72(title)
+msgid "Feedback"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:73(para)
+msgid "To report a bug or make a suggestion regarding the Voice Control Applet applet or this manual, follow the directions in the <ulink url=\"ghelp:gnome-feedback\" type=\"help\">GNOME Feedback Page</ulink>."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:82(primary)
+msgid "Voice Control Applet"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:86(title)
+msgid "Introduction"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:88(para)
+msgid "The <application>Voice Control Applet</application> was created to control the desktop by voice, bringing a great increase to the GNOME Desktop Environment. The objective of the <application>Voice Control Applet</application>is to bring an Desktop Environment efficient as possible for linux users, letting the usability more easy beyond bring a great advance on acessibility systems on Linux. Use of voice instead keyboard is more intuitive and more easy."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:99(title)
+msgid "To Add Voice Control Applet to a Panel"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:100(para)
+msgid "To add <application>Voice Control Applet</application> to a panel, right-click on the panel, then choose <guimenuitem>Add to Panel</guimenuitem>. Select <application>Voice Control Applet</application> in the <application>Add to the panel</application> dialog, then click <guibutton>OK</guibutton>."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:110(title)
+msgid "How to use"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:112(para)
+msgid "The <application>Voice Control Applet</application> allows you to control desktop with voice."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:118(title)
+msgid "Microphone"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:119(para)
+msgid "First of use <application>Voice Control Applet</application> you need to configure properly your microfone. Connect the microphone on the computer, test if it's working. If the microphone isn't working, go to sound properties and adjust the microphone. When the microphone be ready, go to the next topic."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:130(title)
+msgid "Initializing the <application>Voice Control Applet</application>"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:134(para)
+msgid "To initialize the <application>Voice Control Applet</application> follow the steps."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:138(para)
+msgid "Click on the Red symbol on panel and choose start control to make the software work every time."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:144(title) /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:159(title) /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:173(title) /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:197(title)
+msgid "Screenshot"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:151(para)
+msgid "Shows the application on Idle State"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:166(para)
+msgid "Shows the application on Init and Calibrating States"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:180(para)
+msgid "Shows the application on Ready State"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:186(para)
+msgid "If you clicked on start control, when the symbol is green you can start to speech."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:191(para)
+msgid "When the software is processing the speech, the symbol become blue."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:204(para)
+msgid "Shows the application on Listening State"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:215(title)
+msgid "Using the Voice Control Applet"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:222(para)
+msgid "RUN TERMINAL : Open gnome-terminal"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:227(para)
+msgid "RUN BROWSER : Open Mozilla"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:232(para)
+msgid "RUN MAIL : Open Evolution"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:237(para)
+msgid "RUN TEXT EDITOR : Open GEdit"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:242(para)
+msgid "CLOSE WINDOW : Close actual window"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:247(para)
+msgid "MAXIMIZE WINDOW : Maximize actual window"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:252(para)
+msgid "MINIMIZE WINDOW : Minimize actual window"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:257(para)
+msgid "NEXT WINDOW : Change to next window"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:262(para)
+msgid "PREVIOSUS WINDOW : Change to previous window"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:267(para)
+msgid "SWITCH WINDOW : Switch the window"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:217(para)
+msgid "The functions to control windows that we implented are: <placeholder-1/>"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:283(para)
+msgid "HELP : Help (Help about...)"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:288(para)
+msgid "COPY : Copy selected content (Ctrl + C)"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:293(para)
+msgid "CUT : Cut selected content (Ctrl + X)"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:298(para)
+msgid "PASTE : Paste selected content (Ctrl + V)"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:303(para)
+msgid "SEARCH : Open search window"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:276(para)
+msgid "We can control menus too, but you need to have C locale set. To control the menus you can try something like: <placeholder-1/>"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:316(para)
+msgid "CLICK : Click on left mouse button"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:321(para)
+msgid "RIGHT CLICK : Click on right mouse button"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:326(para)
+msgid "MOUSE UP :"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:331(para)
+msgid "MOUSE DOWN :"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:336(para)
+msgid "MOUSE RIGHT :"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:341(para)
+msgid "MOUSE LEFT :"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:310(para)
+msgid "You can control the mouse too. To control the mouse you can try something like: <placeholder-1/>"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:354(para)
+msgid "APPLICATION MENU : Open the desktop application menu"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:359(para)
+msgid "RUN KEYBOARD : Open screen keyborad"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:364(para)
+msgid "RUN EVIACAM : Open webcam mouse emulator (EVIACAM)"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:369(para)
+msgid "HOME FOLDER : Open home folder"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:374(para)
+msgid "SHOW DESKTOP : Shows the desktop"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:379(para)
+msgid "LOCK WINDOWS : Lock system windows"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:384(para)
+msgid "SUSPEND : Suspend the system"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:389(para)
+msgid "REBOOT : Reboot the system"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:394(para)
+msgid "SHUTDOWN SYSTEM : Shutdown the system"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:399(para)
+msgid "LOGOUT USER : Logout actual user"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:404(para)
+msgid "HIBERNATE : Hibernate the system"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:348(para)
+msgid "You can control the desktop and the system. You can try something like: <placeholder-1/>"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:417(para)
+msgid "PAGE UP : Page up key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:422(para)
+msgid "PAGE DOWN : Page down key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:427(para)
+msgid "ESCAPE : Escape key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:432(para)
+msgid "BACKSPACE : Backspace key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:437(para)
+msgid "DELETE : Delete key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:442(para)
+msgid "INSERT : Insert key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:447(para)
+msgid "HOME : Home key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:452(para)
+msgid "END : End key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:457(para)
+msgid "ENTER : Enter key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:462(para)
+msgid "UP : Up key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:467(para)
+msgid "DOWN : Down key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:472(para)
+msgid "LEFT : Left key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:477(para)
+msgid "RIGHT : Right key"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:411(para)
+msgid "You can control the keyboard keys. You can try something like: <placeholder-1/>"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:489(title)
+msgid "Getting Help"
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:490(para)
+msgid "If the voice control applet doesn't work for you, please try to contact developers."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:494(para)
+msgid "First of all, please check that sound is actually recorded in your system. If no, try to adjust mixer settings."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:498(para)
+msgid "The applet and SR is quite complex system in the development, so please don't expect much right now."
+msgstr ""
+
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:503(para)
+msgid "To report any bug you can send to festlang-gvc@lists.berlios.de. You need to be subscribed to send e-mails."
+msgstr ""
+
+#. Put one translator per line, in the form of NAME <EMAIL>, YEAR1, YEAR2
+#: /home/vbox/Escritorio/GVC-packet/gnome-voice-control-06julius/help/C/gnome-voice-control.xml:0(None)
+msgid "translator-credits"
+msgstr ""
+

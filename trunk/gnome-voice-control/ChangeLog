@@ -1,3 +1,22 @@
+2010-12-02  Indisys  <info@indosys.es>
+
+	* configure.ac:
+	* asr.h (added):
+	* asrjulius.c (added): 
+	* asrsphinx.c(added): 
+	* src/voice-control.c:
+	* src/voice-control.h (added):
+	* src/gstsphinxsink.c:
+	* src/action.c:
+	* src/spi-listener.c:
+	
+	Added Julius (v 4.1.5) support (change ASR recognizer in configure.ac)
+	Added acustic models and language models for Julius.
+	Added spanish help documentation.
+	Change GVC Applet language and acustic model language on-the-fly .
+	Added new commands.
+	Updated to fix crashes.
+	
 2009-05-31  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
 
 	* configure.ac:

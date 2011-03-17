@@ -1,0 +1,95 @@
+#########################################
+##
+## Gnome Voice Control
+## Julius configuration file (Jconf)
+## Language: All
+##
+#########################################
+
+############################
+#### Global options
+############################
+
+-GLOBAL
+
+## Input mode
+
+-input mic
+
+############################
+#### Acoustic Model
+############################
+
+## English Model
+
+-AM en
+
+-h hmm/hmm-en
+
+-hlist hmm/tiedlist-en
+
+-spmodel sp
+
+-smpFreq 16000
+
+-gprune safe
+
+## Spanish Model
+
+-AM es
+
+-h hmm/hmm-es
+
+#-spmodel sp
+
+-smpFreq 16000
+
+-gprune safe
+
+############################
+#### Language Models
+############################
+
+## English model
+
+-LM en
+
+-dfa lm/desktop-control-en.dfa
+-v lm/desktop-control-en.dict
+
+-iwsp
+
+## Spanish model
+
+-LM es
+
+-w lm/desktop-control-iw-es.dict
+-wsil sil sil sil
+
+#-iwsp
+
+############################
+#### Search configuration
+############################
+
+## English model
+
+-SR en en en
+
+-n 1
+
+-output 1
+
+-no_ccd
+
+## Spanish model
+
+-SR es es es
+
+-b 10000
+
+-n 1
+
+-output 1
+
+-no_ccd

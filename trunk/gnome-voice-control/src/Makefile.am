@@ -1,34 +1,49 @@
 libexec_PROGRAMS = voice_control_applet
 
-voice_control_applet_SOURCES = \
-	action.c \
-	action.h \
-	gstsphinxsink.c \
-	gstsphinxsink.h \
-	spi-listener.c \
-	spi-listener.h \
-	voice-control.c 
+if SPHINX
+voice_control_applet_SOURCES =  \
+	action.c		\
+	action.h		\
+	asrsphinx.c		\
+	gstsphinxsink.c		\
+	gstsphinxsink.h		\
+	spi-listener.c		\
+	spi-listener.h		\
+	voice-control.c		\
+	voice-control.h		\
+	asr.h
+else
+voice_control_applet_SOURCES =  \
+	action.c		\
+	action.h		\
+	asrjulius.c		\
+	spi-listener.c		\
+	spi-listener.h		\
+	voice-control.c		\
+	voice-control.h		\
+	asr.h
+endif
 
-INCLUDES =					\
+INCLUDES =							\
         -I$(top_srcdir) 					\
 	-I$(top_builddir)					\
 	-DAPPNAME_DATA_DIR=\"$(pkgdatadir)\"			\
 	-DGNOMELOCALEDIR=\"$(prefix)/$(DATADIRNAME)/locale\"	\
 	-DGNOMEDATADIR=\"$(datadir)\"				\
-	-DPOCKETSPHINX_PREFIX=\"$(POCKETSPHINX_PREFIX)\"	\
+	$(EXTRA_PREFIX)						\
 	$(WARN_CFLAGS)						\
 	$(DISABLE_DEPRECATED_CFLAGS)				\
 	$(DISABLE_DEPRECATED)					\
 	$(GNOME_PANEL_CFLAGS)					\
-	$(GST_CFLAGS)						\
-	$(POCKETSPHINX_CFLAGS)
+	$(EXTRA_CFLAGS)						\
+	$(ASR_CFLAGS)						
+	
 
 
-voice_control_applet_LDADD = \
-	$(GNOME_PANEL_LIBS)  \
-	$(GST_LIBS)  \
-	$(POCKETSPHINX_LIBS)
-
+voice_control_applet_LDADD =	\
+	$(GNOME_PANEL_LIBS)	\
+	$(ASR_LIBS)		\
+	$(EXTRA_LIBS)
 
 
 

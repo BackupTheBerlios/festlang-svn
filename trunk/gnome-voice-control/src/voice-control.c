@@ -1,5 +1,8 @@
 /* This file is a part of gnome-voice-control
  *
+ * Copyright (C) 2010  Consorcio Fernando de los Rios - Junta de Andalucia
+ * Developed by Intelligent Dialogue Systems S.L. <info@indisys.es>
+ *
  * Copyright (C) 2007  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
  *
  * voice-control.c:
@@ -25,30 +28,16 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include <locale.h>
+#include <libgnome/libgnome.h>
+#include <libgnomeui/libgnomeui.h>
 
-#include <gtk/gtk.h>
-#include <gdk/gdk.h>
-#include <panel-applet.h>
-#include <glib/gi18n.h>
-#include <gst/gstelement.h>
-#include <gst/gstplugin.h>
-
-#include "gstsphinxsink.h"
 #include "action.h"
+#include "voicecontrol.h"
 
-#define VOICE_CONTROL_APPLET(o) (G_TYPE_CHECK_INSTANCE_CAST ((o), \
-				 voice_control_applet_get_type(),          \
-				 VoiceControlApplet))
-#define VOICE_CONTROL_IS_APPLET(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), \
-				   VOICE_CONTROL_TYPE_APPLET))
+#include "asr.h"
 
-#define VOICE_CONTROL_ICON "gnome-grecord"
-
-#define N_VOICE_CONTROL_LISTENERS 4
-
-#include "spi-listener.h"
-
-static gboolean o_window = FALSE;
+static gboolean o_window = WINDOWS_MODE;
 
 static GOptionEntry applet_control_options[] =
 {
@@ -56,33 +45,53 @@ static GOptionEntry applet_control_options[] =
         { NULL }
 };
 
-typedef struct {
-	PanelApplet        applet;
+static void
+display_help_dialog (BonoboUIComponent   *uic,
+		     VoiceControlApplet  *voice_control,
+		     const char          *verbname);
 
-	guint              listeners [N_VOICE_CONTROL_LISTENERS];
-	
-	GtkWidget*	   about_dialog;
-	GtkWidget*	   frame;
-	GtkWidget*         state_label;
-	
-	GtkTooltips* 	   tooltips;
-	guint 		   ready_timeout;
-	
-	GstElement*        pipeline;	
-	GstElement* 	   sink;
-	
-	ControlSpiListener*	   spi_listener;
-} VoiceControlApplet;
+static void
+display_about_dialog (BonoboUIComponent  *uic,
+		      VoiceControlApplet *voice_control,
+		      const char         *verbname);
 
-typedef struct {
-	PanelAppletClass klass;
-} VoiceControlAppletClass;
+static void
+control_start (BonoboUIComponent  *uic,
+	       VoiceControlApplet *voice_control,
+	       const char         *verbname);
 
-static void  voice_control_applet_init (VoiceControlApplet      *voice_control);
-static void  voice_control_applet_class_init (VoiceControlAppletClass *klass);
-static void  voice_control_set_text (VoiceControlApplet *voice_control, gchar *message, gchar *tooltip);
+static void
+keypress_control_start (BonoboUIComponent  *uic,
+	       VoiceControlApplet *voice_control,
+	       const char         *verbname);
+
+static void
+change_language (BonoboUIComponent  *uic,
+	       VoiceControlApplet *voice_control,
+	       const char         *verbname);
+
+static void
+control_stop (BonoboUIComponent  *uic,
+	       VoiceControlApplet *voice_control,
+	       const char         *verbname);
+
+static const BonoboUIVerb voice_control_menu_verbs [] = {
+	BONOBO_UI_UNSAFE_VERB ("VoiceControlStart",         control_start),
+	BONOBO_UI_UNSAFE_VERB ("VoiceControlStop",          control_stop),
+//	BONOBO_UI_UNSAFE_VERB ("KeypressVoiceControlStart", keypress_control_start),
+        BONOBO_UI_UNSAFE_VERB ("ChangeLanguage",          change_language),
+	BONOBO_UI_UNSAFE_VERB ("VoiceControlHelp",          display_help_dialog),
+	BONOBO_UI_UNSAFE_VERB ("VoiceControlAbout",         display_about_dialog),
+        BONOBO_UI_VERB_END
+};
+
+static const gchar* voice_control_get_menu_xml();
 
 G_DEFINE_TYPE (VoiceControlApplet, voice_control_applet, PANEL_TYPE_APPLET)
+
+//////////////////////////////////
+// Panel Controls
+//////////////////////////////////
 
 static void
 display_help_dialog (BonoboUIComponent   *uic,
@@ -91,10 +100,13 @@ display_help_dialog (BonoboUIComponent   *uic,
 {
 	GError *error = NULL;
 
-	gnome_help_display_desktop_on_screen (
-		NULL, "gnome-voice-control", "gnome-voice-control", "voice-control-settings",
-		gtk_widget_get_screen (GTK_WIDGET (voice_control)),
-		&error);
+        gnome_help_display_desktop_on_screen (
+		NULL, 
+                "gnome-voice-control",
+                "gnome-voice-control",
+                NULL, // "voice-control-settings"
+                gtk_widget_get_screen (GTK_WIDGET (voice_control)),
+                &error);
 
 	if (error) {
 		GtkWidget *dialog;
@@ -121,168 +133,22 @@ display_help_dialog (BonoboUIComponent   *uic,
 }
 
 static void
-control_start (BonoboUIComponent  *uic,
-	       VoiceControlApplet *voice_control,
-	       const char         *verbname)
-{
-	gst_element_set_state (voice_control->pipeline, GST_STATE_PLAYING);
-
-	control_spi_listener_start (voice_control->spi_listener);
-}
-
-static void
-keypress_control_start (BonoboUIComponent  *uic,
-	       VoiceControlApplet *voice_control,
-	       const char         *verbname)
-{
-
-	control_spi_listener_start (voice_control->spi_listener);
-
-	control_spi_set_voice_control_pipeline(voice_control->pipeline);
-
-}
-
-
-static void
-control_stop (BonoboUIComponent  *uic,
-	       VoiceControlApplet *voice_control,
-	       const char         *verbname)
-{
-        gst_element_set_state (voice_control->pipeline, GST_STATE_NULL);
-	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_NO, GTK_ICON_SIZE_MENU);
-	voice_control_set_text (voice_control, _("Idle"), _("Choose Start Control to start"));
-	control_spi_listener_stop (voice_control->spi_listener);
-}
-
-static void
-on_sink_initialization (VoiceControlApplet *voice_control)
-{
-	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_STOP, GTK_ICON_SIZE_MENU);
-	voice_control_set_text (voice_control, _("Init"), _("Loading acoustic and language model, wait a bit"));
-}
-
-static void
-on_sink_after_initialization (VoiceControlApplet *voice_control)
-{
-	GSList *commands;
-	
-	// Set this in main thread as well, sphinxbase doesn't do that automatically unfortunately
-	// for all the threads. Only main thread which called ps_init dumps to stderr
-	err_set_logfp(stderr);
-
-	commands = voice_control_action_append_commands (NULL);	
-	gst_sphinx_sink_set_fsg (GST_SPHINX_SINK(voice_control->sink), commands);
-	g_slist_free (commands);
-}
-
-static void
-on_sink_calibration (VoiceControlApplet *voice_control)
-{
-	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_STOP, GTK_ICON_SIZE_MENU);
-	voice_control_set_text (voice_control, _("Calibration"), _("Tuning up acoustic parameters"));
-}
-
-static void
-on_sink_listening (VoiceControlApplet *voice_control)
-{
-	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_YES, GTK_ICON_SIZE_MENU);
-	voice_control_set_text (voice_control, _("Listening"), _("Processing speech"));
-}
-
-static gboolean
-on_sink_ready (gpointer data)
-{
-	VoiceControlApplet * voice_control = VOICE_CONTROL_APPLET (data);
-	gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_YES, GTK_ICON_SIZE_MENU);
-	voice_control_set_text (voice_control, _("Ready"), _("Ready for input"));
-
-	return FALSE;
-}
-
-static gboolean 
-process_action (VoiceControlApplet *voice_control, const gchar *message)
-{
-	GSList *l, *nodes;
-
-	nodes = control_spi_listener_get_object_list (voice_control->spi_listener);
-
-	for (l = nodes; l; l = l->next) {
-		AccessibleItem *item = (AccessibleItem *)l->data;
-		if (g_strrstr(message, item->name)) {
-			AccessibleAction *action;
-			
-			g_message ("Running action '%s' accessible %p", item->name, item->accessible);
-			
-			action = Accessible_getAction (item->accessible);
-			AccessibleAction_doAction (action, 0);
-			break;
-		}
-	}
-	return FALSE;
-}
-
-/**  
- * Handle messages
- *
- * Checks a pre-defined list of global actions if still not found 
- * searches in items available for the current window
- * 
- * @param *sink gst sink
- * @param *message current message
- * @param data voice_control instance
- * @return void  
- */
-static void
-on_sink_message (VoiceControlApplet *voice_control, const gchar *message)
-{
-	gtk_label_set_text (GTK_LABEL (voice_control->state_label), message);
-
-	if (voice_control_action_process_result (message))
-		return;
-	
-	process_action (voice_control, message);
-	
-	return;
-}
-
-static void
-voice_control_ui_changed (ControlSpiListener *listener, gpointer data)
-{
-	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
-	GSList *l, *nodes, *commands;
-	
-	if (!gst_sphinx_sink_running (GST_SPHINX_SINK (voice_control->sink)))
-		return;
-	
-	nodes = control_spi_listener_get_object_list (listener);
-	commands = NULL;
-
-	for (l = nodes; l; l = l->next) {
-		AccessibleItem *item = (AccessibleItem *)l->data;
-		commands = g_slist_append (commands, item->name);
-	}
-	
-	commands = voice_control_action_append_commands (commands);
-	
-	gst_sphinx_sink_set_fsg (GST_SPHINX_SINK(voice_control->sink), commands);
-
-	g_slist_free (commands);
-}
-
-static void
 display_about_dialog (BonoboUIComponent  *uic,
 		      VoiceControlApplet *voice_control,
 		      const char         *verbname)
 {
-	const char  *documenters [] = {
-		"Nickolay V. Shmyrev <nshmyrev@yandex.ru>",
-          	NULL
-	};
-
-	char        *authors[2];
+	char        *authors[6]; 	
 	char        *descr;
 
-	if (voice_control->about_dialog) {
+
+	const char  *documenters [] = {
+		"Nickolay V. Shmyrev <nshmyrev@yandex.ru>",
+	        "Felipe Ram\u00F3n Fabresse <info@indisys.es>",
+  	        "Diego Mart\u00EDnez Fontiveros <info@indisys.es>",
+	   	NULL
+		};
+
+  	if (voice_control->about_dialog) {
 		gtk_window_set_screen (GTK_WINDOW (voice_control->about_dialog),
 				       gtk_widget_get_screen (GTK_WIDGET (voice_control)));
 		gtk_window_present (GTK_WINDOW (voice_control->about_dialog));
@@ -291,19 +157,22 @@ display_about_dialog (BonoboUIComponent  *uic,
 
 	authors [0] = _("Nickolay V. Shmyrev <nshmyrev@yandex.ru>");
 	authors [1] = _("Raphael Nunes da Motta <raphael.nunes.enc04@gmail.com>");
-	authors [2] = NULL;
+  	authors [2] = _("Felipe Ram\u00F3n Fabresse <info@indisys.es>");
+	authors [3] = _("Diego Mart\u00EDnez Fontiveros <info@indisys.es>");
+	authors [4] = _("Guillermo P\u00E9rez Garc\u00EDa <info@indisys.es>");
+	authors [5] = NULL;
 
 	descr = _("Voice Control Applet used to manage desktop with speech");
-		
+
 	voice_control->about_dialog = gtk_about_dialog_new ();
 	g_object_set (voice_control->about_dialog,
 		      "name", _("VoiceControl"),
 		      "version", VERSION,
-		      "copyright", "Copyright \xc2\xa9 1998-2002 Free Software Foundation, Inc.",
+		      "copyright", "Copyright \xc2\xa9 1998-2002 Free Software Foundation, Inc.\nCopyright \xc2\xa9 2010 Guadalinfo.es.\nCopyright \xc2\xa9 2010 Consorcio Fernando de los R\u00EDos.",
 		      "comments", descr,
 		      "authors", (const char **) authors,
 		      "documenters", documenters,
-		      "translator-credits", _("translator-credits"),
+		      "translator-credits", "Mauricio Henriquez <buhochileno@gmail.com>\nFelipe Ram\u00F3n Fabresse <info@indisys.es>",
 		      "logo-icon-name", VOICE_CONTROL_ICON,
 		      NULL);
 
@@ -324,6 +193,148 @@ display_about_dialog (BonoboUIComponent  *uic,
 }
 
 static void
+control_start (BonoboUIComponent  *uic,
+	       VoiceControlApplet *voice_control,
+	       const char         *verbname)
+{
+	asr_start(voice_control);
+
+	control_spi_listener_start (voice_control->spi_listener);
+}
+
+static void
+keypress_control_start (BonoboUIComponent  *uic,
+	       VoiceControlApplet *voice_control,
+	       const char         *verbname)
+{
+    control_spi_listener_start (voice_control->spi_listener);
+}
+
+static void
+change_language (BonoboUIComponent  *uic,
+	       VoiceControlApplet *voice_control,
+	       const char         *verbname)
+{
+    PanelApplet *applet = PANEL_APPLET (voice_control);
+
+    const gchar* voice_control_menu_xml;
+    gchar* lang = NULL;
+    gchar* short_lang = NULL;
+    gchar ** splits = NULL;
+
+    splits = g_strsplit(voice_control->lang, "_", 2);
+    lang = splits[0];
+
+#ifdef ENABLE_DEBUG_DUMP
+    g_message("Changing language from [%s] to ", voice_control->lang);
+#endif
+
+    if(strcmp(lang, "es") == 0)
+    {
+        lang = setlocale(LC_ALL, "en_US.utf8");
+    }else
+    {
+        lang = setlocale(LC_ALL, "es_ES.utf8");
+    }
+
+    if(lang != NULL)
+    {
+        splits = g_strsplit(lang, "_", 2);
+        short_lang = g_strdup(splits[0]);
+
+        voice_control_menu_xml = voice_control_get_menu_xml();
+
+        panel_applet_setup_menu (
+                    applet, voice_control_menu_xml, voice_control_menu_verbs, voice_control);
+
+        voice_control_set_state(voice_control, voice_control_get_state(voice_control), NULL);
+
+        asr_set_language(voice_control, short_lang);
+
+        g_free(voice_control->lang);
+        voice_control->lang = g_strdup(lang);
+    }
+
+#ifdef ENABLE_DEBUG_DUMP
+    g_message("[%s]\n", voice_control->lang);
+#endif
+
+    if(splits != NULL)
+      g_strfreev(splits);
+    g_free(voice_control_menu_xml);
+}
+
+static void
+control_stop (BonoboUIComponent  *uic,
+	       VoiceControlApplet *voice_control,
+	       const char         *verbname)
+{
+        asr_stop(voice_control);
+        voice_control_set_state(voice_control, STOP, NULL);
+	control_spi_listener_stop (voice_control->spi_listener);
+}
+
+/////////////////////////////////////////////////////
+// Process accesible actions (Not default actions)
+/////////////////////////////////////////////////////
+
+gboolean 
+voice_control_process_action (VoiceControlApplet *voice_control, const gchar *message)
+{
+	GSList *l, *nodes;
+
+	nodes = control_spi_listener_get_object_list (voice_control->spi_listener);
+
+	for (l = nodes; l; l = l->next) {
+		AccessibleItem *item = (AccessibleItem *)l->data;
+		if (g_strrstr(message, item->name)) {
+			AccessibleAction *action;
+
+#ifdef ENABLE_DEBUG_DUMP
+			g_message ("Running action '%s' accessible %p", item->name, item->accessible);
+#endif
+			
+			action = Accessible_getAction (item->accessible);
+			AccessibleAction_doAction (action, 0);
+			break;
+		}
+	}
+	return FALSE;
+}
+
+///////////////////////////////
+// Get new accesible actions
+///////////////////////////////
+
+static void
+voice_control_ui_changed (ControlSpiListener *listener, gpointer data)
+{
+	VoiceControlApplet *voice_control = VOICE_CONTROL_APPLET (data);
+	GSList *l, *nodes, *commands;
+	
+	if (!asr_running(voice_control))
+		return;
+	
+	nodes = control_spi_listener_get_object_list (listener);
+	commands = NULL;
+
+	for (l = nodes; l; l = l->next) {
+		AccessibleItem *item = (AccessibleItem *)l->data;
+		commands = g_slist_append (commands, item->name);
+	}
+	
+	commands = voice_control_action_append_commands (commands);
+	
+	asr_set_grammar(voice_control, commands);
+
+	g_slist_free (commands);
+}
+
+/////////////////////////////
+// Auxiliary functions
+/////////////////////////////
+
+void
 voice_control_set_text (VoiceControlApplet *voice_control, gchar *message, gchar *tooltip)
 {
 	gtk_label_set_text (GTK_LABEL (voice_control->state_label), message);
@@ -351,30 +362,23 @@ setup_voice_control_widget (VoiceControlApplet *voice_control)
 
 	gtk_container_add (GTK_CONTAINER (hbox), voice_control->state_label);
 
-	voice_control_set_text (voice_control, _("Idle"), _("Choose Start Control to start"));
+	voice_control_set_state(voice_control, STOP, NULL);
 
 	gtk_widget_show_all (widget);
 }
-
-static const BonoboUIVerb voice_control_menu_verbs [] = {
-	BONOBO_UI_UNSAFE_VERB ("VoiceControlStart",         control_start),
-	BONOBO_UI_UNSAFE_VERB ("KeypressVoiceControlStart", keypress_control_start),
-	BONOBO_UI_UNSAFE_VERB ("VoiceControlStop",          control_stop),
-	BONOBO_UI_UNSAFE_VERB ("VoiceControlHelp",          display_help_dialog),
-	BONOBO_UI_UNSAFE_VERB ("VoiceControlAbout",         display_about_dialog),
-        BONOBO_UI_VERB_END
-};
 
 static gboolean
 voice_control_applet_fill (VoiceControlApplet *voice_control)
 {
 	PanelApplet *applet = PANEL_APPLET (voice_control);
+        const gchar* voice_control_menu_xml = voice_control_get_menu_xml();
 
 	setup_voice_control_widget (voice_control);
 
-	panel_applet_setup_menu_from_file (
-		applet, GNOMEDATADIR, "GNOME_VoiceControlApplet.xml",
-		NULL, voice_control_menu_verbs, voice_control);
+	panel_applet_setup_menu (
+		applet, voice_control_menu_xml, voice_control_menu_verbs, voice_control);
+
+        g_free(voice_control_menu_xml);
 
 	return TRUE;
 }
@@ -396,7 +400,6 @@ static void
 voice_control_applet_destroy (GtkObject *object)
 {
 	VoiceControlApplet *voice_control = (VoiceControlApplet *) object;
-	int         i;
 
 	if (voice_control->about_dialog)
 		gtk_widget_destroy (voice_control->about_dialog);
@@ -406,74 +409,9 @@ voice_control_applet_destroy (GtkObject *object)
 		g_object_unref (voice_control->tooltips);
 	voice_control->tooltips = NULL;
 
-	if (voice_control->pipeline)
-		g_object_unref (voice_control->pipeline);
-	voice_control->pipeline = NULL;
+        asr_destroy(voice_control);
 
 	GTK_OBJECT_CLASS (voice_control_applet_parent_class)->destroy (object);
-}
-
-static gboolean
-voice_control_pipeline_bus_callback (GstBus *bus,
-				     GstMessage *message,
-				     gpointer data)
-{
-	VoiceControlApplet *voice_control = (VoiceControlApplet *) data;
-
-	switch (GST_MESSAGE_TYPE (message)) {
-		case GST_MESSAGE_ELEMENT: {
-		    const GstStructure *str = gst_message_get_structure (message);
-		    const gchar *name = gst_structure_get_name (str);
-
-		    if (voice_control->ready_timeout > 0) {
-			    g_source_remove (voice_control->ready_timeout);
-			    voice_control->ready_timeout = 0;
-		    }
-		    
-		    if (strcmp (name, "initialization") == 0) {
-			    on_sink_initialization (voice_control);
-		    } else if (strcmp (name, "after_initialization") == 0) {
-			    on_sink_after_initialization (voice_control);
-		    } else if (strcmp (name, "calibration") == 0) {
-			    on_sink_calibration (voice_control);
-		    } else if (strcmp (name, "listening") == 0) {
-			    on_sink_listening (voice_control);
-		    } else if (strcmp (name, "ready") == 0) {
-			    on_sink_ready (voice_control);
-		    } else if (strcmp (name, "message") == 0) {
-			    on_sink_message (voice_control, gst_structure_get_string (str, "text"));
-			    voice_control->ready_timeout = g_timeout_add_seconds (5, on_sink_ready, voice_control);
-		    }
-		}
-	}
-	return TRUE;	
-}
-
-static void
-voice_control_applet_create_pipeline (VoiceControlApplet *voice_control)
-{
-	GError *error = NULL;
-	GstBus *bus;
-
-	voice_control->pipeline = gst_parse_launch ("gconfaudiosrc ! sphinxsink name=sink", &error);
-      
-	if (error != NULL) {
-		g_warning ("Can't create pipeline: %s", error->message);
-		return;
-	}
-
-	voice_control->sink = gst_bin_get_by_name(GST_BIN (voice_control->pipeline),
-	                                          "sink");
-	if (!voice_control->sink) {
-    		g_warning ("Pipeline has no sink");
-		return;
-	}
-
-	bus = gst_pipeline_get_bus (GST_PIPELINE (voice_control->pipeline));
-	gst_bus_add_watch (bus, voice_control_pipeline_bus_callback, voice_control);
-	gst_object_unref (bus);
-      
-    	return;
 }
 
 static void
@@ -482,36 +420,25 @@ voice_control_applet_init (VoiceControlApplet      *voice_control)
 	int i;
 	
 	voice_control->about_dialog = NULL;
+        voice_control->tooltip = NULL;
 
 	for (i = 0; i < N_VOICE_CONTROL_LISTENERS; i++)
 		voice_control->listeners [i] = 0;
 
 	panel_applet_set_flags (PANEL_APPLET (voice_control),
 				PANEL_APPLET_EXPAND_MINOR);
-				
-	voice_control_applet_create_pipeline (voice_control);
+
+        voice_control->lang = g_strdup(setlocale(LC_ALL, NULL));
+        voice_control->asr = NULL;
+
+        asr_init(voice_control);
 
 	voice_control->spi_listener = g_object_new (CONTROL_SPI_LISTENER_TYPE, NULL);
 	g_signal_connect_object (voice_control->spi_listener, "changed", 
 				 G_CALLBACK (voice_control_ui_changed), voice_control, 0);
 
 }
-
-static gboolean
-plugin_init (GstPlugin * plugin)
-{
-  gboolean res = TRUE;
-
-  res &= gst_element_register (plugin, "sphinxsink", GST_RANK_PRIMARY, GST_TYPE_SPHINX_SINK);
-  return res;
-}
-
-GST_PLUGIN_DEFINE_STATIC (GST_VERSION_MAJOR,
-    GST_VERSION_MINOR,
-    "sphinxplugin",
-    "Sphinx Recognition plugin",
-    plugin_init, VERSION, GST_LICENSE_UNKNOWN, PACKAGE_NAME, PACKAGE_NAME);
-                
+          
 static void
 voice_control_applet_class_init (VoiceControlAppletClass *klass)
 {
@@ -522,12 +449,140 @@ voice_control_applet_class_init (VoiceControlAppletClass *klass)
 	gtk_object_class->destroy = voice_control_applet_destroy;
 }
 
+static const gchar*
+voice_control_get_menu_xml()
+{
+    const gchar* voice_control_menu_xml = g_strdup_printf(
+        "<popup name=\"button3\">\n"
+        "   <menuitem name=\"Start Control\" verb=\"VoiceControlStart\" label=\"%s\"\n"
+    	"	    pixtype=\"stock\" pixname=\"gtk-media-play\"/>\n"
+//	"   <menuitem name=\"Start Keypress Control\" verb=\"KeypressVoiceControlStart\" label=\"%s\"\n"
+//	"	    pixtype=\"stock\" pixname=\"gtk-media-play\"/>\n"
+        "   <menuitem name=\"Stop Control\" verb=\"VoiceControlStop\" label=\"%s\"\n"
+    	"	    pixtype=\"stock\" pixname=\"gtk-media-pause\"/>\n"
+        "   <menuitem name=\"Change Language\" verb=\"ChangeLanguage\" label=\"%s\"\n"
+    	"	    pixtype=\"stock\" pixname=\"gtk-preferences\"/>\n"
+        "   <separator/>\n"
+        "   <menuitem name=\"Clock Help Item\" verb=\"VoiceControlHelp\" label=\"%s\"\n"
+    	"	    pixtype=\"stock\" pixname=\"gtk-help\"/>\n"
+        "   <menuitem name=\"Voice Control About Item\" verb=\"VoiceControlAbout\" label=\"%s\"\n"
+    	"	    pixtype=\"stock\" pixname=\"gtk-about\"/>\n"
+        "</popup>\n",
+        _("_Start Control"),
+//        _("_Start Keypress Control"),
+        _("_Stop Control"),
+        _("_Change Language"),
+        _("_Help"),
+        _("_About"));
+
+    return voice_control_menu_xml;
+}
+
+void  voice_control_set_state (VoiceControlApplet *voice_control, gint state, gchar* text)
+{
+    switch(state)
+    {
+        case INIT:
+            gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_STOP, GTK_ICON_SIZE_MENU);
+            voice_control_set_text (voice_control, _("Init"), _("Loading acoustic and language model, wait a bit"));
+            voice_control->tooltip = NULL;
+            voice_control->state = INIT;
+            break;
+
+        case ERROR:
+            gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_NO, GTK_ICON_SIZE_MENU);
+            if(text)
+            {
+                voice_control_set_text (voice_control, _("Error"), _(text));
+                voice_control->tooltip = g_strdup(text);
+            }
+            else if (voice_control->state == ERROR)
+            {
+                if (voice_control->tooltip != NULL)
+                {
+                    voice_control_set_text (voice_control, _("Error"), _(voice_control->tooltip));
+                }
+                else
+                    voice_control_set_text (voice_control, _("Error"), NULL);
+            }
+            else
+            {
+                voice_control_set_text (voice_control, _("Error"), _("Application error, try again later"));
+                voice_control->tooltip = g_strdup("Application error, try again later");
+            }
+
+            voice_control->state = ERROR;
+            
+            break;
+
+        case STOP:
+            gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_NO, GTK_ICON_SIZE_MENU);
+            voice_control_set_text (voice_control, _("Idle"), _("Choose Start Control to start"));
+            voice_control->tooltip = NULL;
+            voice_control->state = STOP;
+            break;
+
+        case READY:
+            gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_YES, GTK_ICON_SIZE_MENU);
+            voice_control_set_text (voice_control, _("Ready"), _("Ready for input"));
+            voice_control->tooltip = NULL;
+            voice_control->state = READY;
+            break;
+
+        case PAUSE:
+            gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_DIALOG_WARNING, GTK_ICON_SIZE_MENU);
+            voice_control_set_text (voice_control, _("Paused"), _("Recognizer paused"));
+            voice_control->tooltip = NULL;
+            voice_control->state = PAUSE;
+            break;
+
+        case LOAD:
+            gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_STOP, GTK_ICON_SIZE_MENU);
+            voice_control_set_text (voice_control, _("Calibration"), _("Tuning up acoustic parameters"));
+            voice_control->tooltip = NULL;
+            voice_control->state = LOAD;
+            break;
+
+        case LISTEN:
+            gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_YES, GTK_ICON_SIZE_MENU);
+            voice_control_set_text (voice_control, _("Listening"), _("Processing speech"));
+            voice_control->tooltip = NULL;
+            voice_control->state = LISTEN;
+            break;
+
+        case TEXT:
+            if(text != NULL)
+            {
+                gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_YES, GTK_ICON_SIZE_MENU);
+                voice_control_set_text (voice_control, text, NULL);
+                voice_control->tooltip = g_strdup(text);
+            }
+            else if (voice_control->tooltip != NULL)
+            {
+                gtk_image_set_from_stock(GTK_IMAGE(voice_control->frame), GTK_STOCK_YES, GTK_ICON_SIZE_MENU);
+                voice_control_set_text (voice_control, voice_control->tooltip, NULL);
+            }
+            break;
+
+            voice_control->state = TEXT;
+            
+        default:
+            return;
+    }
+}
+
+gint  voice_control_get_state (VoiceControlApplet *voice_control)
+{
+    return voice_control->state;
+}
+
 int main (int argc, char *argv [])
 {				
 	int           retval;
  	static GtkWidget *window, *applet;
  	GError *error = NULL;
  	GOptionContext *context;
+        GnomeProgram *program;
 		
 	bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
@@ -537,25 +592,35 @@ int main (int argc, char *argv [])
 	
  	context = g_option_context_new (_("- voice control applet"));
  	g_option_context_add_main_entries (context, applet_control_options, GETTEXT_PACKAGE);
- 	g_option_context_add_group (context, gst_init_get_option_group());
- 	g_option_context_add_group (context, gtk_get_option_group (TRUE));
-
-	if (!g_option_context_parse (context, &argc, &argv, &error)) {
-		g_error (_("Failed to parse option: %s\n"), error->message);
-		exit (1);
-	}
-
+	g_option_context_add_group (context, gtk_get_option_group (TRUE));
+	
 	gtk_init (&argc, &argv);						
+	if (!bonobo_init (&argc, argv)) {					
+		g_printerr ("Cannot initialize bonobo.n");
+		g_option_context_free (context);
+		return 1;							
+	}									
 
-	gst_init (&argc, &argv);
+        asr_setup (&argc, &argv, context);
+
+        if (!g_option_context_parse (context, &argc, &argv, &error)) {
+           g_error (_("Failed to parse option: %s\n"), error->message);
+	   exit (1);
+        }
 
 	gtk_icon_theme_append_search_path (gtk_icon_theme_get_default (),
 					   APPNAME_DATA_DIR G_DIR_SEPARATOR_S 
 		    			   "icons");
 
+        program = gnome_program_init ("voice-control-applet", VERSION,
+				      LIBGNOMEUI_MODULE,
+				      argc, argv,
+				      GNOME_CLIENT_PARAM_SM_CONNECT, FALSE,
+				      GNOME_PARAM_NONE);
+
 	SPI_init ();
 
-	if (o_window) {	
+	if (o_window) {
 		window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 		gtk_window_set_title(GTK_WINDOW(window), _("Voice Control"));
 		g_signal_connect (G_OBJECT (window), "destroy",
@@ -563,7 +628,7 @@ int main (int argc, char *argv [])
 
 		applet = g_object_new(voice_control_applet_get_type(), NULL);
 		
-		gtk_widget_set_size_request (GTK_WIDGET (window), 250, 50);
+		gtk_widget_set_size_request (GTK_WIDGET (window), 250, 25);
 		
 		retval = voice_control_applet_factory(PANEL_APPLET (applet), NULL, NULL);
 	
@@ -576,7 +641,9 @@ int main (int argc, char *argv [])
 			     voice_control_applet_get_type (),
 			     voice_control_applet_factory,
 			     NULL);
-	}		
+	}
+
+        g_object_unref (program);
 	SPI_exit ();
 
 	g_option_context_free (context);

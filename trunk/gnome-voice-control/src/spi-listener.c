@@ -1,5 +1,8 @@
 /* This file is a part of gnome-voice-control
  *
+ * Copyright (C) 2010  Consorcio Fernando de los Rios - Junta de Andalucia
+ * Developed by Intelligent Dialogue Systems S.L. <info@indisys.es>
+ *
  * Copyright (C) 2007  Nickolay V. Shmyrev  <nshmyrev@yandex.ru>
  *
  * spi-listener.c:
@@ -26,9 +29,11 @@
 #include <libspi/application.h>
 #include <cspi/spi.h>
 
-#include "gstsphinxsink.h"
+#include "voicecontrol.h"
 
 #include "spi-listener.h"
+
+#include "asr.h"
 
 enum
 {
@@ -38,7 +43,7 @@ enum
 
 static guint control_spi_listener_signals[LAST_SIGNAL] = { 0 };
 
-GstElement *voice_control_pipeline;
+VoiceControlApplet * voice_control;
 gboolean is_keypressed;
 
 static void
@@ -278,10 +283,10 @@ control_spi_listener_showing_listener_cb (const AccessibleEvent *event,
     		listener->idle_id = g_idle_add (control_spi_listener_process_event, listener);
 }
 
-control_spi_set_voice_control_pipeline (GstElement *pipeline)
+control_spi_set_voice_control (VoiceControlApplet *applet)
 {
 
-	voice_control_pipeline = pipeline;
+	voice_control = applet;
 	is_keypressed = FALSE;
 
 }
@@ -293,12 +298,12 @@ control_spi_listener_keys_listener_cb (const AccessibleEvent *event,
 	ControlSpiListener *listener = CONTROL_SPI_LISTENER (user_data);
 
 	if( !is_keypressed == TRUE ){
-        	gst_element_set_state (voice_control_pipeline, GST_STATE_PLAYING);
+                asr_start(voice_control);
 		is_keypressed = TRUE;
 		g_message ("Key was pressed");	
 	}
 	else{
-	        gst_element_set_state (voice_control_pipeline, GST_STATE_PAUSED);
+	        asr_pause(voice_control);
 		is_keypressed = FALSE;
 		g_message ("Key was released");	
 	}

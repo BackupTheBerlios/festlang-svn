@@ -1,6 +1,3 @@
-uidir 	= $(datadir)/gnome-2.0/ui
-ui_DATA	= GNOME_VoiceControlApplet.xml	
-
 serverdir       = $(libdir)/bonobo/servers
 server_in_files = GNOME_VoiceControlApplet_Factory.server.in
 server_DATA     = $(server_in_files:.server.in=.server)
@@ -17,7 +14,6 @@ $(server_in_files): $(server_in_files).in Makefile
 @INTLTOOL_SERVER_RULE@
 
 EXTRA_DIST =						\
-	GNOME_VoiceControlApplet_Factory.server.in.in	\
-	$(ui_DATA)
+	GNOME_VoiceControlApplet_Factory.server.in.in
 
 CLEANFILES = $(server_in_files) $(server_DATA)

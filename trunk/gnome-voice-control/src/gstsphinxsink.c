@@ -39,7 +39,10 @@
 static char*
 gst_sphinx_get_command () 
 {
-   const gchar* const * language_names = g_get_language_names ();
+   gchar *result;
+
+   // TODO: AT THIS MOMENT GVC ONLY WORKS WITH SPHINX IN ENGLISH 
+   /* Const gchar* const * language_names = g_get_language_names ();
    int i;
 
    gchar *result;
@@ -50,7 +53,7 @@ gst_sphinx_get_command ()
 	gchar *model_path;
 	
 	dict_path = g_strdup_printf (GNOMEDATADIR 
-				     "/gnome-voice-control/desktop-control-%s.dict", 
+				     "/gnome-voice-control/sphinx/desktop-control-%s.dict",
 				     language_names[i]);
 	model_path = g_strdup_printf (POCKETSPHINX_PREFIX 
 				      "/share/pocketsphinx/model/hmm/voxforge-%s/mdef", 
@@ -64,16 +67,16 @@ gst_sphinx_get_command ()
 	}
 	g_free (dict_path);
 	g_free (model_path);
-   }
+   }*/
    
    result = g_strdup_printf ("voice-control "
     "-fwdflat no "
     "-bestpath yes "
     "-dictcase yes "
-    "-hmm " POCKETSPHINX_PREFIX "/share/pocketsphinx/model/hmm/%s%s " 
-    "-fsg " GNOMEDATADIR "/gnome-voice-control/desktop-control.fsg "
-    "-dict " GNOMEDATADIR "/gnome-voice-control/desktop-control-%s.dict ", 
-    lang ? "voxforge-" : "wsj1", lang ? lang : "", lang ? lang : "en");
+    "-hmm " POCKETSPHINX_PREFIX "/share/pocketsphinx/model/hmm/wsj1 " 
+    "-lm " GNOMEDATADIR "/gnome-voice-control/sphinx/desktop-control-en.lm "
+    "-dict " GNOMEDATADIR "/gnome-voice-control/sphinx/desktop-control-en.dict ");
+    //lang ? "voxforge-" : "wsj1", lang ? lang : "", lang ? lang : "en", lang ? lang : "en" )
 
     return result;    
 }
@@ -144,7 +147,7 @@ gst_sphinx_sink_base_init (gpointer g_class)
 static void
 gst_sphinx_sink_finalize (GObject * gobject)
 {
-  GstSphinxSink *sphinxsink = GST_SPHINX_SINK (gobject);
+  GstSphinxSink *sphinxsink = GST_SINK (gobject);
 
   gst_adapter_clear (sphinxsink->adapter);
   g_object_unref (sphinxsink->adapter);
@@ -198,7 +201,7 @@ gst_sphinx_sink_init (GstSphinxSink * sphinxsink, GstSphinxSinkClass * g_class)
 int32 
 gst_sphinx_sink_ad_read(ad_rec_t *ad, int16 *buf, int32 max)
 {
-  GstSphinxSink *sphinxsink = GST_SPHINX_SINK (((GstSphinxSinkAd *)ad)->self);
+  GstSphinxSink *sphinxsink = GST_SINK (((GstSphinxSinkAd *)ad)->self);
 
   memcpy ((void *)buf, gst_adapter_peek (sphinxsink->adapter, REQUIRED_FRAME_BYTES), REQUIRED_FRAME_BYTES);
   
@@ -208,7 +211,7 @@ gst_sphinx_sink_ad_read(ad_rec_t *ad, int16 *buf, int32 max)
 static gboolean
 gst_sphinx_sink_start (GstBaseSink * asink)
 {
-  GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
+  GstSphinxSink *sphinxsink = GST_SINK (asink);
 
   sphinxsink->ad.self = sphinxsink;
   sphinxsink->ad.sps = 16000;
@@ -225,7 +228,7 @@ gst_sphinx_sink_start (GstBaseSink * asink)
 static gboolean
 gst_sphinx_sink_stop (GstBaseSink * asink)
 {
-  GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
+  GstSphinxSink *sphinxsink = GST_SINK (asink);
   
   cont_ad_close (sphinxsink->cont);
   
@@ -275,6 +278,7 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
    	      if ((hyp = ps_get_hyp (sphinxsink->decoder, &score, NULL)) == NULL) {
 	    	
 	    	      gst_sphinx_sink_send_message (sphinxsink, "message", "");
+                      g_message("Not Recognized");
 	      
 	      } else {
 	    	      stripped_hyp = 
@@ -287,6 +291,7 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
 	    	      stripped_hyp [j] = 0;
 	    	      
 	    	      gst_sphinx_sink_send_message (sphinxsink, "message", stripped_hyp);
+                      g_message("Recognized: %s", stripped_hyp);
 	      }
 
 	      sphinxsink->last_ts = 0;
@@ -306,7 +311,7 @@ static void gst_sphinx_sink_process_chunk (GstSphinxSink *sphinxsink)
 
 static GstFlowReturn gst_sphinx_sink_render (GstBaseSink * asink, GstBuffer * buffer)
 {
-  GstSphinxSink *sphinxsink = GST_SPHINX_SINK (asink);
+  GstSphinxSink *sphinxsink = GST_SINK (asink);
 
 #ifdef ENABLE_DEBUG_DUMP
   FILE *dump_fd;
@@ -379,7 +384,7 @@ gst_sphinx_construct_fsg (GstSphinxSink *sink, GSList *phrases)
 	return fsg;
 }
 
-void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *phrases)
+void gst_sphinx_sink_set_grammar (GstSphinxSink *sink, GSList *phrases)
 {	
 	fsg_set_t *fsgs;
 
@@ -389,17 +394,15 @@ void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *phrases)
 	sink->fsg = gst_sphinx_construct_fsg (sink, phrases);
 
         fsgs = ps_get_fsgset(sink->decoder);
-
         fsg_set_remove_byname(fsgs, "desktop-control");
         fsg_set_add(fsgs, fsg_model_name(sink->fsg), sink->fsg);
-        
         if (!fsg_set_select(fsgs, fsg_model_name(sink->fsg))) {
 #if DEBUG
-    	        g_message("Failed to configure grammar");
+	   g_message("Failed to configure grammar");
 #endif
-    		exit(1);
-    	}
-        
+           exit(1);
+        }
+
         ps_update_fsgset (sink->decoder);
 #if DEBUG
 	g_message ("New fsg is set");

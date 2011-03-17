@@ -9,23 +9,35 @@ toolbar items activation, text navigation and many more.
 GnomeVoiceControl Requirements
 ==============================
 
-GStreamer development packages: gstreamer-devel gstreamer-plugins-base-devel
-
- http://gstreamer.freedesktop.org
+- General requirements: 
 
 GNOME development packages: libwnck-dev, libatspi-dev, gnome-panel-dev, startup-notification-devel
 
 GNOME build system: libtool gnome-common intltool
 
  http://gnome.org
+ 
+Ubuntu users can run this command:
+
+  sudo apt-get install libpanel-applet2-0 libgnomeui32 libwnck22 subversion 
+
+  sudo apt-get install libwnck-dev \
+    libatspi-dev libpanel-applet2-dev  libstartup-notification0-dev libtool
+    gnome-common intltool python-all-dev 
+
+
+- With Sphinx (RECOGNIZER="sphinx" in configure.ac):
+
+GStreamer development packages: gstreamer-devel gstreamer-plugins-base-devel
+
+ http://gstreamer.freedesktop.org
 
 Ubuntu users can run this command:
 
-  sudo apt-get install libpanel-applet2-0 libgnomeui32 libgstreamer0.10-0 libwnck22 subversion 
-
-  sudo apt-get install libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev libwnck-dev \
-    libatspi-dev libpanel-applet2-dev  libstartup-notification0-dev libtool
-    gnome-common intltool python-all-dev
+  sudo apt-get install libgstreamer0.10-0 
+  
+  sudo apt-get install libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev 
+  
 
 sphinxbase
 
@@ -34,8 +46,15 @@ sphinxbase
 pocketsphinx
 
  http://downloads.sourceforge.net/cmusphinx/pocketsphinx-0.5.1.tar.bz2 (Stable version)
-
  
+ 
+- With Julius (RECOGNIZER="julius" in configure.ac):
+ 
+julius (4.1.5)
+
+ http://julius.sourceforge.jp/en_index.php
+
+
 Installation
 ============
 
@@ -52,6 +71,22 @@ Or link .server path in /usr/lib:
 Please also note that you must have accessibility enabled. Go to
 Preferences/Acessibility/Assistive Technologies and enable them.
 
+Compiling GVC 0.6
+========================
+
+1º.- Modify configure.ac to select the ASR engine (sets RECOGNIZER variable).
+
+2º.- Compile:
+./autogen.sh --prefix=/usr/
+make
+
+3º.- Install
+sudo make install
+
+
+GVC Start
+============
+
 Once the applet is installed you can add it to the GNOME panel. Right
 click on the panel, select Add to Panel, in the section Miscellaneous
 you will found a icon VoiceControl, add it.
@@ -64,48 +99,74 @@ Listening and in the end of command the notification will appear. If it
 doesn't work or system locks on calibration please check your mixer
 settings and sound recording system setup.
 
-The functions to control windows that we implented are:
+The functions to control windows are:
 
-  - RUN TERMINAL     : open default terminal
-  - RUN BROWSER      : open default web browser
-  - RUN MAIL         : open Evolution
-  - RUN TEXT EDITOR  : open GEdit
-  - CLOSE WINDOW
-  - MAXIMIZE WINDOW
-  - MINIMIZE WINDOW
-  - NEXT WINDOW
+  - RUN TERMINAL             : Open gnome-terminal
+  - RUN BROWSER              : Open Mozilla
+  - RUN MAIL                 : Open Evolution
+  - RUN TEXT EDITOR          : Open GEdit
+  - CLOSE WINDOW             : Close actual window
+  - MAXIMIZE WINDOW          : Maximize actual window
+  - MINIMIZE WINDOW          : Minimize actual window
+  - NEXT WINDOW              : Change to next window
+  - PREVIOSUS WINDOW         : Change to previous window
+  - SWITCH WINDOW            : Switch the window
 
-Mouse and keyboard control should work too:
 
-  - MOUSE RIGHT
-  - MOUSE LEFT
-  - MOUSE UP
-  - MOUSE DOWN
-  - CLICK, RIGHT CLICK
-  - PAGE UP
-  - PAGE DOWN
-  - LEFT
-  - RIGHT
-  etc...
+We can control menus too, but you need to have C locale set. 
+To control the menus you can try something like: 
 
-If you have enabled accessibility you can activate actions. For example
-in GEdit you can try something like:
+  - HELP                     : Help (Help about...)
+  - COPY                     : Copy selected content (Ctrl + C)
+  - CUT                      : Cut selected content (Ctrl + X)
+  - PASTE                    : Paste selected content (Ctrl + V)
+  - SEARCH                   : Open search window
 
-  - FILE .. OPEN 
-  - HELP .. ABOUT
-  - SAVE
-  - PRINT
-  - UNDO
-  - PASTE
-  - FIND
-  - REPLACE
-  - EDIT .. SELECT ALL
+You can control the mouse too. To control the mouse you can try something like:
 
-Languages
+  - CLICK                    : Click on left mouse button
+  - RIGHT CLICK              : Click on right mouse button
+  - MOUSE UP                 : Move mouse up
+  - MOUSE DOWN               : Move mouse down
+  - MOUSE RIGHT              : Move mouse right
+  - MOUSE LEFT               : Move mouse left
+
+You can control the desktop and the system. You can try something like:
+
+  - APPLICATION MENU         : Open the desktop application menu
+  - RUN KEYBOARD             : Open screen keyborad
+  - RUN EVIACAM              : Open webcam mouse emulator (EVIACAM)
+  - HOME FOLDER              : Open home folder
+  - SHOW DESKTOP             : Shows the desktop
+  - LOCK WINDOWS             : Lock system windows
+  - SUSPEND                  : Suspend the system
+  - REBOOT                   : Reboot the system
+  - SHUTDOWN SYSTEM          : Shutdown the system
+  - LOGOUT USER              : Logout actual user
+  - HIBERNATE                : Hibernate the system
+
+You can control the keyboard keys. You can try something like:
+
+  - PAGE UP                  : Page up key
+  - PAGE DOWN                : Page down key
+  - ESCAPE                   : Escape key
+  - BACKSPACE                : Backspace key
+  - DELETE                   : Delete key
+  - INSERT                   : Insert key
+  - HOME                     : Home key
+  - END                      : End key
+  - ENTER                    : Enter key
+  - UP                       : Up key
+  - DOWN                     : Down key
+  - LEFT                     : Left key
+  - RIGHT                    : Right key
+
+
+Sphinx Languages
 =========
 
 We support a number of languages now with http://voxforge.org models. In
-order to use Spanish, German or Russian you need to do the following. 
+order to use Spanish, German or Russian with Sphinx you need to do the following. 
 Download acoustic model for sphinx3 and place it in 
 
 $pocketsphinx_prefix/share/pocketsphinx/model/hmm/voxforge-$LN 
@@ -114,4 +175,13 @@ just beside the wsj1. Check that files in the model folder has the same
 layout as in wsj1. Run applet it your locale, it must automatically
 detect the language. In order to add support for a new language, please
 contact developers. But remember it's a very labour work.
+
+Julius Languages
+=========
+
+We support Spanish and English with Julius. The acustic models (AM) and language models (LM)
+are located in lang subdirectory. You don't need to install any AM or LM 
+
+Spanish acustic model and language model: developed by INTELLIGENT DIALOGUE SYSTEMS S.L (http://www.indisys.es)
+English acustic model and language model: Free Acustic Models of Voxforge (http://www.repository.voxforge1.org/downloads/Main/Tags/Releases/0_1alpha-build541/)
 

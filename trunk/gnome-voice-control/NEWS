@@ -4,6 +4,28 @@ gnome-voice-control 0.4.0
 
 Bug Fixes and Updates
 
+    * Added Julius support (4.1.5).
+    * Added spanish and english Julius dictionaries.
+    * Added spanish and english Julius acustic models.
+    * Added generic ASR interface.
+    * Added Spanish Help documentation.
+    * Change GVC Applet language and acustic model language on-the-fly.
+    * Added new commands.
+    * Updated english and spanish ".po" files.
+    * Fixes.    
+
+Thanks:
+
+    Felipe Ramón Fabresse
+    Diego Martínez Fontiveros
+    Guillermo Pérez García
+
+-------------------------
+gnome-voice-control 0.4.0
+-------------------------
+
+Bug Fixes and Updates
+
     * A lot of fixes related to multithreading
     * Updated to new pocketsphinx API
     * Window mode added for debugging

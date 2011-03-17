@@ -1,0 +1,49 @@
+0	[<s>]	sil
+1	[</s>]	sil
+2	[RUN]	r ah n
+3	[MAIL]	m ey l
+4	[BROWSER]	b r ow z er
+5	[TEXT]	t eh k s t
+6	[EDITOR]	eh d ae t er
+7	[TERMINAL]	t er m ih n ax l
+8	[CLOSE]	k l ow s
+9	[WINDOW]	w ih n d ow
+10	[NEXT]	n eh k s t
+11	[PREVIOUS]	p r iy v ih s
+12	[MINIMIZE]	m iy n ih m ay z
+13	[MAXIMIZE]	m ae k s iy m ay z
+14	[SWITCH]	s w ih ch
+15	[CLICK]	k l ih k
+16	[RIGHT]	r ay t
+17	[PAGE]	p ey jh
+18	[UP]	ah p
+19	[LEFT]	l eh f t
+20	[DOWN]	d aw n
+21	[ESCAPE]	eh s k ey p
+22	[BACKSPACE]	b ae k s p ey s
+23	[DELETE]	d ih l iy t
+24	[INSERT]	ih n s er t
+25	[HOME]	hh ow m
+26	[END]	eh n d
+27	[ENTER]	eh n t er
+28	[COPY]	k aa p iy
+29	[CUT]	k ah t
+30	[PASTE]	p ey s t
+31	[MOUSE]	m ow s
+32	[SHOW]	sh ow
+33	[HELP]	hh eh l p
+34	[MENU]	m eh n y uw
+35	[MAIN]	m ey n
+36	[SUSPEND]	s ax s p eh n d
+37	[KEYBOARD]	k iy b aw r d
+38	[EVIACAM]	iy v iy ax k aa m
+39	[FOLDER]	f ow l d er
+40	[LOCK]	l aa k
+41	[DESKTOP]	d eh s k t ae p
+42	[REBOOT]	r ih b ow t
+43	[SYSTEM]	s ih s t ax m
+44	[SHUTDOWN]	sh uw t d aw n
+45	[LOGOUT]	l ao g ao t
+46	[USER]	y uw z er
+47	[HIBERNATE]	hh iy b er n ey t
+48	[SEARCH]	s er ch

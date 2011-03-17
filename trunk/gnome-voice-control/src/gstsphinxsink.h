@@ -35,16 +35,16 @@
 
 G_BEGIN_DECLS
 
-#define GST_TYPE_SPHINX_SINK \
+#define GST_TYPE_RECOG_SINK \
   (gst_sphinx_sink_get_type())
-#define GST_SPHINX_SINK(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_SPHINX_SINK,GstSphinxSink))
+#define GST_SINK(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_RECOG_SINK,GstSphinxSink))
 #define GST_SPHINX_SINK_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_SPHINX_SINK,GstSphinxSinkClass))
+  (G_TYPE_CHECK_CLASS_CAST((klass),GST_TYPE_RECOG_SINK,GstSphinxSinkClass))
 #define GST_IS_SPHINX_SINK(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_SPHINX_SINK))
+  (G_TYPE_CHECK_INSTANCE_TYPE((obj),GST_TYPE_RECOG_SINK))
 #define GST_IS_SPHINX_SINK_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_SPHINX_SINK))
+  (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_RECOG_SINK))
 #define GST_SPHINX_SINK_CAST(obj) ((GstSphinxSink *)obj)
 
 
@@ -87,7 +87,7 @@ struct _GstSphinxSinkClass {
 
 GType gst_sphinx_sink_get_type (void);
 
-void gst_sphinx_sink_set_fsg (GstSphinxSink *sink, GSList *words);
+void gst_sphinx_sink_set_grammar (GstSphinxSink *sink, GSList *words);
 
 gboolean gst_sphinx_sink_running (GstSphinxSink *sink);
 

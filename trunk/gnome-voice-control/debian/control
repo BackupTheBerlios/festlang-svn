@@ -1,0 +1,19 @@
+Source: gnome-voice-control
+Section: utils
+Priority: optional
+Maintainer: Intelligent Dialogue Systems S.L <info@indisys.es>
+Build-Depends: debhelper (>= 7), autotools-dev
+Standards-Version: 3.8.3
+Homepage: http://live.gnome.org/GnomeVoiceControl
+
+Package: gnome-voice-control
+Version: 0.6julius
+Architecture: any
+Depends: libart-2.0-2 (>= 2.3.18), libatk1.0-0 (>= 1.28.0), libatspi1.0-0 (>= 1.28.1), libbonobo2-0 (>= 2.15.0), libbonoboui2-0 (>= 2.15.1), libc6 (>= 2.3.6-6~), libcairo2 (>= 1.2.4), libfontconfig1 (>= 2.4.0), libfreetype6 (>= 2.2.1), libgconf2-4 (>= 2.27.0), libglib2.0-0 (>= 2.14.0), libgnome2-0 (>= 2.17.3), libgnomecanvas2-0 (>= 2.11.1), libgnomeui-0 (>= 2.22.0), libgnomevfs2-0 (>= 1:2.17.90), libgtk2.0-0 (>= 2.8.0), libice6 (>= 1:1.0.0), liborbit2 (>= 1:2.14.10), libpanel-applet2-0 (>= 2.26.0), libpango1.0-0 (>= 1.14.0), libpopt0 (>= 1.14), libsm6, libwnck22 (>= 2.22.0), libxml2 (>= 2.6.27)
+Description: Speech recognizing applet to control the GNOME Desktop
+ Applet for the GNOME panel which monitors the audio input and makes it
+ possible to control the desktop using voice commands.
+ .
+ Currently it supports basic window management and launching and controlling
+ a limited set of applications.
+Original-Maintainer: Sasa Bodiroza <jazzva@gmail.com>

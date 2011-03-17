@@ -63,6 +63,15 @@
 	  <para role="author">Raphael Nunes da Motta</para>
 	</revdescription>
       </revision>
+      <revision>
+	<revnumber>Version 0.6</revnumber>
+	<date>December 2010</date>
+	<revdescription>
+	  <para role="author">Felipe Ramon Fabresse</para>
+	  <para role="author">Diego Martinez Fontiveros</para>
+	  <para role="author">Guillermo Perez Garcia</para>
+	</revdescription>
+      </revision>      
     </revhistory>
                                                                                                   
     <releaseinfo>This manual describes version &appletversion; of &applet;.
@@ -137,8 +146,7 @@
 
 	  <para>
 	    Click on the Red symbol on panel and choose start control to make the software
-	    work every time or choose keypress control to make the software work only when
-	    a key is pressed.	
+	    work every time.	
    	  </para>
 	
 	  <figure id="gvc_idle-FIG-FIG">
@@ -146,7 +154,7 @@
 	    <screenshot>
 	      <mediaobject>
 	        <imageobject>
-		  <imagedata fileref="/home/ken-ichi/gvc_idle.png" format="PNG"/>
+		  <imagedata fileref="figures/gvc_idle.png" format="PNG"/>
 		</imageobject>
 		<caption>
 		  <para>Shows the application on Idle State</para>
@@ -161,7 +169,7 @@
 	    <screenshot>
 	      <mediaobject>
 	        <imageobject>
-		  <imagedata fileref="/home/ken-ichi/gvc_init-calib.png" format="PNG"/>
+		  <imagedata fileref="figures/gvc_init-calib.png" format="PNG"/>
 		</imageobject>
 		<caption>
 		  <para>Shows the application on Init and Calibrating States</para>
@@ -175,7 +183,7 @@
 	    <screenshot>
 	      <mediaobject>
 	        <imageobject>
-		  <imagedata fileref="/home/ken-ichi/gvc_ready.png" format="PNG"/>
+		  <imagedata fileref="figures/gvc_ready.png" format="PNG"/>
 		</imageobject>
 		<caption>
 		  <para>Shows the application on Ready State</para>
@@ -185,8 +193,7 @@
 	  </figure>		
 
 	  <para>
-	    If you clicked on start control, when the symbol is green you can start to speech.
-	    If you clicked on start keypress control, first of start to speech you need to press a key.	
+	    If you clicked on start control, when the symbol is green you can start to speech.	    
    	  </para>
 
 
@@ -200,7 +207,7 @@
 	    <screenshot>
 	      <mediaobject>
 	        <imageobject>
-		  <imagedata fileref="/home/ken-ichi/gvc_listening.png" format="PNG"/>
+		  <imagedata fileref="figures/gvc_listening.png" format="PNG"/>
 		</imageobject>
 		<caption>
 		  <para>Shows the application on Listening State</para>
@@ -222,46 +229,57 @@
 		<itemizedlist>
 		  <listitem>
 		    <para>
-		  RUN TERMINAL     : Open gnome-terminal
+		  RUN TERMINAL             : Open gnome-terminal
 		    </para>
 		  </listitem>
 		  <listitem>
 		    <para>
-		  RUN BROWSER      : Open Epiphany
+		  RUN BROWSER              : Open Mozilla
 		    </para>
 		  </listitem>
 		  <listitem>
 		    <para>
-		  RUN MAIL         : Open Evolution
+		  RUN MAIL                 : Open Evolution
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  RUN TEXT EDITOR  : Open GEdit
+		  RUN TEXT EDITOR          : Open GEdit
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  CLOSE WINDOW
+		  CLOSE WINDOW             : Close actual window
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  MAXIMIZE WINDOW
+		  MAXIMIZE WINDOW          : Maximize actual window
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  MINIMIZE WINDOW
+		  MINIMIZE WINDOW          : Minimize actual window
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  NEXT WINDOW
+		  NEXT WINDOW              : Change to next window
 		    </para>
 		   </listitem>
+      <listitem>
+		    <para>
+		  PREVIOSUS WINDOW         : Change to previous window
+		    </para>
+		   </listitem>
+      <listitem>
+        <para>
+      SWITCH WINDOW            : Switch the window
+        </para>
+      </listitem>
+      
 
-		</itemizedlist> 		
+    </itemizedlist> 		
 		</para>	
 
 		<para>
@@ -272,76 +290,206 @@
  		  <itemizedlist>
 		  <listitem>
 		    <para>
-		  FILE .. OPEN 
+		  HELP                     : Help (Help about...)
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  HELP .. ABOUT
+		  COPY                     : Copy selected content (Ctrl + C)
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  SAVE
+		  CUT                      : Cut selected content (Ctrl + X)
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  PRINT
+		  PASTE                    : Paste selected content (Ctrl + V)
 		    </para>
 		   </listitem>
-		  <listitem>
+      <listitem>
 		    <para>
-		  UNDO
-		    </para>
-		   </listitem>
-		  <listitem>
-		    <para>
-		  PASTE
+		  SEARCH                   : Open search window
 		    </para>
 		   </listitem>
 		  </itemizedlist>
 		</para>
 
-
-		<para>
+    <para>
 
 		You can control the mouse too. To control the mouse you can try something like:
 
 		  <itemizedlist>
 		  <listitem>
 		    <para>
-		  CLICK
+		  CLICK                    : Click on left mouse button
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  RIGHT CLICK
+		  RIGHT CLICK              : Click on right mouse button
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  MOUSE UP
+		  MOUSE UP                 : Move mouse up
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  MOUSE DOWN
+		  MOUSE DOWN               : Move mouse down
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  MOUSE RIGHT
+		  MOUSE RIGHT              : Move mouse right
 		    </para>
 		   </listitem>
 		  <listitem>
 		    <para>
-		  MOUSE LEFT
+		  MOUSE LEFT               : Move mouse left
 		    </para>
 		   </listitem>
 		  </itemizedlist>
 		</para>
+    
+    <para>
 
+		You can control the desktop and the system. You can try something like:
+
+		  <itemizedlist>
+		  <listitem>
+		    <para>
+		  APPLICATION MENU         : Open the desktop application menu
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  RUN KEYBOARD             : Open screen keyborad
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  RUN EVIACAM              : Open webcam mouse emulator (EVIACAM)
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  HOME FOLDER              : Open home folder
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  SHOW DESKTOP             : Shows the desktop
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  LOCK WINDOWS             : Lock system windows
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  SUSPEND                  : Suspend the system
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  REBOOT                   : Reboot the system
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  SHUTDOWN SYSTEM          : Shutdown the system
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  LOGOUT USER              : Logout actual user
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  HIBERNATE                : Hibernate the system
+		    </para>
+		   </listitem>
+		  </itemizedlist>
+		</para>
+  
+      <para>
+
+		You can control the keyboard keys. You can try something like:
+
+		  <itemizedlist>
+		  <listitem>
+		    <para>
+		  PAGE UP                  : Page up key
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  PAGE DOWN                : Page down key
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  ESCAPE                   : Escape key
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  BACKSPACE                : Backspace key
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  DELETE                   : Delete key
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  INSERT                   : Insert key
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  HOME                     : Home key
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  END                      : End key
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  ENTER                    : Enter key
+		    </para>
+		   </listitem>
+    	<listitem>
+		    <para>
+		  UP                       : Up key
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  DOWN                     : Down key
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  LEFT                     : Left key
+		    </para>
+		   </listitem>
+		  <listitem>
+		    <para>
+		  RIGHT                    : Right key
+		    </para>
+		   </listitem>
+		  </itemizedlist>
+		</para>
+    
  	</sect2>
 
  </sect1>
@@ -355,16 +503,11 @@
 	<para>
 		First of all, please check that sound is actually recorded
 		in your system. If no, try to adjust mixer settings.
-	</para>
-	<para>
-		The applet and SR is quite complex system in the development, so
-		please don't expect much right now.
-	</para>
-
+	</para>	
 	<para>
 		To report any bug you can send to festlang-gvc@lists.berlios.de.
 		You need to be subscribed to send e-mails.
 	</para>
 </sect1>
 
-</article> 
+</article>

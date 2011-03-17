@@ -1,10 +1,9 @@
-languagedir=$(datadir)/gnome-voice-control
+hmmdir=$(datadir)/gnome-voice-control/$(RECOGNIZER)/hmm
+lmdir=$(datadir)/gnome-voice-control/$(RECOGNIZER)/lm
+asrdir=$(datadir)/gnome-voice-control/$(RECOGNIZER)
 
-language_DATA=\
-	desktop-control-de.dict \
-	desktop-control-en.dict \
-	desktop-control-es.dict \
-	desktop-control-ru.dict \
-	desktop-control.fsg
+hmm_DATA=${ASRHMM_DATA}
+lm_DATA=${ASRLM_DATA}
+asr_DATA=${ASR_DATA}
 
-EXTRA_DIST = $(language_DATA)
+EXTRA_DIST = $(asr_DATA) $(hmm_DATA) $(lm_DATA)

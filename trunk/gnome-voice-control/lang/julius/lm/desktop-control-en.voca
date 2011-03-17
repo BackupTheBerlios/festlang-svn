@@ -1,0 +1,147 @@
+% NS_I
+<s> sil
+
+% NS_F
+</s> sil
+
+% RUN
+RUN r ah n
+
+% MAIL
+MAIL m ey l
+
+% BROWSER
+BROWSER b r ow z er
+
+% TEXT
+TEXT t eh k s t
+
+% EDITOR
+
+EDITOR eh d ae t er
+
+% TERMINAL
+TERMINAL t er m ih n ax l
+
+% CLOSE
+CLOSE k l ow s
+
+% WINDOW
+WINDOW w ih n d ow
+
+% NEXT
+NEXT n eh k s t
+
+% PREVIOUS
+PREVIOUS p r iy v ih s
+
+% MINIMIZE
+MINIMIZE m iy n ih m ay z
+
+% MAXIMIZE
+MAXIMIZE m ae k s iy m ay z
+
+% SWITCH
+SWITCH s w ih ch
+
+% CLICK
+CLICK k l ih k
+
+% RIGHT
+RIGHT r ay t
+
+% PAGE
+PAGE p ey jh
+
+% UP
+UP ah p
+
+% LEFT
+LEFT l eh f t
+
+% DOWN
+DOWN d aw n
+
+% ESCAPE
+ESCAPE eh s k ey p
+
+% BACKSPACE
+BACKSPACE b ae k s p ey s
+
+% DELETE
+DELETE d ih l iy t
+
+% INSERT
+INSERT ih n s er t
+
+% HOME
+HOME hh ow m
+
+% END
+END eh n d
+
+% ENTER
+ENTER eh n t er
+
+% COPY
+COPY k aa p iy
+
+% CUT
+CUT k ah t
+
+% PASTE
+PASTE p ey s t
+
+% MOUSE
+MOUSE m ow s
+
+% SHOW
+SHOW sh ow
+
+% HELP
+HELP hh eh l p
+
+% MENU
+MENU m eh n y uw
+
+% MAIN
+MAIN m ey n
+
+% SUSPEND
+SUSPEND s ax s p eh n d
+
+% KEYBOARD
+KEYBOARD k iy b aw r d
+
+% EVIACAM
+EVIACAM iy v iy ax k aa m
+
+% FOLDER
+FOLDER f ow l d er
+
+% LOCK
+LOCK l aa k
+
+% DESKTOP
+DESKTOP d eh s k t ae p
+
+% REBOOT
+REBOOT r ih b ow t
+
+% SYSTEM
+SYSTEM s ih s t ax m
+
+% SHUTDOWN
+SHUTDOWN sh uw t d aw n
+
+% LOGOUT
+LOGOUT l ao g ao t
+
+% USER
+USER y uw z er
+
+% HIBERNATE
+HIBERNATE hh iy b er n ey t
+
+% SEARCH
+SEARCH s er ch

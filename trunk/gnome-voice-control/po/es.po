@@ -25,11 +25,11 @@ msgstr "Fabrica para crear el applet the control por voz"
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:3
 #: ../src/voice-control.c:346
 msgid "VoiceControl"
-msgstr "ControlVoz"
+msgstr "Gnome Voice Control"
 
 #: ../data/GNOME_VoiceControlApplet_Factory.server.in.in.h:4
 msgid "VoiceControl Applet Factory"
-msgstr "Fabrica del Applet de ControlVoz"
+msgstr "Fabrica del Applet de Gnome Voice Control"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:1
 msgid "_About"
@@ -42,6 +42,9 @@ msgstr "_Ayuda"
 #: ../data/GNOME_VoiceControlApplet.xml.h:3
 msgid "_Start Control"
 msgstr "_Iniciar Control"
+
+msgid "_Change Language"
+msgstr "_Cambiar de idioma"
 
 #: ../data/GNOME_VoiceControlApplet.xml.h:4
 msgid "_Start Keypress Control"
@@ -58,7 +61,21 @@ msgstr "Se ha producido un error al desplegar la ayuda: %s"
 
 #: ../src/voice-control.c:148 ../src/voice-control.c:395
 msgid "Idle"
-msgstr "Leerlauf"
+msgstr "Detenido"
+
+msgid "Paused"
+msgstr "Pausado"
+
+msgid "Recognizer paused"
+msgstr "Reconocedor pausado"
+
+#: ../src/voice-control.c:212
+msgid "Error"
+msgstr "Error"
+
+#: ../src/voice-control.c:212
+msgid "Application error, try again later"
+msgstr "Error interno, intentelo de nuevo mas tarde"
 
 #: ../src/voice-control.c:148 ../src/voice-control.c:395
 msgid "Choose Start Control to start"
@@ -112,9 +129,12 @@ msgstr "Applet de Control por Voz para manejar el escritorio por voz"
 msgid "translator-credits"
 msgstr "Mauricio Henriquez <buhochileno@gmail.com>"
 
+msgid "Error loading recognition engine"
+msgstr "Se ha producido un error al iniciar el motor de reconocimiento"
+
 #: ../src/action.c:98
 msgid "RUN MAIL"
-msgstr "ABRIR CORREO"
+msgstr "ABRIR EL CORREO"
 
 #: ../src/action.c:99
 msgid "RUN BROWSER"
@@ -134,7 +154,7 @@ msgstr "CERRAR VENTANA"
 
 #: ../src/action.c:103
 msgid "NEXT WINDOW"
-msgstr "SIGUIENTE VENTANA"
+msgstr "VENTANA SIGUIENTE"
 
 #: ../src/action.c:104
 msgid "PREVIOUS WINDOW"
@@ -150,23 +170,23 @@ msgstr "MAXIMIZAR VENTANA"
 
 #: ../src/action.c:107
 msgid "SWITCH WINDOW"
-msgstr "CAMBIAR VENTANA"
+msgstr "CAMBIAR DE VENTANA"
 
 #: ../src/action.c:108
 msgid "RIGHT CLICK"
-msgstr "CLICK DERECHO"
+msgstr "BOTON DERECHO"
 
 #: ../src/action.c:109
 msgid "CLICK"
 msgstr "CLICK"
 
 #: ../src/action.c:111
-msgid "PAGE UP"
-msgstr "PAGINA ARRIBA"
+msgid "PAGE DOWN"
+msgstr "PAGINA SIGUIENTE"
 
 #: ../src/action.c:112
-msgid "PAGE DOWN"
-msgstr "PAGINA ABAJO"
+msgid "PAGE UP"
+msgstr "PAGINA ANTERIOR"
 
 #: ../src/action.c:113
 msgid "UP"
@@ -190,11 +210,11 @@ msgstr "ESCAPE"
 
 #: ../src/action.c:118
 msgid "BACKSPACE"
-msgstr "BACKSPACE"
+msgstr "BORRAR"
 
 #: ../src/action.c:119
 msgid "DELETE"
-msgstr "BORRAR"
+msgstr "SUPRIMIR"
 
 #: ../src/action.c:120
 msgid "INSERT"
@@ -202,7 +222,7 @@ msgstr "INSERTAR"
 
 #: ../src/action.c:121
 msgid "HOME"
-msgstr "INICIO"
+msgstr "HOME"
 
 #: ../src/action.c:122
 msgid "END"
@@ -226,20 +246,67 @@ msgstr "PEGAR"
 
 #: ../src/action.c:128
 msgid "MOUSE LEFT"
-msgstr "MOUSE IZQUIERDA"
+msgstr "CURSOR IZQUIERDA"
 
 #: ../src/action.c:129
 msgid "MOUSE RIGHT"
-msgstr "MOUSE DERECHA"
+msgstr "CURSOR DERECHA"
 
 #: ../src/action.c:130
 msgid "MOUSE DOWN"
-msgstr "MOUSE ABAJO"
+msgstr "CURSOR ABAJO"
 
 #: ../src/action.c:131
 msgid "MOUSE UP"
-msgstr "MOUSE ARRIBA"
+msgstr "CURSOR ARRIBA"
 
 #: ../src/action.c:134
 msgid "MAIN MENU"
-msgstr "MENU PRINCIPAL"
+msgstr "MENU DE APLICACIONES"
+
+#: ../src/action.c:139
+msgid "SHOW HELP"
+msgstr "AYUDA"
+
+#: ../src/action.c:140
+msgid "SUSPEND"
+msgstr "SUSPENDER"
+
+#: ../src/action.c:141
+msgid "RUN KEYBOARD"
+msgstr "ABRIR TECLADO"
+
+#: ../src/action.c:142
+msgid "RUN EVIACAM"
+msgstr "ABRIR EVIACAM"
+
+#: ../src/action.c:143
+msgid "HOME FOLDER"
+msgstr "CARPETA PERSONAL"
+
+#: ../src/action.c:144
+msgid "LOCK DESKTOP"
+msgstr "BLOQUEAR LA PANTALLA"
+
+#: ../src/action.c:145
+msgid "REBOOT"
+msgstr "REINICIAR EL SISTEMA"
+
+#: ../src/action.c:146
+msgid "SHUTDOWN SYSTEM"
+msgstr "APAGAR EL SISTEMA"
+
+#: ../src/action.c:147
+msgid "LOGOUT USER"
+msgstr "CERRAR SESION"
+
+#: ../src/action.c:148
+msgid "SEARCH"
+msgstr "BUSCAR"
+
+#: ../src/action.c:149
+msgid "SHOW DESKTOP"
+msgstr "MOSTRAR ESCRITORIO"
+
+msgid "HIBERNATE"
+msgstr "HIBERNAR"
